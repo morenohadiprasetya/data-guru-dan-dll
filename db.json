@@ -1,0 +1,23 @@
+{
+  "siswa": [
+    {
+      "id": "0801",
+      "nama": "dafa",
+      "ket": "15 sd"
+    }
+  ],
+  "guru": [
+    {
+      "id": "c338",
+      "nama": "pak amba",
+      "ket": "b inggris"
+    }
+  ],
+  "karyawan": [
+    {
+      "id": "2ddf",
+      "nama": "fadil",
+      "ket": "kantin"
+    }
+  ]
+}
