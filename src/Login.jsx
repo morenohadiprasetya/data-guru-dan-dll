@@ -44,7 +44,7 @@ function Login() {
       setFormData({ email: "", password: "" });
 
       setTimeout(() => {
-        navigate("/sidnav");
+        navigate("/apo");
       }, 1500);
     }
   };
@@ -103,13 +103,7 @@ function Login() {
               Daftar
             </button>
           </p>
-          <button
-            type="button"
-            onClick={() => navigate("/sidnav")}
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 mt-4"
-          >
-            Kembali
-          </button>
+           
         </div>
       </form>
     </div>

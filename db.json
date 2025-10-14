@@ -1,23 +1,22 @@
 {
-  "siswa": [
-    {
-      "id": "0801",
-      "nama": "dafa",
-      "ket": "15 sd"
-    }
-  ],
+  "siswa": [],
   "guru": [
     {
-      "id": "c338",
-      "nama": "pak amba",
-      "ket": "b inggris"
+      "id": "219c",
+      "nama": "ambathukam",
+      "ket": "ambafortika"
+    },
+    {
+      "id": "3e68",
+      "nama": "ccccccccccc",
+      "ket": "cc"
     }
   ],
   "karyawan": [
     {
-      "id": "2ddf",
-      "nama": "fadil",
-      "ket": "kantin"
+      "id": "819c",
+      "nama": "ccccccccccccccccccccccccc",
+      "ket": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
     }
   ]
 }

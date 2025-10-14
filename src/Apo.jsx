@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 
-export default function Apo() {
+ function Apo() {
   const nav = useNavigate();
   const [kategori, setKategori] = useState("Siswa");
   const [data, setData] = useState({
@@ -85,9 +85,7 @@ export default function Apo() {
     <div style={s.page}>
       <div style={s.head}>
         <h2>📋 Data {kategori}</h2>
-        <button onClick={() => nav("/sidnav")} style={s.btnBack}>
-          ← Kembali
-        </button>
+        
       </div>
 
       <select
@@ -177,3 +175,4 @@ const s = {
   btnDel: { background: "#EF4444", color: "#fff", border: 0, borderRadius: 4, padding: "4px 8px" },
   empty: { textAlign: "center", padding: 20, background: "#fff", borderRadius: 8 },
 };
+export default Apo;
