@@ -1,22 +1,5 @@
 {
   "siswa": [],
-  "guru": [
-    {
-      "id": "219c",
-      "nama": "ambathukam",
-      "ket": "ambafortika"
-    },
-    {
-      "id": "3e68",
-      "nama": "ccccccccccc",
-      "ket": "cc"
-    }
-  ],
-  "karyawan": [
-    {
-      "id": "819c",
-      "nama": "ccccccccccccccccccccccccc",
-      "ket": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
-    }
-  ]
+  "guru": [],
+  "karyawan": []
 }

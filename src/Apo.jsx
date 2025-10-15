@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 
- function Apo() {
+function Apo() {
   const nav = useNavigate();
   const [kategori, setKategori] = useState("Siswa");
   const [data, setData] = useState({
@@ -11,10 +11,9 @@ import "sweetalert2/dist/sweetalert2.min.css";
     Guru: [],
     Karyawan: [],
   });
-  const [input, setInput] = useState({ nama: "", ket: "" });
+  const [input, setInput] = useState({ nama: "", ket: "", alamat: "", hp: "" });
   const [edit, setEdit] = useState(null);
 
-   
   useEffect(() => {
     fetch(`http://localhost:5000/${kategori.toLowerCase()}`)
       .then((res) => res.json())
@@ -23,14 +22,13 @@ import "sweetalert2/dist/sweetalert2.min.css";
   }, [kategori]);
 
   const tambah = async () => {
-    if (!input.nama || !input.ket)
-      return Swal.fire("⚠️", "Isi nama & keterangan", "warning");
+    if (!input.nama || !input.ket || !input.alamat || !input.hp)
+      return Swal.fire("⚠️", "Isi semua kolom dulu!", "warning");
 
     const endpoint = `http://localhost:5000/${kategori.toLowerCase()}`;
 
     try {
       if (edit !== null) {
-        
         const item = data[kategori][edit];
         await fetch(`${endpoint}/${item.id}`, {
           method: "PUT",
@@ -39,7 +37,6 @@ import "sweetalert2/dist/sweetalert2.min.css";
         });
         Swal.fire("✅", "Data diubah!", "success");
       } else {
-        
         await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -48,11 +45,10 @@ import "sweetalert2/dist/sweetalert2.min.css";
         Swal.fire("✅", "Data ditambah!", "success");
       }
 
-     
       const res = await fetch(endpoint);
       const newData = await res.json();
       setData({ ...data, [kategori]: newData });
-      setInput({ nama: "", ket: "" });
+      setInput({ nama: "", ket: "", alamat: "", hp: "" });
       setEdit(null);
     } catch (err) {
       console.error(err);
@@ -85,7 +81,6 @@ import "sweetalert2/dist/sweetalert2.min.css";
     <div style={s.page}>
       <div style={s.head}>
         <h2>📋 Data {kategori}</h2>
-        
       </div>
 
       <select
@@ -117,6 +112,18 @@ import "sweetalert2/dist/sweetalert2.min.css";
           onChange={(e) => setInput({ ...input, ket: e.target.value })}
           style={s.inp}
         />
+        <input
+          placeholder="Alamat"
+          value={input.alamat}
+          onChange={(e) => setInput({ ...input, alamat: e.target.value })}
+          style={s.inp}
+        />
+        <input
+          placeholder="Nomor HP"
+          value={input.hp}
+          onChange={(e) => setInput({ ...input, hp: e.target.value })}
+          style={s.inp}
+        />
         <button onClick={tambah} style={s.btnAdd}>
           {edit !== null ? "💾 Simpan" : "➕ Tambah"}
         </button>
@@ -131,6 +138,8 @@ import "sweetalert2/dist/sweetalert2.min.css";
               <div>
                 <b>{d.nama}</b>
                 <p style={{ margin: 0, color: "#555" }}>{d.ket}</p>
+                <p style={{ margin: 0, color: "#555" }}>🏠 {d.alamat}</p>
+                <p style={{ margin: 0, color: "#555" }}>📞 {d.hp}</p>
               </div>
               <div>
                 <button
@@ -155,13 +164,40 @@ import "sweetalert2/dist/sweetalert2.min.css";
 }
 
 const s = {
-  page: { fontFamily: "Segoe UI", padding: 30, background: "#f3f4f6", minHeight: "100vh" },
+  page: {
+    fontFamily: "Segoe UI",
+    padding: 30,
+    background: "#f3f4f6",
+    minHeight: "100vh",
+  },
   head: { display: "flex", justifyContent: "space-between", alignItems: "center" },
-  btnBack: { background: "#ef4444", color: "#fff", border: 0, borderRadius: 6, padding: "6px 12px" },
-  select: { padding: 8, borderRadius: 6, border: "1px solid #ccc", margin: "15px 0" },
-  form: { display: "flex", gap: 8, marginBottom: 15 },
-  inp: { flex: 1, padding: 8, border: "1px solid #ccc", borderRadius: 6 },
-  btnAdd: { background: "#16A34A", color: "#fff", border: 0, borderRadius: 6, padding: "8px 14px" },
+  btnBack: {
+    background: "#ef4444",
+    color: "#fff",
+    border: 0,
+    borderRadius: 6,
+    padding: "6px 12px",
+  },
+  select: {
+    padding: 8,
+    borderRadius: 6,
+    border: "1px solid #ccc",
+    margin: "15px 0",
+  },
+  form: { display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 15 },
+  inp: {
+    flex: "1 1 200px",
+    padding: 8,
+    border: "1px solid #ccc",
+    borderRadius: 6,
+  },
+  btnAdd: {
+    background: "#16A34A",
+    color: "#fff",
+    border: 0,
+    borderRadius: 6,
+    padding: "8px 14px",
+  },
   list: { display: "flex", flexDirection: "column", gap: 8 },
   card: {
     background: "#fff",
@@ -171,8 +207,27 @@ const s = {
     justifyContent: "space-between",
     boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
   },
-  btnEdit: { background: "#F59E0B", color: "#fff", border: 0, borderRadius: 4, padding: "4px 8px", marginRight: 5 },
-  btnDel: { background: "#EF4444", color: "#fff", border: 0, borderRadius: 4, padding: "4px 8px" },
-  empty: { textAlign: "center", padding: 20, background: "#fff", borderRadius: 8 },
+  btnEdit: {
+    background: "#F59E0B",
+    color: "#fff",
+    border: 0,
+    borderRadius: 4,
+    padding: "4px 8px",
+    marginRight: 5,
+  },
+  btnDel: {
+    background: "#EF4444",
+    color: "#fff",
+    border: 0,
+    borderRadius: 4,
+    padding: "4px 8px",
+  },
+  empty: {
+    textAlign: "center",
+    padding: 20,
+    background: "#fff",
+    borderRadius: 8,
+  },
 };
+
 export default Apo;
