@@ -82,12 +82,12 @@ function Apo() {
       <div style={s.head}>
         <h2>📋 Data {kategori}</h2>
       </div>
-
+      {/* ini  */}
       <select
         value={kategori}
         onChange={(e) => setKategori(e.target.value)}
         style={s.select}
-      >
+      > 
         <option>Siswa</option>
         <option>Guru</option>
         <option>Karyawan</option>

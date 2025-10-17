@@ -112,6 +112,16 @@ function Register() {
             style={styles.input}
           />
           {errors.email && <div style={styles.error}>{errors.email}</div>}
+          <label>Buat Username</label>
+          <input
+            type="Username"
+            name="Username"
+            value={formData.Username}
+            onChange={handleChange}
+            placeholder="ketuk untuk mengetik...."
+            style={styles.input}
+          />
+          {errors.Username && <div style={styles.error}>{errors.Username}</div>}
 
           <label>Password</label>
           <input

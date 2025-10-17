@@ -1,5 +1,13 @@
 {
-  "siswa": [],
+  "siswa": [
+    {
+      "id": "e712",
+      "nama": "ggjh",
+      "ket": "ddd",
+      "alamat": "ambssa",
+      "hp": "084528934"
+    }
+  ],
   "guru": [],
   "karyawan": []
 }

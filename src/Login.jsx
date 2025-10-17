@@ -5,6 +5,7 @@ import "animate.css";
 
 function Login() {
   const [formData, setFormData] = useState({
+    username: "",
     email: "",
     password: "",
   });
@@ -18,14 +19,15 @@ function Login() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const newErrors = {};
-
+ 
+    if (!formData.username) newErrors.username = "Username wajib diisi";
     if (!formData.email) newErrors.email = "Email wajib diisi";
     if (!formData.password) newErrors.password = "Password wajib diisi";
 
     setErrors(newErrors);
 
-    if (Object.keys(newErrors).length === 0) {
  
+    if (Object.keys(newErrors).length === 0) {
       Swal.fire({
         position: "center",
         icon: "success",
@@ -41,8 +43,10 @@ function Login() {
         },
       });
 
-      setFormData({ email: "", password: "" });
+       
+      setFormData({ username: "", email: "", password: "" });
 
+      
       setTimeout(() => {
         navigate("/apo");
       }, 1500);
@@ -57,6 +61,22 @@ function Login() {
       >
         <h2 className="text-2xl font-bold text-center mb-4">Login</h2>
 
+      
+        <div className="mb-4">
+          <label className="block mb-1 font-medium">Username</label>
+          <input
+            type="text"
+            name="username"
+            className="w-full border rounded px-3 py-2"
+            value={formData.username}
+            onChange={handleChange}
+          />
+          {errors.username && (
+            <p className="text-red-500 text-sm">{errors.username}</p>
+          )}
+        </div>
+
+     
         <div className="mb-4">
           <label className="block mb-1 font-medium">Email</label>
           <input
@@ -70,7 +90,7 @@ function Login() {
             <p className="text-red-500 text-sm">{errors.email}</p>
           )}
         </div>
-
+ 
         <div className="mb-4">
           <label className="block mb-1 font-medium">Password</label>
           <input
@@ -85,13 +105,15 @@ function Login() {
           )}
         </div>
 
+     
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition duration-200"
         >
           Login
         </button>
 
+    
         <div className="text-center mt-6">
           <p className="text-gray-700">
             Belum punya akun?{" "}
@@ -103,7 +125,6 @@ function Login() {
               Daftar
             </button>
           </p>
-           
         </div>
       </form>
     </div>
