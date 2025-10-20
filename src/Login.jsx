@@ -48,7 +48,7 @@ function Login() {
 
       
       setTimeout(() => {
-        navigate("/apo");
+        navigate("/dash");
       }, 1500);
     }
   };

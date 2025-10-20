@@ -4,6 +4,7 @@ import Login from "./Login";
 import Register from "./Register";
 import Apo from "./Apo";
 import Dashboard from "./Dashboard";
+import Easteregg from "./Easteregg";
 import "./App.css";
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
       >
         <Routes>
           <Route path="/" element={<Login />} />
+          <Route path="/s" element={<Easteregg />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dash" element={<Dashboard />} />
           <Route path="/apo" element={<Apo />} />

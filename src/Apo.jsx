@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 
 function Apo() {
   const nav = useNavigate();
+  const lokasi = useLocation();
+
   const [kategori, setKategori] = useState("Siswa");
   const [data, setData] = useState({
     Siswa: [],
@@ -14,6 +16,19 @@ function Apo() {
   const [input, setInput] = useState({ nama: "", ket: "", alamat: "", hp: "" });
   const [edit, setEdit] = useState(null);
 
+  
+  useEffect(() => {
+    const query = new URLSearchParams(lokasi.search);
+    const kategoriURL = query.get("kategori");
+    if (kategoriURL) {
+      const formatted =
+        kategoriURL.charAt(0).toUpperCase() +
+        kategoriURL.slice(1).toLowerCase();
+      setKategori(formatted);
+    }
+  }, [lokasi.search]);
+
+  
   useEffect(() => {
     fetch(`http://localhost:5000/${kategori.toLowerCase()}`)
       .then((res) => res.json())
@@ -81,13 +96,16 @@ function Apo() {
     <div style={s.page}>
       <div style={s.head}>
         <h2>📋 Data {kategori}</h2>
+        <button onClick={() => nav("/dash")} style={s.btnBack}>
+          ⬅️ Kembali
+        </button>
       </div>
-      {/* ini  */}
+
       <select
         value={kategori}
         onChange={(e) => setKategori(e.target.value)}
         style={s.select}
-      > 
+      >
         <option>Siswa</option>
         <option>Guru</option>
         <option>Karyawan</option>
@@ -159,7 +177,15 @@ function Apo() {
           ))
         )}
       </div>
+       <button
+              type="button"
+              onClick={() => navigate("/s")}
+              className="text-blue-600 underline hover:text-blue-800"
+            >
+              Daftar
+            </button>
     </div>
+    
   );
 }
 
@@ -177,6 +203,7 @@ const s = {
     border: 0,
     borderRadius: 6,
     padding: "6px 12px",
+    cursor: "pointer",
   },
   select: {
     padding: 8,
@@ -197,6 +224,7 @@ const s = {
     border: 0,
     borderRadius: 6,
     padding: "8px 14px",
+    cursor: "pointer",
   },
   list: { display: "flex", flexDirection: "column", gap: 8 },
   card: {
@@ -214,6 +242,7 @@ const s = {
     borderRadius: 4,
     padding: "4px 8px",
     marginRight: 5,
+    cursor: "pointer",
   },
   btnDel: {
     background: "#EF4444",
@@ -221,6 +250,7 @@ const s = {
     border: 0,
     borderRadius: 4,
     padding: "4px 8px",
+    cursor: "pointer",
   },
   empty: {
     textAlign: "center",

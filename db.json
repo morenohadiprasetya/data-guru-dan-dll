@@ -1,13 +1,77 @@
 {
   "siswa": [
     {
-      "id": "e712",
-      "nama": "ggjh",
-      "ket": "ddd",
-      "alamat": "ambssa",
-      "hp": "084528934"
+      "id": "f4c7",
+      "nama": "Renz",
+      "ket": "10 tkj",
+      "alamat": "ngebruk",
+      "hp": "08387729"
+    },
+    {
+      "id": "6223",
+      "nama": "Andre",
+      "ket": "10 X TKJ",
+      "alamat": "Garut",
+      "hp": "08923971"
+    },
+    {
+      "id": "7e7b",
+      "nama": "Ayyas",
+      "ket": "10 X TKJ",
+      "alamat": "Krapyak",
+      "hp": "08238221"
+    },
+    {
+      "id": "408c",
+      "nama": "Darren",
+      "ket": "10 X TKJ",
+      "alamat": "Ksatrean",
+      "hp": "08327838"
+    },
+    {
+      "id": "3268",
+      "nama": "Fadhil",
+      "ket": "15 XI sd",
+      "alamat": "Beringin ",
+      "hp": "0888969"
+    },
+    {
+      "id": "f315",
+      "nama": "Dafa",
+      "ket": "12 Taman kanak kanak",
+      "alamat": "Taman Lele",
+      "hp": "08759293"
+    } 
+  ],
+  "guru": [
+    {
+      "id": "b4cd",
+      "nama": "Pak Renz",
+      "ket": "Ngawinesia",
+      "alamat": "Ngebruk",
+      "hp": "083877290876"
+    },
+    {
+      "id": "c344",
+      "nama": "Pak Andre",
+      "ket": "ngawiformatika",
+      "alamat": "Garot",
+      "hp": "083842381"
+    },
+    {
+      "id": "8f33",
+      "nama": "Pak Ayyas",
+      "ket": "ilmu pengetahuan  ngawi",
+      "alamat": "Krapyak",
+      "hp": "082873823636"
+    },
+    {
+      "id": "a7ff",
+      "nama": "fadhil",
+      "ket": "robotikaambatron",
+      "alamat": "bringen",
+      "hp": "088969"
     }
   ],
-  "guru": [],
   "karyawan": []
 }

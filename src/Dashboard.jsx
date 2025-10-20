@@ -37,7 +37,7 @@ export default function Dashboard() {
         <div style={{ ...s.card, background: "#60A5FA" }}>
           <h3>👨‍🎓 Siswa</h3>
           <p style={s.jumlah}>{jumlah.siswa}</p>
-          <button style={s.btn} onClick={() => nav("/apo?siswa")}>
+          <button style={s.btn} onClick={() => nav("/apo?kategori=siswa")}>
             Lihat Data
           </button>
         </div>
@@ -45,7 +45,7 @@ export default function Dashboard() {
         <div style={{ ...s.card, background: "#34D399" }}>
           <h3>👩‍🏫 Guru</h3>
           <p style={s.jumlah}>{jumlah.guru}</p>
-          <button style={s.btn} onClick={() => nav("/apo?guru")}>
+          <button style={s.btn} onClick={() => nav("/apo?kategori=guru")}>
             Lihat Data
           </button>
         </div>
@@ -53,7 +53,7 @@ export default function Dashboard() {
         <div style={{ ...s.card, background: "#FBBF24" }}>
           <h3>🏢 Karyawan</h3>
           <p style={s.jumlah}>{jumlah.karyawan}</p>
-          <button style={s.btn} onClick={() => nav("/apo?karyawan")}>
+          <button style={s.btn} onClick={() => nav("/apo?kategori=karyawan")}>
             Lihat Data
           </button>
         </div>
