@@ -16,7 +16,6 @@ function Apo() {
   const [input, setInput] = useState({ nama: "", ket: "", alamat: "", hp: "" });
   const [edit, setEdit] = useState(null);
 
-  
   useEffect(() => {
     const query = new URLSearchParams(lokasi.search);
     const kategoriURL = query.get("kategori");
@@ -28,48 +27,12 @@ function Apo() {
     }
   }, [lokasi.search]);
 
-  
   useEffect(() => {
     fetch(`http://localhost:5000/${kategori.toLowerCase()}`)
       .then((res) => res.json())
       .then((res) => setData((prev) => ({ ...prev, [kategori]: res })))
       .catch(() => console.log("Gagal ambil data dari JSON Server"));
   }, [kategori]);
-
-  const tambah = async () => {
-    if (!input.nama || !input.ket || !input.alamat || !input.hp)
-      return Swal.fire("⚠️", "Isi semua kolom dulu!", "warning");
-
-    const endpoint = `http://localhost:5000/${kategori.toLowerCase()}`;
-
-    try {
-      if (edit !== null) {
-        const item = data[kategori][edit];
-        await fetch(`${endpoint}/${item.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(input),
-        });
-        Swal.fire("✅", "Data diubah!", "success");
-      } else {
-        await fetch(endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(input),
-        });
-        Swal.fire("✅", "Data ditambah!", "success");
-      }
-
-      const res = await fetch(endpoint);
-      const newData = await res.json();
-      setData({ ...data, [kategori]: newData });
-      setInput({ nama: "", ket: "", alamat: "", hp: "" });
-      setEdit(null);
-    } catch (err) {
-      console.error(err);
-      Swal.fire("❌", "Gagal menyimpan ke db.json", "error");
-    }
-  };
 
   const hapus = async (i) => {
     const item = data[kategori][i];
@@ -96,9 +59,12 @@ function Apo() {
     <div style={s.page}>
       <div style={s.head}>
         <h2>📋 Data {kategori}</h2>
-        <button onClick={() => nav("/dash")} style={s.btnBack}>
-          ⬅️ Kembali
-        </button>
+        <div>
+          <button onClick={() => nav(`/ta`)} style={s.btnAddPage}>
+            ➕ Tambah Data Baru
+          </button>
+          
+        </div>
       </div>
 
       <select
@@ -141,60 +107,70 @@ function Apo() {
           value={input.hp}
           onChange={(e) => setInput({ ...input, hp: e.target.value })}
           style={s.inp}
-        />
-        <button onClick={tambah} style={s.btnAdd}>
-          {edit !== null ? "💾 Simpan" : "➕ Tambah"}
-        </button>
+        /> 
+        
       </div>
 
-      <div style={s.list}>
+      <div style={s.tableContainer}>
         {data[kategori].length === 0 ? (
           <div style={s.empty}>Belum ada data</div>
         ) : (
-          data[kategori].map((d, i) => (
-            <div key={i} style={s.card}>
-              <div>
-                <b>{d.nama}</b>
-                <p style={{ margin: 0, color: "#555" }}>{d.ket}</p>
-                <p style={{ margin: 0, color: "#555" }}>🏠 {d.alamat}</p>
-                <p style={{ margin: 0, color: "#555" }}>📞 {d.hp}</p>
-              </div>
-              <div>
-                <button
-                  onClick={() => {
-                    setInput(d);
-                    setEdit(i);
-                  }}
-                  style={s.btnEdit}
-                >
-                  ✏️
-                </button>
-                <button onClick={() => hapus(i)} style={s.btnDel}>
-                  🗑️
-                </button>
-              </div>
-            </div>
-          ))
+          <table style={s.table}>
+            <thead>
+              <tr>
+                <th style={s.th}>No</th>
+                <th style={s.th}>Nama</th>
+                <th style={s.th}>
+                  {kategori === "Siswa"
+                    ? "Kelas"
+                    : kategori === "Guru"
+                    ? "Mapel"
+                    : "Jabatan"}
+                </th>
+                <th style={s.th}>Alamat</th>
+                <th style={s.th}>Nomor HP</th>
+                <th style={s.th}>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data[kategori].map((d, i) => (
+                <tr key={i} style={s.tr}>
+                  <td style={s.td}>{i + 1}</td>
+                  <td style={s.td}>{d.nama}</td>
+                  <td style={s.td}>{d.ket}</td>
+                  <td style={s.td}>{d.alamat}</td>
+                  <td style={s.td}>{d.hp}</td>
+                  <td style={s.td}>
+                    <button
+                      onClick={() => {
+                        setInput(d);
+                        setEdit(i);
+                      }}
+                      style={s.btnEdit}
+                    >
+                      ✏️
+                    </button>
+                    <button onClick={() => hapus(i)} style={s.btnDel}>
+                      🗑️
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
-       <button
-              type="button"
-              onClick={() => navigate("/s")}
-              className="text-blue-600 underline hover:text-blue-800"
-            >
-              Daftar
-            </button>
     </div>
-    
   );
 }
 
 const s = {
   page: {
     fontFamily: "Segoe UI",
-    padding: 30,
     background: "#f3f4f6",
     minHeight: "100vh",
+    padding: 30,
+    marginLeft: -225,
   },
   head: { display: "flex", justifyContent: "space-between", alignItems: "center" },
   btnBack: {
@@ -203,6 +179,15 @@ const s = {
     border: 0,
     borderRadius: 6,
     padding: "6px 12px",
+    cursor: "pointer",
+  },
+  btnAddPage: {
+    background: "#3B82F6",
+    color: "#fff",
+    border: 0,
+    borderRadius: 6,
+    padding: "6px 12px",
+    marginRight: 8,
     cursor: "pointer",
   },
   select: {
@@ -218,22 +203,35 @@ const s = {
     border: "1px solid #ccc",
     borderRadius: 6,
   },
-  btnAdd: {
-    background: "#16A34A",
-    color: "#fff",
-    border: 0,
-    borderRadius: 6,
-    padding: "8px 14px",
-    cursor: "pointer",
-  },
-  list: { display: "flex", flexDirection: "column", gap: 8 },
-  card: {
+  tableContainer: {
+    overflowX: "auto",
     background: "#fff",
     borderRadius: 8,
     padding: 10,
-    display: "flex",
-    justifyContent: "space-between",
-    boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+    boxShadow: "0 2px 50px rgba(0,0,0,0.1)",
+  },
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
+  },
+  th: {
+    border: "1px solid #ccc",
+    padding: 8,
+    background: "#f9fafb",
+    textAlign: "left",
+  },
+  td: {
+    border: "1px solid #ccc",
+    padding: 8,
+  },
+  tr: {
+    transition: "background 0.2s",
+  },
+  empty: {
+    textAlign: "center",
+    padding: 20,
+    background: "#fff",
+    borderRadius: 8,
   },
   btnEdit: {
     background: "#F59E0B",
@@ -241,7 +239,7 @@ const s = {
     border: 0,
     borderRadius: 4,
     padding: "4px 8px",
-    marginRight: 5,
+    marginRight: 20,
     cursor: "pointer",
   },
   btnDel: {
@@ -251,12 +249,6 @@ const s = {
     borderRadius: 4,
     padding: "4px 8px",
     cursor: "pointer",
-  },
-  empty: {
-    textAlign: "center",
-    padding: 20,
-    background: "#fff",
-    borderRadius: 8,
   },
 };
 

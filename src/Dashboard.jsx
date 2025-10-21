@@ -68,6 +68,8 @@ const s = {
     background: "#f3f4f6",
     minHeight: "100vh",
     padding: 30,
+    marginLeft: -230,  
+    transition: "margin 0.3s ease",
   },
   title: {
     textAlign: "center",

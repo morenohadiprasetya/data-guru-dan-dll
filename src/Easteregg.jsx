@@ -1,14 +1,16 @@
- import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
- import Kepp from "../public/Kepp.jpg"
+import React from "react";
+import kiw from "../public/kiw.png"; // atau "/Kepp.jpg" kalau di public
 
 const Easteregg = () => {
   return (
-    <div className="">
-<h1 className="text-9xl">rhdtjtgj</h1>
-    <div className="w-100"><img src="Kepp" alt="" /></div>
+    <div className="flex items-center justify-center w-screen h-screen bg-black overflow-hidden">
+      <img
+        src={kiw}
+        alt="Easteregg"
+        className="max-w-full max-h-full object-contain"
+      />
     </div>
-  )
-}
+  );
+};
 
 export default Easteregg;

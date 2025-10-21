@@ -1,21 +1,23 @@
 import { Routes, Route, useLocation } from "react-router-dom";
- import Sidnav from "./sidnav";
+import Sidnav from "./sidnav";
 import Login from "./Login";
 import Register from "./Register";
 import Apo from "./Apo";
 import Dashboard from "./Dashboard";
 import Easteregg from "./Easteregg";
+import TambahData from "./TambahData";
 import "./App.css";
 
 function App() {
   const location = useLocation();
 
- 
-  const hideSidnav = ["/", "/register"];
+  
+  const hideSidnav = ["/", "/register", "/s"];
   const isHideSidnav = hideSidnav.includes(location.pathname);
 
   return (
-    <div style={{ display: "flex" }}> 
+    <div style={{ display: "flex" }}>
+   
       {!isHideSidnav && <Sidnav />}
 
       <div
@@ -28,10 +30,12 @@ function App() {
       >
         <Routes>
           <Route path="/" element={<Login />} />
-          <Route path="/s" element={<Easteregg />} />
+          <Route path="/Ta" element={<TambahData />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dash" element={<Dashboard />} />
           <Route path="/apo" element={<Apo />} />
+         
+          <Route path="/s" element={<Easteregg />} />
         </Routes>
       </div>
     </div>

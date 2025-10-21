@@ -8,6 +8,7 @@ function Register() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    Username: "",
     password: "",
     confirm: "",
   });
@@ -19,9 +20,7 @@ function Register() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const isValidEmail = (email) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
+  const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   async function hashPassword(password) {
     const enc = new TextEncoder();
@@ -37,12 +36,14 @@ function Register() {
     setErrors({});
     setMessage("");
 
-    const { name, email, password, confirm } = formData;
+    const { name, email, Username, password, confirm } = formData;
     let newErrors = {};
 
     if (name.trim().length < 2) newErrors.name = "Nama minimal 2 karakter.";
     if (!isValidEmail(email)) newErrors.email = "Masukkan email yang valid.";
-    if (password.length < 1)
+    if (Username.trim().length < 3)
+      newErrors.Username = "Username minimal 3 karakter.";
+    if (password.length < 6)
       newErrors.password = "Password minimal 6 karakter.";
     if (password !== confirm) newErrors.confirm = "Password tidak cocok.";
 
@@ -64,6 +65,7 @@ function Register() {
     const newUser = {
       id: Date.now(),
       name,
+      Username,
       email,
       passwordHash: hashed,
       createdAt: new Date().toISOString(),
@@ -71,24 +73,22 @@ function Register() {
     users.push(newUser);
     localStorage.setItem(usersKey, JSON.stringify(users));
 
-     
     Swal.fire({
       icon: "success",
       title: "Berhasil daftar!",
       text: "Akun kamu berhasil dibuat.",
       confirmButtonText: "Lanjut",
     }).then(() => {
-      navigate("/"); 
+      navigate("/");
     });
 
-     
-    setFormData({ name: "", email: "", password: "", confirm: "" });
+    setFormData({ name: "", email: "", Username: "", password: "", confirm: "" });
   };
 
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h1 className="text-center font-bold text-1xl  mb-15">Buat akun baru</h1>
+        <h1 className="text-center font-bold text-2xl mb-6">Register</h1>
 
         <form onSubmit={handleSubmit}>
           <label>Nama Lengkap</label>
@@ -97,7 +97,7 @@ function Register() {
             name="name"
             value={formData.name}
             onChange={handleChange}
-            placeholder="masukkan nama"
+            placeholder="Masukkan nama"
             style={styles.input}
           />
           {errors.name && <div style={styles.error}>{errors.name}</div>}
@@ -108,17 +108,18 @@ function Register() {
             name="email"
             value={formData.email}
             onChange={handleChange}
-            placeholder="ketuk untuk mengetik...."
+            placeholder="Masukkan email"
             style={styles.input}
           />
           {errors.email && <div style={styles.error}>{errors.email}</div>}
-          <label>Buat Username</label>
+
+          <label>Username</label>
           <input
-            type="Username"
+            type="text"
             name="Username"
             value={formData.Username}
             onChange={handleChange}
-            placeholder="ketuk untuk mengetik...."
+            placeholder="Masukkan username"
             style={styles.input}
           />
           {errors.Username && <div style={styles.error}>{errors.Username}</div>}
@@ -129,7 +130,7 @@ function Register() {
             name="password"
             value={formData.password}
             onChange={handleChange}
-            placeholder="masukkan password"
+            placeholder="Masukkan password"
             style={styles.input}
           />
           {errors.password && <div style={styles.error}>{errors.password}</div>}
@@ -149,13 +150,21 @@ function Register() {
             Daftar
           </button>
 
-          <button
-            type="button"
-            onClick={() => navigate("/")}
-            style={{ ...styles.button, background: "red", marginTop: 10 }}
-          >
-            Kembali
-          </button>
+          
+
+          
+          <div className="text-center mt-4">
+            <p className="text-gray-700">
+              Sudah punya akun?{" "}
+              <button
+                type="button"
+                onClick={() => navigate("/")}
+                className="text-blue-600 underline hover:text-blue-800"
+              >
+                Login
+              </button>
+            </p>
+          </div>
         </form>
 
         {message && <div style={styles.success}>{message}</div>}
@@ -174,7 +183,7 @@ const styles = {
   },
   card: {
     background: "#fff",
-    padding: 22,
+    padding: 24,
     borderRadius: 12,
     boxShadow: "0 6px 20px rgba(2,6,23,.08)",
     width: 360,
