@@ -1,255 +1,265 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 
 function Apo() {
   const nav = useNavigate();
-  const lokasi = useLocation();
+  const location = useLocation();
+  const query = new URLSearchParams(location.search);
+  const kategori = query.get("kategori") || "Siswa";
 
-  const [kategori, setKategori] = useState("Siswa");
   const [data, setData] = useState({
     Siswa: [],
     Guru: [],
     Karyawan: [],
   });
-  const [input, setInput] = useState({ nama: "", ket: "", alamat: "", hp: "" });
-  const [edit, setEdit] = useState(null);
+
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const query = new URLSearchParams(lokasi.search);
-    const kategoriURL = query.get("kategori");
-    if (kategoriURL) {
-      const formatted =
-        kategoriURL.charAt(0).toUpperCase() +
-        kategoriURL.slice(1).toLowerCase();
-      setKategori(formatted);
-    }
-  }, [lokasi.search]);
-
-  useEffect(() => {
-    fetch(`http://localhost:5000/${kategori.toLowerCase()}`)
-      .then((res) => res.json())
-      .then((res) => setData((prev) => ({ ...prev, [kategori]: res })))
-      .catch(() => console.log("Gagal ambil data dari JSON Server"));
+    fetchData(kategori);
   }, [kategori]);
 
-  const hapus = async (i) => {
-    const item = data[kategori][i];
-    const endpoint = `http://localhost:5000/${kategori.toLowerCase()}`;
+  const fetchData = async (kat) => {
+    try {
+      setLoading(true);
+      const res = await fetch(`http://localhost:5000/${kat.toLowerCase()}`);
+      const hasil = await res.json();
+      setData((prev) => ({ ...prev, [kat]: hasil }));
+    } catch (error) {
+      console.error("Gagal ambil data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    Swal.fire({
-      title: "Hapus data ini?",
+  const handleHapus = async (id) => {
+    const konfirmasi = await Swal.fire({
+      title: "Yakin ingin menghapus?",
+      text: "Data akan dihapus permanen.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Ya",
+      confirmButtonText: "Ya, hapus",
       cancelButtonText: "Batal",
-    }).then(async (r) => {
-      if (r.isConfirmed) {
-        await fetch(`${endpoint}/${item.id}`, { method: "DELETE" });
-        const res = await fetch(endpoint);
-        const newData = await res.json();
-        setData({ ...data, [kategori]: newData });
-        Swal.fire("🗑️", "Data dihapus!", "success");
-      }
     });
+
+    if (konfirmasi.isConfirmed) {
+      await fetch(`http://localhost:5000/${kategori.toLowerCase()}/${id}`, {
+        method: "DELETE",
+      });
+      Swal.fire("Terhapus!", "Data berhasil dihapus", "success");
+      fetchData(kategori);
+    }
   };
 
   return (
-    <div style={s.page}>
-      <div style={s.head}>
-        <h2>📋 Data {kategori}</h2>
-        <div>
-          <button onClick={() => nav(`/ta`)} style={s.btnAddPage}>
-            ➕ Tambah Data Baru
-          </button>
-          
-        </div>
-      </div>
-
-      <select
-        value={kategori}
-        onChange={(e) => setKategori(e.target.value)}
-        style={s.select}
+    <div
+      style={{
+        marginLeft: -220,
+        width: "100%",
+        minHeight: "10vh",
+        padding: "20px 1px",
+        backgroundColor: "#f9fafb",
+        boxSizing: "border-box",
+      }}
+    >
+      <div
+        style={{
+          background: "#fff",
+          borderRadius: 12,
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          padding: 25,
+          border: "1px solid #e5e7eb",
+        }}
       >
-        <option>Siswa</option>
-        <option>Guru</option>
-        <option>Karyawan</option>
-      </select>
+    
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 20,
+          }}
+        >
+          <h2 style={{ color: "#1f2937" }}>📋 Data {kategori}</h2>
 
-      <div style={s.form}>
-        <input
-          placeholder="Nama"
-          value={input.nama}
-          onChange={(e) => setInput({ ...input, nama: e.target.value })}
-          style={s.inp}
-        />
-        <input
-          placeholder={
-            kategori === "Siswa"
-              ? "Kelas"
-              : kategori === "Guru"
-              ? "Mapel"
-              : "Jabatan"
-          }
-          value={input.ket}
-          onChange={(e) => setInput({ ...input, ket: e.target.value })}
-          style={s.inp}
-        />
-        <input
-          placeholder="Alamat"
-          value={input.alamat}
-          onChange={(e) => setInput({ ...input, alamat: e.target.value })}
-          style={s.inp}
-        />
-        <input
-          placeholder="Nomor HP"
-          value={input.hp}
-          onChange={(e) => setInput({ ...input, hp: e.target.value })}
-          style={s.inp}
-        /> 
+          <button
+            onClick={() => nav(`/Ta`)}
+            style={{
+              background: "#2563eb",
+              color: "#fff",
+              border: 0,
+              borderRadius: 8,
+              padding: "10px 16px",
+              fontWeight: 600,
+              cursor: "pointer",
+              transition: "0.2s",
+            }}
+            onMouseOver={(e) => (e.target.style.background = "#1d4ed8")}
+            onMouseOut={(e) => (e.target.style.background = "#2563eb")}
+          >
+            + Tambah Data
+          </button>
+        </div>
+
+       
+        <div style={{ marginBottom: 20 }}>
+          <label style={{ fontWeight: 600, marginRight: 8 }}>Kategori:</label>
+          <select
+            value={kategori}
+            onChange={(e) => nav(`/apo?kategori=${e.target.value}`)}
+            style={{
+              padding: "8px 10px",
+              borderRadius: 8,
+              border: "1px solid #d1d5db",
+              outline: "none",
+            }}
+          >
+            <option value="Siswa">Siswa</option>
+            <option value="Guru">Guru</option>
+            <option value="Karyawan">Karyawan</option>
+          </select>
+        </div>
+
         
-      </div>
-
-      <div style={s.tableContainer}>
-        {data[kategori].length === 0 ? (
-          <div style={s.empty}>Belum ada data</div>
+        {loading ? (
+          <p>Sedang memuat data...</p>
         ) : (
-          <table style={s.table}>
-            <thead>
-              <tr>
-                <th style={s.th}>No</th>
-                <th style={s.th}>Nama</th>
-                <th style={s.th}>
-                  {kategori === "Siswa"
-                    ? "Kelas"
-                    : kategori === "Guru"
-                    ? "Mapel"
-                    : "Jabatan"}
-                </th>
-                <th style={s.th}>Alamat</th>
-                <th style={s.th}>Nomor HP</th>
-                <th style={s.th}>Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data[kategori].map((d, i) => (
-                <tr key={i} style={s.tr}>
-                  <td style={s.td}>{i + 1}</td>
-                  <td style={s.td}>{d.nama}</td>
-                  <td style={s.td}>{d.ket}</td>
-                  <td style={s.td}>{d.alamat}</td>
-                  <td style={s.td}>{d.hp}</td>
-                  <td style={s.td}>
-                    <button
-                      onClick={() => {
-                        setInput(d);
-                        setEdit(i);
-                      }}
-                      style={s.btnEdit}
-                    >
-                      ✏️
-                    </button>
-                    <button onClick={() => hapus(i)} style={s.btnDel}>
-                      🗑️
-                    </button>
-                  </td>
+          <div
+            style={{
+              overflowX: "auto",
+              borderRadius: 8,
+            }}
+          >
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                border: "1px solid #e5e7eb",
+              }}
+            >
+              <thead>
+                <tr style={{ background: "#f3f4f6", textAlign: "left" }}>
+                  <th style={thStyle}>No</th>
+                  <th style={thStyle}>Nama</th>
+                  <th style={thStyle}>
+                    {kategori === "Siswa"
+                      ? "Kelas"
+                      : kategori === "Guru"
+                      ? "Mapel"
+                      : "Jabatan"}
+                  </th>
+                  <th style={thStyle}>Alamat</th>
+                  <th style={thStyle}>No. HP</th>
+                  <th style={thStyle}>Aksi</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody>
+                {data[kategori].length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan="6"
+                      style={{
+                        textAlign: "center",
+                        padding: 20,
+                        border: "1px solid #e5e7eb",
+                        color: "#6b7280",
+                      }}
+                    >
+                      Tidak ada data.
+                    </td>
+                  </tr>
+                ) : (
+                  data[kategori].map((item, index) => (
+                    <tr
+                      key={item.id}
+                      style={{
+                        borderBottom: "1px solid #e5e7eb",
+                        background: index % 2 === 0 ? "#ffffff" : "#f9fafb",
+                      }}
+                    >
+                      <td style={tdStyle}>{index + 1}</td>
+                      <td style={tdStyle}>{item.nama}</td>
+                      <td style={tdStyle}>{item.ket}</td>
+                      <td style={tdStyle}>{item.alamat}</td>
+                      <td style={tdStyle}>{item.hp}</td>
+                      <td style={{ ...tdStyle, textAlign: "center" }}>
+                        <button
+                          onClick={() =>
+                            nav(`/edit?id=${item.id}&kategori=${kategori}`)
+                          }
+                          style={btnEdit}
+                        >
+                          ✏️
+                        </button>
+
+                        <button
+                          onClick={() => handleHapus(item.id)}
+                          style={btnHapus}
+                        >
+                          🗑️
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         )}
+
+      
+        <div style={{ marginTop: 20 }}>
+          <Link
+            to="/s"
+            style={{
+              background: "#ffffffff",
+              color: "#fff",
+              padding: "8px 14px",
+              borderRadius: 8,
+              textDecoration: "none",
+            }}
+          >
+            amba
+          </Link>
+        </div>
       </div>
     </div>
   );
 }
 
-const s = {
-  page: {
-    fontFamily: "Segoe UI",
-    background: "#f3f4f6",
-    minHeight: "100vh",
-    padding: 30,
-    marginLeft: -225,
-  },
-  head: { display: "flex", justifyContent: "space-between", alignItems: "center" },
-  btnBack: {
-    background: "#ef4444",
-    color: "#fff",
-    border: 0,
-    borderRadius: 6,
-    padding: "6px 12px",
-    cursor: "pointer",
-  },
-  btnAddPage: {
-    background: "#3B82F6",
-    color: "#fff",
-    border: 0,
-    borderRadius: 6,
-    padding: "6px 12px",
-    marginRight: 8,
-    cursor: "pointer",
-  },
-  select: {
-    padding: 8,
-    borderRadius: 6,
-    border: "1px solid #ccc",
-    margin: "15px 0",
-  },
-  form: { display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 15 },
-  inp: {
-    flex: "1 1 200px",
-    padding: 8,
-    border: "1px solid #ccc",
-    borderRadius: 6,
-  },
-  tableContainer: {
-    overflowX: "auto",
-    background: "#fff",
-    borderRadius: 8,
-    padding: 10,
-    boxShadow: "0 2px 50px rgba(0,0,0,0.1)",
-  },
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-  },
-  th: {
-    border: "1px solid #ccc",
-    padding: 8,
-    background: "#f9fafb",
-    textAlign: "left",
-  },
-  td: {
-    border: "1px solid #ccc",
-    padding: 8,
-  },
-  tr: {
-    transition: "background 0.2s",
-  },
-  empty: {
-    textAlign: "center",
-    padding: 20,
-    background: "#fff",
-    borderRadius: 8,
-  },
-  btnEdit: {
-    background: "#F59E0B",
-    color: "#fff",
-    border: 0,
-    borderRadius: 4,
-    padding: "4px 8px",
-    marginRight: 20,
-    cursor: "pointer",
-  },
-  btnDel: {
-    background: "#EF4444",
-    color: "#fff",
-    border: 0,
-    borderRadius: 4,
-    padding: "4px 8px",
-    cursor: "pointer",
-  },
+ 
+const thStyle = {
+  border: "1px solid #e5e7eb",
+  padding: "12px 10px",
+  fontWeight: "600",
+  color: "#374151",
+};
+
+const tdStyle = {
+  border: "1px solid #e5e7eb",
+  padding: "10px 10px",
+  color: "#1f2937",
+};
+
+const btnEdit = {
+  background: "#fbbf24",
+  border: 0,
+  borderRadius: 6,
+  padding: "6px 10px",
+  marginRight: 6,
+  cursor: "pointer",
+};
+
+const btnHapus = {
+  background: "#ef4444",
+  border: 0,
+  borderRadius: 6,
+  padding: "6px 10px",
+  color: "#fff",
+  cursor: "pointer",
 };
 
 export default Apo;

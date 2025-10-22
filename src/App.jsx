@@ -6,6 +6,7 @@ import Apo from "./Apo";
 import Dashboard from "./Dashboard";
 import Easteregg from "./Easteregg";
 import TambahData from "./TambahData";
+import Edit from "./Editdata";
 import "./App.css";
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
       >
         <Routes>
           <Route path="/" element={<Login />} />
+          <Route path="/Edit" element={<Edit />} />
           <Route path="/Ta" element={<TambahData />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dash" element={<Dashboard />} />

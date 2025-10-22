@@ -1,18 +1,25 @@
 {
   "siswa": [
     {
-      "id": "6feb",
-      "nama": "amba",
+      "id": "40b9",
+      "nama": "ambatukam",
       "ket": "15 sd",
-      "alamat": "ngebruk",
-      "hp": "0867645"
+      "alamat": "garut",
+      "hp": "0986756"
     },
     {
-      "id": "9bda",
-      "nama": "Nama",
-      "ket": "Kelas",
-      "alamat": "Alamat",
-      "hp": "Nomor HP"
+      "id": "e1bc",
+      "nama": "ambatukam",
+      "ket": "15 sd",
+      "alamat": "garut",
+      "hp": "0986756"
+    },
+    {
+      "id": "d53b",
+      "nama": "ambatukam",
+      "ket": "15 sd",
+      "alamat": "garut",
+      "hp": "0986756"
     }
   ],
   "guru": [

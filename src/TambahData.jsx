@@ -1,162 +1,217 @@
- 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
 
-function TambahData() {
+function Tambah() {
   const nav = useNavigate();
   const lokasi = useLocation();
-  const [kategori, setKategori] = useState("Siswa");
-  const [input, setInput] = useState({
+  const query = new URLSearchParams(lokasi.search);
+  const kategori = query.get("kategori") || "Siswa";
+
+  const [form, setForm] = useState({
     nama: "",
     ket: "",
     alamat: "",
     hp: "",
   });
 
- 
-  const hideSidnav = ["/", "/register"];
-  const isHideSidnav = hideSidnav.includes(lokasi.pathname);
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
-   
-  useEffect(() => {
-    const query = new URLSearchParams(lokasi.search);
-    const kat = query.get("kategori");
-    if (kat) {
-      const formatted =
-        kat.charAt(0).toUpperCase() + kat.slice(1).toLowerCase();
-      setKategori(formatted);
-    }
-  }, [lokasi.search]);
-
-  const simpan = async () => {
-    if (!input.nama || !input.ket || !input.alamat || !input.hp)
-      return Swal.fire("⚠️", "Isi semua kolom dulu!", "warning");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
     const endpoint = `http://localhost:5000/${kategori.toLowerCase()}`;
-    try {
-      await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(input),
-      });
-      Swal.fire("✅", "Data berhasil ditambahkan!", "success").then(() =>
-        nav(`/apo?kategori=${kategori}`)
-      );
-    } catch {
-      Swal.fire("❌", "Gagal menambahkan data!", "error");
+
+    if (!form.nama || !form.ket || !form.alamat || !form.hp) {
+      Swal.fire("⚠️", "Semua kolom harus diisi!", "warning");
+      return;
     }
+
+    await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
+
+    Swal.fire("✅", "Data berhasil ditambahkan!", "success");
+    nav(`/apo?kategori=${kategori}`);
   };
 
   return (
-    <div
-      style={{
-        ...s.container,
-        marginLeft: isHideSidnav ? 0 : -230,  
-      }}
-    >
-      <div style={s.card}>
-        <h2 style={s.title}>Tambah Data {kategori}</h2>
-        <div style={s.form}>
-          <input
-            placeholder="Nama"
-            value={input.nama}
-            onChange={(e) => setInput({ ...input, nama: e.target.value })}
-            style={s.inp}
-          />
-          <input
-            placeholder={
-              kategori === "Siswa"
-                ? "Kelas"
-                : kategori === "Guru"
-                ? "Mapel"
-                : "Jabatan"
-            }
-            value={input.ket}
-            onChange={(e) => setInput({ ...input, ket: e.target.value })}
-            style={s.inp}
-          />
-          <input
-            placeholder="Alamat"
-            value={input.alamat}
-            onChange={(e) => setInput({ ...input, alamat: e.target.value })}
-            style={s.inp}
-          />
-          <input
-            placeholder="Nomor HP"
-            value={input.hp}
-            onChange={(e) => setInput({ ...input, hp: e.target.value })}
-            style={s.inp}
-          />
-          <button onClick={simpan} style={s.btnSave}>
-            💾 Simpan
-          </button>
-          <button
-            onClick={() => nav(`/apo?kategori=${kategori}`)}
-            style={s.btnCancel}
+    <div style={{ padding: 30,  fontFamily: "Segoe UI" }}>
+      <div
+        style={{
+          marginLeft: -200,
+          background: "#fff",
+          borderRadius: 12,
+          boxShadow: "0 9px 8px rgba(0,0,0,0.1)",
+          padding: "25px 40px",
+          maxWidth: 600,
+          margin: "0 auto",
+          border: "1px solid #e5e7eb",
+        }}
+      >
+        <h2 style={{ marginBottom: 25, color: "#1f2937" }}>
+          ➕ Tambah Data {kategori}
+        </h2>
+
+        <form onSubmit={handleSubmit}>
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              marginBottom: 20,
+            }}
           >
-            ⬅️ Batal
-          </button>
-        </div>
+            <tbody>
+              <tr>
+                <td
+                  style={{
+                    padding: "10px",
+                    border: "1px solid #e5e7eb",
+                    width: "30%",
+                    fontWeight: 600,
+                  }}
+                >
+                  Nama
+                </td>
+                <td style={{ border: "1px solid #e5e7eb", padding: "10px" }}>
+                  <input
+                    name="nama"
+                    value={form.nama}
+                    onChange={handleChange}
+                    placeholder="Masukkan nama"
+                    style={{
+                      width: "100%",
+                      border: "1px solid #d1d5db",
+                      borderRadius: 8,
+                      padding: "8px",
+                    }}
+                  />
+                </td>
+              </tr>
+
+              <tr>
+                <td
+                  style={{
+                    padding: "10px",
+                    border: "1px solid #e5e7eb",
+                    fontWeight: 600,
+                  }}
+                >
+                  {kategori === "Siswa"
+                    ? "Kelas"
+                    : kategori === "Guru"
+                    ? "Mapel"
+                    : "Jabatan"}
+                </td>
+                <td style={{ border: "1px solid #e5e7eb", padding: "10px" }}>
+                  <input
+                    name="ket"
+                    value={form.ket}
+                    onChange={handleChange}
+                    placeholder="Masukkan data"
+                    style={{
+                      width: "100%",
+                      border: "1px solid #d1d5db",
+                      borderRadius: 8,
+                      padding: "8px",
+                    }}
+                  />
+                </td>
+              </tr>
+
+              <tr>
+                <td
+                  style={{
+                    padding: "10px",
+                    border: "1px solid #e5e7eb",
+                    fontWeight: 600,
+                  }}
+                >
+                  Alamat
+                </td>
+                <td style={{ border: "1px solid #e5e7eb", padding: "10px" }}>
+                  <input
+                    name="alamat"
+                    value={form.alamat}
+                    onChange={handleChange}
+                    placeholder="Masukkan alamat"
+                    style={{
+                      width: "100%",
+                      border: "1px solid #d1d5db",
+                      borderRadius: 8,
+                      padding: "8px",
+                    }}
+                  />
+                </td>
+              </tr>
+
+              <tr>
+                <td
+                  style={{
+                    padding: "10px",
+                    border: "1px solid #e5e7eb",
+                    fontWeight: 600,
+                  }}
+                >
+                  Nomor HP
+                </td>
+                <td style={{ border: "1px solid #e5e7eb", padding: "10px" }}>
+                  <input
+                    name="hp"
+                    value={form.hp}
+                    onChange={handleChange}
+                    placeholder="Masukkan nomor HP"
+                    style={{
+                      width: "100%",
+                      border: "1px solid #d1d5db",
+                      borderRadius: 8,
+                      padding: "8px",
+                    }}
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div style={{ display: "flex", gap: 10 }}>
+            <button
+              type="submit"
+              style={{
+                background: "#2563eb",
+                color: "#fff",
+                border: 0,
+                borderRadius: 8,
+                padding: "10px 20px",
+                cursor: "pointer",
+                fontWeight: 600,
+              }}
+            >
+              Tambah
+            </button>
+            <button
+              type="button"
+              onClick={() => nav(`/apo?kategori=${kategori}`)}
+              style={{
+                background: "#ef4444",
+                color: "#fff",
+                border: 0,
+                borderRadius: 8,
+                padding: "10px 20px",
+                cursor: "pointer",
+                fontWeight: 600,
+              }}
+            >
+              Batal
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
 }
 
-const s = {
-  container: {
-    background: "#f3f4f6",
-    minHeight: "100vh",
-    padding: "40px 20px",
-    fontFamily: "Segoe UI",
-    transition: "margin 0.3s ease",
-  },
-  card: {
-    background: "#fff",
-    maxWidth: 450,
-    margin: "auto",
-    padding: 30,
-    borderRadius: 10,
-    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-  },
-  title: {
-    textAlign: "center",
-    marginBottom: 20,
-    fontSize: 20,
-    color: "#111827",
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 12,
-  },
-  inp: {
-    padding: 10,
-    borderRadius: 6,
-    border: "1px solid #ccc",
-    fontSize: 15,
-    outline: "none",
-  },
-  btnSave: {
-    background: "#16A34A",
-    color: "#fff",
-    border: "none",
-    padding: 10,
-    borderRadius: 6,
-    cursor: "pointer",
-    fontSize: 15,
-    fontWeight: 600,
-  },
-  btnCancel: {
-    background: "#EF4444",
-    color: "#fff",
-    border: "none",
-    padding: 10,
-    borderRadius: 6,
-    cursor: "pointer",
-    fontSize: 15,
-    fontWeight: 600,
-  },
-};
-
-export default TambahData;
+export default Tambah;
