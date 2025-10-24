@@ -19,12 +19,14 @@ function Apo() {
 
   useEffect(() => {
     fetchData(kategori);
+    console.log("Kategori aktif:", kategori);
   }, [kategori]);
 
   const fetchData = async (kat) => {
     try {
       setLoading(true);
       const res = await fetch(`http://localhost:5000/${kat.toLowerCase()}`);
+      if (!res.ok) throw new Error("Gagal ambil data dari server");
       const hasil = await res.json();
       setData((prev) => ({ ...prev, [kat]: hasil }));
     } catch (error) {
@@ -45,25 +47,36 @@ function Apo() {
     });
 
     if (konfirmasi.isConfirmed) {
-      await fetch(`http://localhost:5000/${kategori.toLowerCase()}/${id}`, {
-        method: "DELETE",
-      });
-      Swal.fire("Terhapus!", "Data berhasil dihapus", "success");
-      fetchData(kategori);
+      try {
+        const res = await fetch(
+          `http://localhost:5000/${kategori.toLowerCase()}/${id}`,
+          {
+            method: "DELETE",
+          }
+        );
+        if (!res.ok) throw new Error("Gagal menghapus");
+        Swal.fire("Terhapus!", "Data berhasil dihapus", "success");
+        fetchData(kategori);
+      } catch (err) {
+        console.error(err);
+        Swal.fire("Gagal", "Tidak dapat menghapus data", "error");
+      }
     }
   };
 
   return (
     <div
-      style={{
-        marginLeft: -220,
-        width: "100%",
-        minHeight: "10vh",
-        padding: "20px 1px",
-        backgroundColor: "#f9fafb",
-        boxSizing: "border-box",
-      }}
-    >
+  style={{
+    marginLeft: -220,
+    marginRight: 22,
+    width: "calc(100% + 220px)",
+    minHeight: "10vh",
+    padding: "20px 1px",
+    backgroundColor: "#f9fafb",
+    boxSizing: "border-box",
+  }}
+>
+  
       <div
         style={{
           background: "#fff",
@@ -73,7 +86,7 @@ function Apo() {
           border: "1px solid #e5e7eb",
         }}
       >
-    
+       
         <div
           style={{
             display: "flex",
@@ -84,8 +97,9 @@ function Apo() {
         >
           <h2 style={{ color: "#1f2937" }}>📋 Data {kategori}</h2>
 
+         
           <button
-            onClick={() => nav(`/Ta`)}
+            onClick={() => nav(`/Ta?kategori=${kategori}`)}
             style={{
               background: "#2563eb",
               color: "#fff",
@@ -103,7 +117,7 @@ function Apo() {
           </button>
         </div>
 
-       
+      
         <div style={{ marginBottom: 20 }}>
           <label style={{ fontWeight: 600, marginRight: 8 }}>Kategori:</label>
           <select
@@ -122,16 +136,11 @@ function Apo() {
           </select>
         </div>
 
-        
+         
         {loading ? (
           <p>Sedang memuat data...</p>
         ) : (
-          <div
-            style={{
-              overflowX: "auto",
-              borderRadius: 8,
-            }}
-          >
+          <div style={{ overflowX: "auto", borderRadius: 8 }}>
             <table
               style={{
                 width: "100%",
@@ -157,7 +166,7 @@ function Apo() {
               </thead>
 
               <tbody>
-                {data[kategori].length === 0 ? (
+                {!data[kategori] || data[kategori].length === 0 ? (
                   <tr>
                     <td
                       colSpan="6"
@@ -174,10 +183,11 @@ function Apo() {
                 ) : (
                   data[kategori].map((item, index) => (
                     <tr
-                      key={item.id}
+                      key={item.id ?? index}
                       style={{
                         borderBottom: "1px solid #e5e7eb",
-                        background: index % 2 === 0 ? "#ffffff" : "#f9fafb",
+                        background:
+                          index % 2 === 0 ? "#ffffff" : "#f9fafb",
                       }}
                     >
                       <td style={tdStyle}>{index + 1}</td>
@@ -194,7 +204,6 @@ function Apo() {
                         >
                           ✏️
                         </button>
-
                         <button
                           onClick={() => handleHapus(item.id)}
                           style={btnHapus}
@@ -209,17 +218,18 @@ function Apo() {
             </table>
           </div>
         )}
-
-      
-        <div style={{ marginTop: 20 }}>
+ 
+        <div style={{ marginTop: 20, textAlign: "center" }}>
           <Link
             to="/s"
             style={{
+              marginRight: 1200,
               background: "#ffffffff",
               color: "#fff",
               padding: "8px 14px",
               borderRadius: 8,
               textDecoration: "none",
+              fontWeight: 500,
             }}
           >
             amba
@@ -230,7 +240,6 @@ function Apo() {
   );
 }
 
- 
 const thStyle = {
   border: "1px solid #e5e7eb",
   padding: "12px 10px",
