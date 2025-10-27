@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
 
 function Register() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
     Username: "",
+    email: "",
     password: "",
     confirm: "",
   });
@@ -36,13 +36,12 @@ function Register() {
     setErrors({});
     setMessage("");
 
-    const { name, email, Username, password, confirm } = formData;
+    const { Username, email, password, confirm } = formData;
     let newErrors = {};
 
-    if (name.trim().length < 2) newErrors.name = "Nama minimal 2 karakter.";
-    if (!isValidEmail(email)) newErrors.email = "Masukkan email yang valid.";
     if (Username.trim().length < 3)
       newErrors.Username = "Username minimal 3 karakter.";
+    if (!isValidEmail(email)) newErrors.email = "Masukkan email yang valid.";
     if (password.length < 6)
       newErrors.password = "Password minimal 6 karakter.";
     if (password !== confirm) newErrors.confirm = "Password tidak cocok.";
@@ -64,7 +63,6 @@ function Register() {
     const hashed = await hashPassword(password);
     const newUser = {
       id: Date.now(),
-      name,
       Username,
       email,
       passwordHash: hashed,
@@ -82,79 +80,85 @@ function Register() {
       navigate("/");
     });
 
-    setFormData({ name: "", email: "", Username: "", password: "", confirm: "" });
+    setFormData({ Username: "", email: "", password: "", confirm: "" });
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h1 className="text-center font-bold text-2xl mb-6">Register</h1>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 px-4">
+      <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full max-w-sm">
+        <h1 className="text-center font-bold text-2xl mb-6 text-gray-800">
+          Register
+        </h1>
 
-        <form onSubmit={handleSubmit}>
-          <label>Nama Lengkap</label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            placeholder="Masukkan nama"
-            style={styles.input}
-          />
-          {errors.name && <div style={styles.error}>{errors.name}</div>}
+        <form onSubmit={handleSubmit} className="space-y-3">
+          {/* Username di atas */}
+          <div>
+            <label className="font-medium text-gray-700">Username</label>
+            <input
+              type="text"
+              name="Username"
+              value={formData.Username}
+              onChange={handleChange}
+              placeholder="Buat username"
+              className="w-full mt-1 p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            />
+            {errors.Username && (
+              <p className="text-red-600 text-sm mt-1">{errors.Username}</p>
+            )}
+          </div>
 
-          <label>Email</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Masukkan email"
-            style={styles.input}
-          />
-          {errors.email && <div style={styles.error}>{errors.email}</div>}
+          <div>
+            <label className="font-medium text-gray-700">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="Masukkan email"
+              className="w-full mt-1 p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            />
+            {errors.email && <p className="text-red-600 text-sm mt-1">{errors.email}</p>}
+          </div>
 
-          <label>Username</label>
-          <input
-            type="text"
-            name="Username"
-            value={formData.Username}
-            onChange={handleChange}
-            placeholder="Masukkan username"
-            style={styles.input}
-          />
-          {errors.Username && <div style={styles.error}>{errors.Username}</div>}
+          <div>
+            <label className="font-medium text-gray-700">Password</label>
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Buat password"
+              className="w-full mt-1 p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            />
+            {errors.password && (
+              <p className="text-red-600 text-sm mt-1">{errors.password}</p>
+            )}
+          </div>
 
-          <label>Password</label>
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="Masukkan password"
-            style={styles.input}
-          />
-          {errors.password && <div style={styles.error}>{errors.password}</div>}
+          <div>
+            <label className="font-medium text-gray-700">Konfirmasi Password</label>
+            <input
+              type="password"
+              name="confirm"
+              value={formData.confirm}
+              onChange={handleChange}
+              placeholder="Ketik ulang password"
+              className="w-full mt-1 p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            />
+            {errors.confirm && (
+              <p className="text-red-600 text-sm mt-1">{errors.confirm}</p>
+            )}
+          </div>
 
-          <label>Konfirmasi Password</label>
-          <input
-            type="password"
-            name="confirm"
-            value={formData.confirm}
-            onChange={handleChange}
-            placeholder="Ketik ulang password"
-            style={styles.input}
-          />
-          {errors.confirm && <div style={styles.error}>{errors.confirm}</div>}
-
-          <button type="submit" style={styles.button}>
+          <button
+            type="submit"
+            className="w-full py-2.5 mt-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+          >
             Daftar
           </button>
 
-          
-
-          
           <div className="text-center mt-4">
-            <p className="text-gray-700">
+            <p className="text-gray-700 text-sm">
               Sudah punya akun?{" "}
               <button
                 type="button"
@@ -167,48 +171,10 @@ function Register() {
           </div>
         </form>
 
-        {message && <div style={styles.success}>{message}</div>}
+        {message && <p className="text-green-700 text-sm mt-3">{message}</p>}
       </div>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    minHeight: "100vh",
-    background: "#f4f7fb",
-  },
-  card: {
-    background: "#fff",
-    padding: 24,
-    borderRadius: 12,
-    boxShadow: "0 6px 20px rgba(2,6,23,.08)",
-    width: 360,
-  },
-  input: {
-    width: "100%",
-    padding: "10px 12px",
-    marginTop: 6,
-    marginBottom: 10,
-    border: "1px solid #e6e9ef",
-    borderRadius: 8,
-  },
-  button: {
-    width: "100%",
-    padding: 10,
-    marginTop: 16,
-    borderRadius: 8,
-    border: "none",
-    background: "#2563eb",
-    color: "white",
-    fontWeight: 600,
-    cursor: "pointer",
-  },
-  error: { color: "#b91c1c", fontSize: 12, marginBottom: 6 },
-  success: { color: "#065f46", fontSize: 13, marginTop: 8 },
-};
 
 export default Register;

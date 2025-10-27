@@ -48,7 +48,7 @@ function Login() {
 
       
       setTimeout(() => {
-        navigate("/dash");
+        navigate("/dashboard");
       }, 1500);
     }
   };

@@ -2,14 +2,14 @@
   "siswa": [
     {
       "id": "e1bc",
-      "nama": " dsfsf",
-      "ket": " ",
-      "alamat": " dsff",
-      "hp": " htyu"
+      "nama": "ayyas",
+      "ket": " 15 smp",
+      "alamat": " ngebrok",
+      "hp": "0864553232"
     },
     {
       "id": "f82e",
-      "nama": "ambatukam",
+      "nama": "andretukam",
       "ket": "15 sd",
       "alamat": "garut",
       "hp": "0867645"
@@ -17,9 +17,44 @@
     {
       "id": "91ae",
       "nama": "ambatukam",
-      "ket": "ssdqc",
-      "alamat": "dcdw",
-      "hp": "cdcwc"
+      "ket": " 15 smp",
+      "alamat": "ngawi",
+      "hp": "0897867544 "
+    },
+    {
+      "id": "ff16",
+      "nama": " ambatuyas",
+      "ket": "15 sd",
+      "alamat": " krapyak",
+      "hp": " 08632321"
+    },
+    {
+      "id": "041e",
+      "nama": "andr",
+      "ket": "12 sd",
+      "alamat": "garut",
+      "hp": "087564563"
+    },
+    {
+      "id": "e034",
+      "nama": "ambatukam",
+      "ket": "15 sd",
+      "alamat": "garut",
+      "hp": "0986756"
+    },
+    {
+      "id": "1fa1",
+      "nama": "ambatukam",
+      "ket": "15 sd",
+      "alamat": "garut",
+      "hp": "0986756"
+    },
+    {
+      "id": "9b01",
+      "nama": "ambatukam",
+      "ket": "15 sd",
+      "alamat": "garut",
+      "hp": "0986756"
     }
   ],
   "guru": [
@@ -52,5 +87,13 @@
       "hp": "088969"
     }
   ],
-  "karyawan": []
+  "karyawan": [
+    {
+      "id": "1cf9",
+      "nama": "andre",
+      "ket": "obhn",
+      "alamat": "garut",
+      "hp": "0986756"
+    }
+  ]
 }

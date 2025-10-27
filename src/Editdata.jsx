@@ -1,237 +1,127 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
-import "sweetalert2/dist/sweetalert2.min.css";
-import "animate.css";
+import "remixicon/fonts/remixicon.css";
 
-function Edit() {
+ 
+
+export default function Edit() {
   const nav = useNavigate();
-  const lokasi = useLocation();
-  const query = new URLSearchParams(lokasi.search);
+  const loc = useLocation();
+  const q = new URLSearchParams(loc.search);
+  const id = q.get("id");
+  const kategori = q.get("kategori") || "Siswa";
 
-  const id = query.get("id");
-  const kategori = query.get("kategori");
-
+  const [form, setForm] = useState({ nama: "", ket: "", alamat: "", hp: "" });
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState({
-    nama: "",
-    ket: "",
-    alamat: "",
-    hp: "",
-  });
+  const [saving, setSaving] = useState(false);
 
-   
   useEffect(() => {
-    if (!id || !kategori) return;
-    const endpoint = `http://localhost:5000/${kategori.toLowerCase()}/${id}`;
-
-    fetch(endpoint)
-      .then((res) => {
-        if (!res.ok) throw new Error("Data tidak ditemukan");
-        return res.json();
-      })
-      .then((res) => {
-        setForm(res);
+    let mounted = true;
+    async function load() {
+      if (!id) {
         setLoading(false);
-      })
-      .catch(() => {
-        Swal.fire({
-          icon: "error",
-          title: "❌",
-          text: "Data tidak ditemukan di server!",
-          confirmButtonColor: "#3B82F6",
-        }).then(() => {
-          nav(`/apo?kategori=${kategori}`);
-        });
-      });
+        return;
+      }
+      try {
+        const resp = await fetch(`http://localhost:5000/${kategori.toLowerCase()}/${id}`);
+        if (!resp.ok) throw new Error("not found");
+        const json = await resp.json();
+        if (!mounted) return;
+        setForm({ nama: json.nama || "", ket: json.ket || "", alamat: json.alamat || "", hp: json.hp || "" });
+      } catch (err) {
+        console.error("Edit load error:", err);
+        Swal.fire({ icon: "error", title: "Data tidak ditemukan" }).then(() => nav(`/Apo?kategori=${kategori}`));
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+    load();
+    return () => (mounted = false);
   }, [id, kategori, nav]);
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  function handleChange(e) {
+    setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
+  }
 
-  const handleSubmit = async (e) => {
+  async function handleSubmit(e) {
     e.preventDefault();
-
-     
     if (!form.nama || !form.ket || !form.alamat || !form.hp) {
-      Swal.fire({
-        title: "⚠️ Kolom Kosong!",
-        text: "Harap isi semua kolom sebelum menyimpan.",
-        icon: "warning",
-        confirmButtonText: "Oke, akan saya isi",
-        confirmButtonColor: "#3B82F6",
-        showClass: {
-          popup: "animate__animated animate__headShake animate__faster",
-        },
-        hideClass: {
-          popup: "animate__animated animate__fadeOutUp animate__faster",
-        },
-      });
+      Swal.fire({ icon: "warning", title: "Semua kolom harus diisi" });
       return;
     }
 
-    
-    Swal.fire({
-      title: "Apakah kamu ingin menyimpan perubahan?",
-      icon: "question",
-      showDenyButton: true,
-      showCancelButton: true,
-      confirmButtonText: "💾 Simpan",
-      denyButtonText: "🚫 Jangan simpan",
-      cancelButtonText: "❌ Batal",
-      confirmButtonColor: "#2563EB",
-      denyButtonColor: "#F59E0B",
-      cancelButtonColor: "#DC2626",
-      showClass: {
-        popup: "animate__animated animate__fadeInDown animate__faster",
-      },
-      hideClass: {
-        popup: "animate__animated animate__fadeOutUp animate__faster",
-      },
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-         
-        const endpoint = `http://localhost:5000/${kategori.toLowerCase()}/${id}`;
-        try {
-          const response = await fetch(endpoint, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(form),
-          });
-
-          if (response.ok) {
-            Swal.fire({
-              icon: "success",
-              title: "✅ Disimpan!",
-              text: "Data berhasil diperbarui.",
-              confirmButtonColor: "#3B82F6",
-              showClass: {
-                popup: "animate__animated animate__fadeInDown animate__faster",
-              },
-              hideClass: {
-                popup: "animate__animated animate__fadeOutUp animate__faster",
-              },
-            }).then(() => {
-              nav(`/apo?kategori=${kategori}`);
-            });
-          } else {
-            throw new Error("Gagal update data");
-          }
-        } catch {
-          Swal.fire({
-            icon: "error",
-            title: "❌ Gagal!",
-            text: "Terjadi kesalahan saat memperbarui data!",
-            confirmButtonColor: "#3B82F6",
-          });
-        }
-      } else if (result.isDenied) {
-        Swal.fire({
-          icon: "info",
-          title: "Perubahan tidak disimpan",
-          text: "Data tetap seperti sebelumnya.",
-          confirmButtonColor: "#3B82F6",
-          showClass: {
-            popup: "animate__animated animate__fadeInDown animate__faster",
-          },
-          hideClass: {
-            popup: "animate__animated animate__fadeOutUp animate__faster",
-          },
-        });
-      }
-    });
-  };
+    try {
+      setSaving(true);
+      const resp = await fetch(`http://localhost:5000/${kategori.toLowerCase()}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!resp.ok) throw new Error("update failed");
+      Swal.fire({ icon: "success", title: "Data diperbarui" }).then(() => nav(`/Apo?kategori=${kategori}`));
+    } catch (err) {
+      console.error(err);
+      Swal.fire({ icon: "error", title: "Gagal memperbarui data" });
+    } finally {
+      setSaving(false);
+    }
+  }
 
   if (loading) {
     return (
-      <div className="p-8 font-[Segoe UI]">
-        <h3>⏳ Sedang memuat data...</h3>
+      <div className="min-h-screen flex items-center justify-center bg-blue-50 p-6">
+        <div className="text-blue-600">⏳ Memuat data...</div>
       </div>
     );
   }
 
   return (
-    <div className="p-8 font-[Segoe UI] min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white rounded-2xl shadow-lg w-full max-w-lg p-8 border border-gray-200 animate__animated animate__fadeIn">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-          ✏️ Edit Data {kategori}
-        </h2>
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div>
-            <label className="font-semibold text-gray-700">Nama</label>
-            <input
-              name="nama"
-              value={form.nama}
-              onChange={handleChange}
-              className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Masukkan nama"
-            />
+    <div className="min-h-screen bg-blue-50 p-6">
+      <div className="max-w-3xl mx-auto">
+        <div className="bg-white rounded-xl p-6 border border-blue-100 shadow">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-blue-900 flex items-center gap-2">
+              <i className="ri-edit-box-line text-yellow-500"></i>
+              Edit Data {kategori}
+            </h2>
+            <button onClick={() => nav(-1)} className="text-sm text-blue-600 bg-blue-50 px-3 py-2 rounded-md">
+              <i className="ri-arrow-left-line"></i> Kembali
+            </button>
           </div>
 
-          <div>
-            <label className="font-semibold text-gray-700">
-              {kategori === "Siswa"
-                ? "Kelas"
-                : kategori === "Guru"
-                ? "Mapel"
-                : "Jabatan"}
-            </label>
-            <input
-              name="ket"
-              value={form.ket}
-              onChange={handleChange}
-              className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder={`Masukkan ${
-                kategori === "Siswa"
-                  ? "kelas"
-                  : kategori === "Guru"
-                  ? "mapel"
-                  : "jabatan"
-              }`}
-            />
-          </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-blue-700 mb-1">Nama</label>
+              <input name="nama" value={form.nama} onChange={handleChange} className="w-full rounded-md border border-blue-200 p-2" />
+            </div>
 
-          <div>
-            <label className="font-semibold text-gray-700">Alamat</label>
-            <input
-              name="alamat"
-              value={form.alamat}
-              onChange={handleChange}
-              className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Masukkan alamat"
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-semibold text-blue-700 mb-1">{kategori === "Siswa" ? "Kelas" : kategori === "Guru" ? "Mapel" : "Jabatan"}</label>
+              <input name="ket" value={form.ket} onChange={handleChange} className="w-full rounded-md border border-blue-200 p-2" />
+            </div>
 
-          <div>
-            <label className="font-semibold text-gray-700">Nomor HP</label>
-            <input
-              name="hp"
-              value={form.hp}
-              onChange={handleChange}
-              className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Masukkan nomor HP"
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-semibold text-blue-700 mb-1">Alamat</label>
+              <input name="alamat" value={form.alamat} onChange={handleChange} className="w-full rounded-md border border-blue-200 p-2" />
+            </div>
 
-          <button
-            type="submit"
-            className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition duration-200"
-          >
-            Simpan Perubahan
-          </button>
+            <div>
+              <label className="block text-sm font-semibold text-blue-700 mb-1">Nomor HP</label>
+              <input name="hp" value={form.hp} onChange={handleChange} className="w-full rounded-md border border-blue-200 p-2" />
+            </div>
 
-          <button
-            type="button"
-            onClick={() => nav(`/apo?kategori=${kategori}`)}
-            className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 rounded-lg transition duration-200"
-          >
-            Batal
-          </button>
-        </form>
+            <div className="flex items-center justify-end gap-3 mt-4">
+              <button type="button" onClick={() => nav(`/Apo?kategori=${kategori}`)} className="px-4 py-2 rounded-md bg-gray-100 text-gray-700">
+                <i className="ri-close-circle-line"></i> Batal
+              </button>
+              <button type="submit" disabled={saving} className="px-4 py-2 rounded-md bg-blue-600 text-white">
+                {saving ? "Menyimpan..." : <><i className="ri-save-3-line"></i> Simpan Perubahan</>}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
 }
-
-export default Edit;

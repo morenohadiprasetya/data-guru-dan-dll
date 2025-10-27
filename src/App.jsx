@@ -2,7 +2,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import Sidnav from "./sidnav";
 import Login from "./Login";
 import Register from "./Register";
-import Apo from "./Apo";
+import Apo from "./Tabeldata";
 import Dashboard from "./Dashboard";
 import Easteregg from "./Easteregg";
 import TambahData from "./TambahData";
@@ -34,8 +34,8 @@ function App() {
           <Route path="/Edit" element={<Edit />} />
           <Route path="/Ta" element={<TambahData />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/dash" element={<Dashboard />} />
-          <Route path="/apo" element={<Apo />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/Apo" element={<Apo />} />
          
           <Route path="/s" element={<Easteregg />} />
         </Routes>
