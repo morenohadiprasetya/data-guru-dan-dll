@@ -89,11 +89,11 @@ export default function Apo() {
   return (
     <div className="min-h-screen p-6 bg-gradient-to-br from-blue-50 to-blue-100">
       <div className="max-w-full mx-auto">
-         
+       
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <h2 className="text-2xl font-bold text-blue-900 flex items-center gap-2">
             <i className="ri-file-list-3-line text-blue-700"></i>
-            Data {kategori}
+           Tabel Data {kategori}
           </h2>
 
           <button
@@ -105,7 +105,7 @@ export default function Apo() {
           </button>
         </div>
 
-       
+        
         <div className="bg-white p-4 rounded-xl shadow-md border border-blue-100 mb-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -135,7 +135,7 @@ export default function Apo() {
           </div>
         </div>
 
-        
+    
         <div className="bg-white p-5 rounded-xl shadow-md border border-blue-100">
           {loading ? (
             <div className="py-12 text-center text-blue-600">⏳ Memuat data...</div>
@@ -143,22 +143,21 @@ export default function Apo() {
             <div className="py-12 text-center text-blue-600">Tidak ada data ditemukan.</div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full text-sm text-blue-900">
+              <table className="min-w-full text-sm text-blue-900 border border-blue-200">
                 <thead className="bg-blue-50 text-blue-800">
-                  
                   <tr>
-                    <th className="p-3 text-left font-bold border-b border-blue-100">No</th>
-                    <th className="p-3 text-left font-bold border-b border-blue-100">Nama</th>
-                    <th className="p-3 text-left font-bold border-b border-blue-100">
+                    <th className="p-3 text-left font-bold border border-blue-200">No</th>
+                    <th className="p-3 text-left font-bold border border-blue-200">Nama</th>
+                    <th className="p-3 text-left font-bold border border-blue-200">
                       {kategori === "Siswa"
                         ? "Kelas"
                         : kategori === "Guru"
                         ? "Mapel"
                         : "Jabatan"}
                     </th>
-                    <th className="p-3 text-left font-semibold border-b border-blue-100">Alamat</th>
-                    <th className="p-3 text-left font-semibold border-b border-blue-100">No HP</th>
-                    <th className="p-3 text-center font-semibold border-b border-blue-100">Aksi</th>
+                    <th className="p-3 text-left font-semibold border border-blue-200">Alamat</th>
+                    <th className="p-3 text-left font-semibold border border-blue-200">No HP</th>
+                    <th className="p-3 text-center font-semibold border border-blue-200">Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -169,12 +168,12 @@ export default function Apo() {
                         idx % 2 === 0 ? "bg-white" : "bg-blue-50"
                       } hover:bg-blue-100`}
                     >
-                      <td className="p-3 border-b border-blue-100">{idx + 1}</td>
-                      <td className="p-3 border-b border-blue-100 font-medium">{item.nama}</td>
-                      <td className="p-3 border-b border-blue-100">{item.ket}</td>
-                      <td className="p-3 border-b border-blue-100">{item.alamat}</td>
-                      <td className="p-3 border-b border-blue-100">{item.hp}</td>
-                      <td className="p-3 border-b border-blue-100 text-center">
+                      <td className="p-3 border border-blue-200">{idx + 1}</td>
+                      <td className="p-3 border border-blue-200 font-medium">{item.nama}</td>
+                      <td className="p-3 border border-blue-200">{item.ket}</td>
+                      <td className="p-3 border border-blue-200">{item.alamat}</td>
+                      <td className="p-3 border border-blue-200">{item.hp}</td>
+                      <td className="p-3 border border-blue-200 text-center">
                         <div className="flex items-center justify-center gap-2">
                           <Link
                             to={`/Edit?id=${item.id}&kategori=${kategori}`}

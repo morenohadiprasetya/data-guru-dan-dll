@@ -4,7 +4,8 @@ import "remixicon/fonts/remixicon.css";
 
 function Sidnav() {
   return (
-    <div className="h-screen w-48 bg-blue-900 text-white flex flex-col justify-between">
+  <div className="fixed top-0 left-0 h-screen w-48 bg-blue-900 text-white flex flex-col justify-between shadow-lg z-50">
+
       <div>
         <h2 className="text-lg font-bold text-center py-4 border-b border-blue-700">
           <i className="ri-menu-line mr-2"></i>MENU

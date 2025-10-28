@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "remixicon/fonts/remixicon.css";
 
- 
 export default function Dashboard() {
   const [siswa, setSiswa] = useState([]);
   const [guru, setGuru] = useState([]);
@@ -15,11 +14,11 @@ export default function Dashboard() {
     async function fetchAll() {
       try {
         setLoading(true);
-         
+
         const [resSiswa, resGuru, resKaryawan] = await Promise.all([
-          fetch("http://localhost:5000/siswa").then((r) => r.ok ? r.json() : []),
-          fetch("http://localhost:5000/guru").then((r) => r.ok ? r.json() : []),
-          fetch("http://localhost:5000/karyawan").then((r) => r.ok ? r.json() : []),
+          fetch("http://localhost:5000/siswa").then((r) => (r.ok ? r.json() : [])),
+          fetch("http://localhost:5000/guru").then((r) => (r.ok ? r.json() : [])),
+          fetch("http://localhost:5000/karyawan").then((r) => (r.ok ? r.json() : [])),
         ]);
 
         if (!mounted) return;
@@ -28,7 +27,6 @@ export default function Dashboard() {
         setKaryawan(Array.isArray(resKaryawan) ? resKaryawan : []);
       } catch (err) {
         console.error("Dashboard fetch error:", err);
-        // fallback: kosongkan arrays
         setSiswa([]);
         setGuru([]);
         setKaryawan([]);
@@ -55,6 +53,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-6">
+       
       <header className="mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -77,26 +76,18 @@ export default function Dashboard() {
               />
               <i className="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-blue-400"></i>
             </div>
+
             <div className="hidden sm:flex items-center gap-2">
-              <div className="text-sm text-blue-800 bg-blue-50 px-3 py-2 rounded-lg border border-blue-100">
-                <span className="font-semibold">{siswa.length}</span>{" "}
-                <span className="text-blue-600/80">Siswa</span>
-              </div>
-              <div className="text-sm text-blue-800 bg-blue-50 px-3 py-2 rounded-lg border border-blue-100">
-                <span className="font-semibold">{guru.length}</span>{" "}
-                <span className="text-blue-600/80">Guru</span>
-              </div>
-              <div className="text-sm text-blue-800 bg-blue-50 px-3 py-2 rounded-lg border border-blue-100">
-                <span className="font-semibold">{karyawan.length}</span>{" "}
-                <span className="text-blue-600/80">Karyawan</span>
-              </div>
+              <InfoBadge count={siswa.length} label="Siswa" />
+              <InfoBadge count={guru.length} label="Guru" />
+              <InfoBadge count={karyawan.length} label="Karyawan" />
             </div>
           </div>
         </div>
       </header>
-
+ 
       <main>
-        
+      
         <section className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
           <StatCard
             title="Siswa"
@@ -121,7 +112,7 @@ export default function Dashboard() {
           />
         </section>
 
-        
+       
         <section className="bg-white border border-blue-100 rounded-xl p-4 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-blue-900 flex items-center gap-2">
@@ -139,28 +130,33 @@ export default function Dashboard() {
             <EmptyState />
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full text-sm">
-                <thead className="bg-blue-50">
+              <table className="min-w-full text-sm text-blue-900 border border-blue-200">
+                <thead className="bg-blue-50 text-blue-800">
                   <tr>
-                    <th className="p-3 text-left font-semibold text-blue-700 border-b border-blue-100">No</th>
-                    <th className="p-3 text-left font-semibold text-blue-700 border-b border-blue-100">Kategori</th>
-                    <th className="p-3 text-left font-semibold text-blue-700 border-b border-blue-100">Nama</th>
-                    <th className="p-3 text-left font-semibold text-blue-700 border-b border-blue-100">Keterangan</th>
-                    <th className="p-3 text-left font-semibold text-blue-700 border-b border-blue-100">Alamat</th>
-                    <th className="p-3 text-left font-semibold text-blue-700 border-b border-blue-100">No HP</th>
+                    <th className="p-3 border border-blue-200 font-bold text-left">No</th>
+                    <th className="p-3 border border-blue-200 font-bold text-left">Kategori</th>
+                    <th className="p-3 border border-blue-200 font-bold text-left">Nama</th>
+                    <th className="p-3 border border-blue-200 font-bold text-left">Keterangan</th>
+                    <th className="p-3 border border-blue-200 font-bold text-left">Alamat</th>
+                    <th className="p-3 border border-blue-200 font-bold text-left">No HP</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filtered.map((d, i) => (
-                    <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-blue-50"}>
-                      <td className="p-3 border-b border-blue-100">{i + 1}</td>
-                      <td className="p-3 border-b border-blue-100">
+                    <tr
+                      key={i}
+                      className={`transition-all duration-150 ${
+                        i % 2 === 0 ? "bg-white" : "bg-blue-50"
+                      } hover:bg-blue-100`}
+                    >
+                      <td className="p-3 border border-blue-200">{i + 1}</td>
+                      <td className="p-3 border border-blue-200">
                         <CategoryPill kategori={d.kategori} />
                       </td>
-                      <td className="p-3 border-b border-blue-100 font-medium">{d.nama}</td>
-                      <td className="p-3 border-b border-blue-100">{d.ket}</td>
-                      <td className="p-3 border-b border-blue-100">{d.alamat}</td>
-                      <td className="p-3 border-b border-blue-100">{d.hp}</td>
+                      <td className="p-3 border border-blue-200 font-medium">{d.nama}</td>
+                      <td className="p-3 border border-blue-200">{d.ket}</td>
+                      <td className="p-3 border border-blue-200">{d.alamat}</td>
+                      <td className="p-3 border border-blue-200">{d.hp}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -173,6 +169,14 @@ export default function Dashboard() {
   );
 }
 
+function InfoBadge({ count, label }) {
+  return (
+    <div className="text-sm text-blue-800 bg-blue-50 px-3 py-2 rounded-lg border border-blue-100">
+      <span className="font-semibold">{count}</span>{" "}
+      <span className="text-blue-600/80">{label}</span>
+    </div>
+  );
+}
 
 function StatCard({ title, value, icon, accent, description }) {
   return (
