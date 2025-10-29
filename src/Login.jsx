@@ -5,8 +5,7 @@ import "animate.css";
 
 function Login() {
   const [formData, setFormData] = useState({
-    username: "",
-    email: "",
+     email: "",
     password: "",
   });
   const [errors, setErrors] = useState({});
@@ -19,22 +18,22 @@ function Login() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const newErrors = {};
- 
-    if (!formData.username) newErrors.username = "Username wajib diisi";
-    if (!formData.email) newErrors.email = "Email wajib diisi";
+
+     if (!formData.email) newErrors.email = "Email wajib diisi";
     if (!formData.password) newErrors.password = "Password wajib diisi";
 
     setErrors(newErrors);
 
- 
     if (Object.keys(newErrors).length === 0) {
+      // Tampilkan SweetAlert sukses
       Swal.fire({
-        position: "center",
-        icon: "success",
         title: "Login berhasil!",
+        text: "Selamat datang di dashboard.",
+        icon: "success",
         showConfirmButton: false,
         timer: 1500,
         timerProgressBar: true,
+        position: "center",
         showClass: {
           popup: "animate__animated animate__fadeInDown",
         },
@@ -43,14 +42,18 @@ function Login() {
         },
       });
 
-       
-      setFormData({ username: "", email: "", password: "" });
+      // Reset form
+      setFormData({ email: "", password: "" });
 
-      
+      // Pindah halaman setelah 1.5 detik
       setTimeout(() => {
         navigate("/dashboard");
       }, 1500);
     }
+  };
+
+  const handleDirectToWeb = () => {
+    navigate("/Apo?kategori=Siswa");
   };
 
   return (
@@ -59,24 +62,21 @@ function Login() {
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-lg shadow-md w-96"
       >
+        {/* Tombol ke web Apo */}
+        <button
+          type="button"
+          onClick={handleDirectToWeb}
+          className="text-white py-2"
+        >
+          M
+        </button>
+
         <h2 className="text-2xl font-bold text-center mb-4">Login</h2>
 
-      
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">Username</label>
-          <input
-            type="text"
-            name="username"
-            className="w-full border rounded px-3 py-2"
-            value={formData.username}
-            onChange={handleChange}
-          />
-          {errors.username && (
-            <p className="text-red-500 text-sm">{errors.username}</p>
-          )}
-        </div>
+        {/* Username */}
+         
 
-     
+        {/* Email */}
         <div className="mb-4">
           <label className="block mb-1 font-medium">Email</label>
           <input
@@ -90,7 +90,8 @@ function Login() {
             <p className="text-red-500 text-sm">{errors.email}</p>
           )}
         </div>
- 
+
+        {/* Password */}
         <div className="mb-4">
           <label className="block mb-1 font-medium">Password</label>
           <input
@@ -105,7 +106,7 @@ function Login() {
           )}
         </div>
 
-     
+        {/* Tombol login dengan SweetAlert */}
         <button
           type="submit"
           className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition duration-200"
@@ -113,7 +114,7 @@ function Login() {
           Login
         </button>
 
-    
+        {/* Link ke halaman register */}
         <div className="text-center mt-6">
           <p className="text-gray-700">
             Belum punya akun?{" "}
