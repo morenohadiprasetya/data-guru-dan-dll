@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import "remixicon/fonts/remixicon.css";
 import "animate.css";
 
-function Sidnav() {
+export default function Sidnav() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -34,7 +34,7 @@ function Sidnav() {
           timerProgressBar: true,
         });
         setTimeout(() => {
-          navigate("/"); // arahkan ke halaman login
+          navigate("/");
         }, 1500);
       }
     });
@@ -43,16 +43,17 @@ function Sidnav() {
   return (
     <div className="fixed top-0 left-0 h-screen w-48 bg-blue-900 text-white flex flex-col justify-between shadow-lg z-50">
       <div>
-        
-          <h2 className="text-lg font-bold text-center py-4 border-b border-blue-700"
-          onClick={() => navigate("/")}>
-            <i className="ri-menu-line mr-2"></i>MENU
-          </h2>
-         
-        <nav className="flex flex-col mt-4 space-y-2 px-4">
+        <h2
+          className="text-lg font-bold text-center py-4 border-b border-blue-700 cursor-pointer hover:bg-blue-800 transition"
+          onClick={() => navigate("/")}
+        >
+          <i className="ri-menu-line mr-2"></i>MENU
+        </h2>
+
+        <nav className="flex flex-col mt-4 space-y-2 px-3">
           <Link
             to="/Dashboard"
-            className="flex items-center gap-2 hover:bg-blue-800 rounded-md px-3 py-2 transition"
+            className="flex items-center gap-2 bg-blue-800 hover:bg-blue-700 rounded-md px-3 py-2 transition"
           >
             <i className="ri-dashboard-3-line text-xl"></i>
             Dashboard
@@ -61,8 +62,15 @@ function Sidnav() {
             to="/Apo"
             className="flex items-center gap-2 hover:bg-blue-800 rounded-md px-3 py-2 transition"
           >
-            <i className="ri-table-line text-xl"></i>
-            Tabel Data
+            <i className="ri-database-2-line text-xl"></i>
+            Database
+          </Link>
+          <Link
+            to="/Keuangan"
+            className="flex items-center gap-2 hover:bg-blue-800 rounded-md px-3 py-2 transition"
+          >
+            <i className="ri-money-dollar-circle-line text-xl"></i>
+            Keuangan
           </Link>
         </nav>
       </div>
@@ -79,5 +87,3 @@ function Sidnav() {
     </div>
   );
 }
-
-export default Sidnav;

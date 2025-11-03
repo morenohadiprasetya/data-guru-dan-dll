@@ -1,221 +1,165 @@
 import React, { useEffect, useState } from "react";
+import Sidnav from "./Sidnav";
+import { useNavigate } from "react-router-dom";
 import "remixicon/fonts/remixicon.css";
 
 export default function Dashboard() {
-  const [siswa, setSiswa] = useState([]);
-  const [guru, setGuru] = useState([]);
-  const [karyawan, setKaryawan] = useState([]);
+  const nav = useNavigate();
+  const [data, setData] = useState({
+    siswa: [],
+    guru: [],
+    karyawan: [],
+  });
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
 
   useEffect(() => {
     let mounted = true;
-
     async function fetchAll() {
       try {
         setLoading(true);
-
         const [resSiswa, resGuru, resKaryawan] = await Promise.all([
           fetch("http://localhost:5000/siswa").then((r) => (r.ok ? r.json() : [])),
           fetch("http://localhost:5000/guru").then((r) => (r.ok ? r.json() : [])),
           fetch("http://localhost:5000/karyawan").then((r) => (r.ok ? r.json() : [])),
         ]);
-
         if (!mounted) return;
-        setSiswa(Array.isArray(resSiswa) ? resSiswa : []);
-        setGuru(Array.isArray(resGuru) ? resGuru : []);
-        setKaryawan(Array.isArray(resKaryawan) ? resKaryawan : []);
+        setData({
+          siswa: Array.isArray(resSiswa) ? resSiswa : [],
+          guru: Array.isArray(resGuru) ? resGuru : [],
+          karyawan: Array.isArray(resKaryawan) ? resKaryawan : [],
+        });
       } catch (err) {
-        console.error("Dashboard fetch error:", err);
-        setSiswa([]);
-        setGuru([]);
-        setKaryawan([]);
+        console.error("Fetch dashboard error:", err);
       } finally {
         if (mounted) setLoading(false);
       }
     }
-
     fetchAll();
     return () => (mounted = false);
   }, []);
 
-  const semuaData = [
-    ...siswa.map((it) => ({ ...it, kategori: "Siswa" })),
-    ...guru.map((it) => ({ ...it, kategori: "Guru" })),
-    ...karyawan.map((it) => ({ ...it, kategori: "Karyawan" })),
+  const stats = [
+    { title: "Total Siswa", value: data.siswa.length, icon: "ri-user-3-line", color: "from-blue-500 to-blue-600" },
+    { title: "Total Guru", value: data.guru.length, icon: "ri-user-star-line", color: "from-indigo-500 to-indigo-600" },
+    { title: "Total Karyawan", value: data.karyawan.length, icon: "ri-building-4-line", color: "from-emerald-500 to-emerald-600" },
+    { title: "Total Tagihan", value: 0, icon: "ri-wallet-3-line", color: "from-yellow-500 to-yellow-600" },
+    { title: "Total Lunas", value: 0, icon: "ri-check-double-line", color: "from-green-500 to-green-600" },
+    { title: "Total Belum Lunas", value: 0, icon: "ri-close-circle-line", color: "from-red-500 to-red-600" },
   ];
 
-  const filtered = semuaData.filter((d) =>
-    `${d.nama ?? ""} ${d.ket ?? ""} ${d.alamat ?? ""} ${d.hp ?? ""} ${d.kategori ?? ""}`
-      .toLowerCase()
-      .includes(search.trim().toLowerCase())
-  );
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-6">
-       
-      <header className="mb-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-blue-900 flex items-center gap-3">
-              <i className="ri-bar-chart-2-line text-2xl text-blue-600"></i>
-              Dashboard Sekolah
-            </h1>
-            <p className="text-sm text-blue-700/80 mt-1">
-              Ringkasan cepat jumlah dan daftar semua entitas di sistem.
-            </p>
-          </div>
+    <div className="flex ">
+      <Sidnav />
 
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Cari nama, kelas, atau nomor..."
-                className="pl-10 pr-4 py-2 rounded-lg border border-blue-200 focus:ring-2 focus:ring-blue-300 focus:outline-none w-64 bg-white"
-              />
-              <i className="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-blue-400"></i>
-            </div>
-
-            <div className="hidden sm:flex items-center gap-2">
-              <InfoBadge count={siswa.length} label="Siswa" />
-              <InfoBadge count={guru.length} label="Guru" />
-              <InfoBadge count={karyawan.length} label="Karyawan" />
-            </div>
-          </div>
-        </div>
-      </header>
- 
-      <main>
       
-        <section className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
-          <StatCard
-            title="Siswa"
-            value={siswa.length}
-            icon="ri-user-3-line"
-            accent="from-blue-500 to-blue-600"
-            description="Jumlah terdaftar"
-          />
-          <StatCard
-            title="Guru"
-            value={guru.length}
-            icon="ri-user-star-line"
-            accent="from-indigo-500 to-indigo-600"
-            description="Pengajar aktif"
-          />
-          <StatCard
-            title="Karyawan"
-            value={karyawan.length}
-            icon="ri-building-4-line"
-            accent="from-emerald-500 to-emerald-600"
-            description="Staf & admin"
-          />
-        </section>
+      <div className="flex-1 ml-48 p-1 bg-gradient-to-b from-blue-50 to-white min-h-screen">
+        <h1 className="text-3xl font-extrabold text-blue-300 mb-6 flex items-center gap-2">
+          <i className="ri-dashboard-3-line text-blue-700"></i> Dashboard Sekolah
+        </h1>
+
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
+          {stats.map((s, i) => (
+            <div
+              key={i}
+              className={`rounded-xl p-5 shadow bg-gradient-to-br ${s.color} text-white flex items-center gap-4`}
+            >
+              <div className="p-3 mr-1 bg-white/20 rounded-lg">
+                <i className={`${s.icon} text-2xl`}></i>
+              </div>
+              <div>
+                <p className="text-sm font-medium">{s.title}</p>
+                <h2 className="text-2xl font-extrabold">{loading ? "..." : s.value}</h2>
+              </div>
+            </div>
+          ))}
+        </div>
 
        
-        <section className="bg-white border border-blue-100 rounded-xl p-4 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-blue-900 flex items-center gap-2">
-              <i className="ri-file-list-3-line text-blue-600"></i> Semua Data
-            </h3>
-            <p className="text-sm text-blue-600/80">
-              Menampilkan <span className="font-semibold">{filtered.length}</span> dari{" "}
-              <span className="font-semibold">{semuaData.length}</span> entri
-            </p>
-          </div>
-
-          {loading ? (
-            <div className="py-12 text-center text-blue-600">⏳ Memuat data...</div>
-          ) : filtered.length === 0 ? (
-            <EmptyState />
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-sm text-blue-900 border border-blue-200">
-                <thead className="bg-blue-50 text-blue-800">
-                  <tr>
-                    <th className="p-3 border border-blue-200 font-bold text-left">No</th>
-                    <th className="p-3 border border-blue-200 font-bold text-left">Kategori</th>
-                    <th className="p-3 border border-blue-200 font-bold text-left">Nama</th>
-                    <th className="p-3 border border-blue-200 font-bold text-left">Keterangan</th>
-                    <th className="p-3 border border-blue-200 font-bold text-left">Alamat</th>
-                    <th className="p-3 border border-blue-200 font-bold text-left">No HP</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((d, i) => (
-                    <tr
-                      key={i}
-                      className={`transition-all duration-150 ${
-                        i % 2 === 0 ? "bg-white" : "bg-blue-50"
-                      } hover:bg-blue-100`}
-                    >
-                      <td className="p-3 border border-blue-200">{i + 1}</td>
-                      <td className="p-3 border border-blue-200">
-                        <CategoryPill kategori={d.kategori} />
-                      </td>
-                      <td className="p-3 border border-blue-200 font-medium">{d.nama}</td>
-                      <td className="p-3 border border-blue-200">{d.ket}</td>
-                      <td className="p-3 border border-blue-200">{d.alamat}</td>
-                      <td className="p-3 border border-blue-200">{d.hp}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </section>
-      </main>
-    </div>
-  );
-}
-
-function InfoBadge({ count, label }) {
-  return (
-    <div className="text-sm text-blue-800 bg-blue-50 px-3 py-2 rounded-lg border border-blue-100">
-      <span className="font-semibold">{count}</span>{" "}
-      <span className="text-blue-600/80">{label}</span>
-    </div>
-  );
-}
-
-function StatCard({ title, value, icon, accent, description }) {
-  return (
-    <div className="rounded-xl p-4 shadow-sm bg-gradient-to-r from-white to-white border border-blue-50">
-      <div className="flex items-center gap-4">
-        <div
-          className={`p-3 rounded-lg bg-gradient-to-br ${accent} text-white shadow-md`}
-          style={{ minWidth: 64, minHeight: 64 }}
-        >
-          <i className={`${icon} text-2xl`}></i>
-        </div>
-        <div>
-          <p className="text-sm text-blue-600 font-semibold">{title}</p>
-          <h4 className="text-2xl font-extrabold text-blue-900">{value}</h4>
-          <p className="text-xs text-blue-500 mt-1">{description}</p>
+        <div className="space-y-8">
+          <DataPreview
+            title="Data Siswa"
+            data={data.siswa}
+            kategori="Siswa"
+            loading={loading}
+            onSelengkapnya={() => nav("/Apo?kategori=Siswa")}
+          />
+          <DataPreview
+            title="Data Guru"
+            data={data.guru}
+            kategori="Guru"
+            loading={loading}
+            onSelengkapnya={() => nav("/Apo?kategori=Guru")}
+          />
+          <DataPreview
+            title="Data Karyawan"
+            data={data.karyawan}
+            kategori="Karyawan"
+            loading={loading}
+            onSelengkapnya={() => nav("/Apo?kategori=Karyawan")}
+          />
         </div>
       </div>
     </div>
   );
 }
 
-function CategoryPill({ kategori }) {
-  const map = {
-    Siswa: "bg-blue-600/10 text-blue-700 border-blue-100",
-    Guru: "bg-indigo-600/10 text-indigo-700 border-indigo-100",
-    Karyawan: "bg-emerald-600/10 text-emerald-700 border-emerald-100",
-  };
-  const cls = map[kategori] || "bg-gray-100 text-gray-700 border-gray-100";
+function DataPreview({ title, data, kategori, loading, onSelengkapnya }) {
   return (
-    <span className={`px-3 py-1 rounded-full text-sm font-medium border ${cls}`}>{kategori}</span>
-  );
-}
+    <div className="bg-white border border-blue-100 rounded-xl p-5 shadow-sm">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-bold text-blue-900 flex items-center gap-2">
+          <i className="ri-file-list-3-line text-blue-600"></i> {title}
+        </h3>
+        <button
+          onClick={onSelengkapnya}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm"
+        >
+          Selengkapnya
+        </button>
+      </div>
 
-function EmptyState() {
-  return (
-    <div className="py-12 text-center text-blue-600">
-      <i className="ri-folder-open-line text-4xl mb-2 block"></i>
-      <p className="text-lg font-semibold">Tidak ada data yang cocok</p>
-      <p className="text-sm mt-2">Coba ubah kata pencarian atau tambahkan data baru.</p>
+      {loading ? (
+        <div className="text-center text-blue-600 py-6">⏳ Memuat data...</div>
+      ) : data.length === 0 ? (
+        <div className="text-center text-blue-500 py-6">Tidak ada data.</div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm text-blue-900 border border-blue-200">
+            <thead className="bg-blue-50 text-blue-800">
+              <tr>
+                <th className="p-3 text-left border border-blue-200">No</th>
+                <th className="p-3 text-left border border-blue-200">Nama</th>
+                <th className="p-3 text-left border border-blue-200">
+                  {kategori === "Siswa"
+                    ? "Kelas"
+                    : kategori === "Guru"
+                    ? "Mapel"
+                    : "Jabatan"}
+                </th>
+                <th className="p-3 text-left border border-blue-200">Alamat</th>
+                <th className="p-3 text-left border border-blue-200">No HP</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.slice(0, 5).map((item, i) => (
+                <tr
+                  key={i}
+                  className={`${
+                    i % 2 === 0 ? "bg-white" : "bg-blue-50"
+                  } hover:bg-blue-100 transition`}
+                >
+                  <td className="p-3 border border-blue-200">{i + 1}</td>
+                  <td className="p-3 border border-blue-200">{item.nama}</td>
+                  <td className="p-3 border border-blue-200">{item.ket}</td>
+                  <td className="p-3 border border-blue-200">{item.alamat}</td>
+                  <td className="p-3 border border-blue-200">{item.hp}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

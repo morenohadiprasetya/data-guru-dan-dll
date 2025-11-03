@@ -12,23 +12,14 @@ import "./App.css";
 function App() {
   const location = useLocation();
 
-  
   const hideSidnav = ["/", "/register", "/s"];
   const isHideSidnav = hideSidnav.includes(location.pathname);
 
   return (
-    <div style={{ display: "flex" }}>
-   
+    <div className="flex">
       {!isHideSidnav && <Sidnav />}
 
-      <div
-        style={{
-          flex: 1,
-          marginLeft: !isHideSidnav ? "220px" : "0",
-          padding: "20px",
-          transition: "margin-left 0.3s ease",
-        }}
-      >
+      <div className="flex-1 min-h-screen">
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/Edit" element={<Edit />} />
@@ -36,7 +27,6 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/Apo" element={<Apo />} />
-         
           <Route path="/s" element={<Easteregg />} />
         </Routes>
       </div>
