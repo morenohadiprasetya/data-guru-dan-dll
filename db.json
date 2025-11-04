@@ -3,8 +3,8 @@
     {
       "id": "e1bc",
       "nama": "ayyas",
-      "ket": " 15 smp",
-      "alamat": " ngebrok",
+      "ket": "15 smp",
+      "alamat": "ngebrok",
       "hp": "0864553232"
     },
     {
@@ -15,56 +15,7 @@
       "hp": "0867645"
     },
     {
-      "id": "91ae",
-      "nama": "ambatukam",
-      "ket": " 15 smp",
-      "alamat": "ngawi",
-      "hp": "0897867544 "
-    },
-    {
-      "id": "ff16",
-      "nama": " ambatuyas",
-      "ket": "15 sd",
-      "alamat": " krapyak",
-      "hp": " 08632321"
-    },
-    {
-      "id": "041e",
-      "nama": "andr",
-      "ket": "12 sd",
-      "alamat": "garut",
-      "hp": "087564563"
-    },
-    {
-      "id": "e034",
-      "nama": "ambatukam",
-      "ket": "15 sd",
-      "alamat": "garut",
-      "hp": "0986756"
-    },
-    {
-      "id": "1fa1",
-      "nama": "ambatukam",
-      "ket": "15 sd",
-      "alamat": "garut",
-      "hp": "0986756"
-    },
-    {
-      "id": "9b01",
-      "nama": "ambatukam",
-      "ket": "15 sd",
-      "alamat": "garut",
-      "hp": "0986756"
-    },
-    {
-      "id": "5b60",
-      "nama": " dsfsf",
-      "ket": "15 sd",
-      "alamat": "garut",
-      "hp": "0986756"
-    },
-    {
-      "id": "e867",
+      "id": "2091",
       "nama": "Ryuzaki (L . Lawliet)",
       "ket": "12 x Tkj",
       "alamat": "japan",
@@ -80,25 +31,11 @@
       "hp": "083877290876"
     },
     {
-      "id": "c344",
-      "nama": "Pak Andre",
-      "ket": "ngawiformatika",
-      "alamat": "Garot",
-      "hp": "083842381"
-    },
-    {
-      "id": "8f33",
-      "nama": "Pak Ayyas",
-      "ket": "ilmu pengetahuan  ngawi",
-      "alamat": "Krapyak",
-      "hp": "082873823636"
-    },
-    {
-      "id": "a7ff",
-      "nama": "fadhil",
-      "ket": "robotikaambatron",
-      "alamat": "bringen",
-      "hp": "088969"
+      "id": "g1",
+      "nama": "Ibu Siti",
+      "ket": "Matematika",
+      "alamat": "Sekolah",
+      "hp": "0811111111"
     }
   ],
   "karyawan": [
@@ -108,6 +45,62 @@
       "ket": "obhn",
       "alamat": "garut",
       "hp": "0986756"
+    },
+    {
+      "id": "k1",
+      "nama": "Pak Joko",
+      "ket": "Staff TU",
+      "alamat": "Sekolah",
+      "hp": "0813333333"
     }
-  ]
+  ],
+  "kategoriTagihan": [
+    {
+      "id": "kt1",
+      "nama": "SPP"
+    },
+    {
+      "id": "kt2",
+      "nama": "Praktikum"
+    },
+    {
+      "id": "kt3",
+      "nama": "Uang Kegiatan"
+    }
+  ],
+  "tagihan": [
+    {
+      "id": "t1",
+      "siswaId": "e1bc",
+      "kategoriId": "kt1",
+      "bulan": "November",
+      "jumlah": 150000,
+      "status": "Lunas"
+    },
+    {
+      "id": "t2",
+      "siswaId": "f82e",
+      "kategoriId": "kt1",
+      "bulan": "November",
+      "jumlah": 150000,
+      "status": "Lunas"
+    },
+    {
+      "id": "t3",
+      "nama": "Ryuzaki (L . Lawliet)",
+      "kelas": "12",
+      "bulan": "Desember",
+      "jumlah": 0,
+      "status": "Belum Lunas",
+      "kategoriId": null
+    }
+  ],
+  "dashboard": {
+    "totalSiswa": 3,
+    "totalGuru": 3,
+    "totalKaryawan": 3,
+    "totalTagihan": 5,
+    "totalLunas": 2,
+    "totalBelumLunas": 1
+  }
 }
