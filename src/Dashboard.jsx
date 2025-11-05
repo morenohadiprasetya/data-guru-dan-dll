@@ -61,7 +61,7 @@ export default function Dashboard() {
             </div>
           ))}
           
-          {/* New Total card */}
+     
           <div
             className="bg-purple-500 text-white rounded-xl shadow-md p-4 flex flex-col justify-center items-center hover:scale-105 transition-transform duration-200"
           >
@@ -71,7 +71,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Data Siswa Section */}
+    
         <div className="bg-white rounded-xl shadow-md p-6 mb-8">
           <h3 className="font-bold text-lg text-gray-700 mb-3">Data Siswa</h3>
           <div className="max-h-56 overflow-y-auto border border-gray-200 rounded-lg">
@@ -105,7 +105,7 @@ export default function Dashboard() {
           </button>
         </div>
 
-        {/* Data Guru Section */}
+    
         <div className="bg-white rounded-xl shadow-md p-6 mb-8">
           <h3 className="font-bold text-lg text-gray-700 mb-3">Data Guru</h3>
           <div className="max-h-56 overflow-y-auto border border-gray-200 rounded-lg">
@@ -139,7 +139,7 @@ export default function Dashboard() {
           </button>
         </div>
 
-        {/* Data Karyawan Section */}
+       
         <div className="bg-white rounded-xl shadow-md p-6">
           <h3 className="font-bold text-lg text-gray-700 mb-3">Data Karyawan</h3>
           <div className="max-h-56 overflow-y-auto border border-gray-200 rounded-lg">

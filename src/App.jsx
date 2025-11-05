@@ -1,13 +1,14 @@
 import { Routes, Route, useLocation } from "react-router-dom";
-import Sidnav from "./sidnav";
+import Sidnav from "./Sidnav";
 import Login from "./Login";
 import Register from "./Register";
- import Data from "./data"
+import Data from "./data";
 import Dashboard from "./Dashboard";
 import Easteregg from "./Easteregg";
 import TambahData from "./TambahData";
 import Edit from "./Editdata";
- 
+ import Masterdata from "./masterdata";
+import Kelas from "./Kelas";
 import Tagihan from "./tagihan";
 import "./App.css";
 
@@ -30,8 +31,9 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/apo" element={<Data />} />
           <Route path="/s" element={<Easteregg />} />
+          <Route path="/kelas" element={<Kelas />} />
+          <Route path="/masterData" element={<Masterdata />} />
           <Route path="/tagihan" element={<Tagihan />} />
-          
         </Routes>
       </div>
     </div>

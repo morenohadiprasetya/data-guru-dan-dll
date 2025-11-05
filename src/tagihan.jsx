@@ -18,26 +18,60 @@ export default function TagihanDashboard() {
   const totalBelum = tagihan.filter(t => t.status === "Belum Lunas").length;
   const totalNominal = tagihan.reduce((sum, t) => sum + t.jumlah, 0);
 
-  // ✅ Konfirmasi Bayar
-  const handleBayar = (id) => {
-    Swal.fire({
-      title: "Konfirmasi Pembayaran",
-      text: "Apakah Anda yakin ingin menandai tagihan ini sebagai lunas?",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Ya, Lunas!",
-      cancelButtonText: "Batal",
-      confirmButtonColor: "#16a34a",
-      cancelButtonColor: "#d33",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setTagihan(tagihan.map(t => (t.id === id ? { ...t, status: "Lunas" } : t)));
-        Swal.fire("Berhasil!", "Tagihan telah ditandai lunas.", "success");
-      }
-    });
-  };
+  
+ const handleBayar = (id) => {
+  const tagihanDipilih = tagihan.find(t => t.id === id);
 
-  // ✅ Konfirmasi Hapus
+  Swal.fire({
+    title: "Masukkan Jumlah Pembayaran",
+    text: `Tagihan atas nama ${tagihanDipilih.nama} sebesar Rp ${tagihanDipilih.jumlah.toLocaleString()}`,
+    input: "number",
+    inputAttributes: {
+      min: 0,
+      max: tagihanDipilih.jumlah,
+      step: 1000,
+    },
+    inputPlaceholder: "Masukkan jumlah yang dibayar...",
+    showCancelButton: true,
+    confirmButtonText: "Bayar",
+    cancelButtonText: "Batal",
+    confirmButtonColor: "#16a34a",
+    cancelButtonColor: "#d33",
+    preConfirm: (value) => {
+      if (!value || value <= 0) {
+        Swal.showValidationMessage("Masukkan jumlah yang valid!");
+        return false;
+      }
+      if (value > tagihanDipilih.jumlah) {
+        Swal.showValidationMessage("Jumlah tidak boleh melebihi total tagihan!");
+        return false;
+      }
+      return value;
+    },
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const jumlahBayar = parseInt(result.value);
+      const sisa = tagihanDipilih.jumlah - jumlahBayar;
+
+      if (sisa === 0) {
+        setTagihan(tagihan.map(t => (t.id === id ? { ...t, status: "Lunas" } : t)));
+        Swal.fire("Lunas!", "Tagihan telah dibayar penuh.", "success");
+      } else {
+        setTagihan(tagihan.map(t => (
+          t.id === id ? { ...t, jumlah: sisa, status: "Belum Lunas" } : t
+        )));
+        Swal.fire(
+          "Sebagian Terbayar",
+          `Pembayaran sebesar Rp ${jumlahBayar.toLocaleString()} berhasil.\nSisa tagihan: Rp ${sisa.toLocaleString()}`,
+          "info"
+        );
+      }
+    }
+  });
+};
+
+
+   
   const handleHapus = (id) => {
     Swal.fire({
       title: "Hapus Data?",
@@ -56,7 +90,7 @@ export default function TagihanDashboard() {
     });
   };
 
-  // ✅ Tambah & Edit
+ 
   const handleAdd = () => setModal({ open: true, type: "add", data: {} });
   const handleEdit = (item) => setModal({ open: true, type: "edit", data: item });
 
@@ -91,18 +125,18 @@ export default function TagihanDashboard() {
       <Sidnav />
 
       <main className="flex-1 ml-48 p-8 transition-all duration-300">
-        {/* === HEADER === */}
+      
         <header className="mb-6">
           <h1 className="text-3xl font-bold text-blue-900 flex items-center">
             <i className="ri-money-dollar-circle-line text-blue-700 mr-2"></i>
-            Dashboard Tagihan Siswa
+           Tagihan Siswa
           </h1>
           <p className="text-gray-600 mt-1">
             Kelola data tagihan siswa: lihat status, tambah, ubah, atau hapus.
           </p>
         </header>
 
-        {/* === STAT CARDS === */}
+     
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {[
             { label: "Total Tagihan", value: totalTagihan, color: "bg-blue-100 text-blue-800" },
@@ -117,7 +151,7 @@ export default function TagihanDashboard() {
           ))}
         </section>
 
-        {/* === FILTERS === */}
+    
         <div className="flex flex-col md:flex-row gap-3 mb-4 items-center">
           <input
             type="text"

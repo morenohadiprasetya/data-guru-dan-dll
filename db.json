@@ -2,24 +2,31 @@
   "siswa": [
     {
       "id": "e1bc",
-      "nama": "ayyas",
-      "ket": "15 smp",
-      "alamat": "ngebrok",
+      "nama": "Ayyas",
+      "ket": "15 SMP",
+      "alamat": "Ngebrok",
       "hp": "0864553232"
     },
     {
       "id": "f82e",
-      "nama": "andretukam",
-      "ket": "15 sd",
-      "alamat": "garut",
+      "nama": "Andretukam",
+      "ket": "15 SD",
+      "alamat": "Garut",
       "hp": "0867645"
     },
     {
       "id": "2091",
-      "nama": "Ryuzaki (L . Lawliet)",
-      "ket": "12 x Tkj",
-      "alamat": "japan",
+      "nama": "Ryuzaki (L. Lawliet)",
+      "ket": "12 X TKJ",
+      "alamat": "Japan",
       "hp": "086786776575"
+    },
+    {
+      "id": "521c",
+      "nama": "mas cahyo",
+      "ket": "100SD",
+      "alamat": "nGEBROK JERO BANYU",
+      "hp": "89321907390`17490`7"
     }
   ],
   "guru": [
@@ -36,14 +43,21 @@
       "ket": "Matematika",
       "alamat": "Sekolah",
       "hp": "0811111111"
+    },
+    {
+      "id": "g2",
+      "nama": "Pak Budi",
+      "ket": "Bahasa Inggris",
+      "alamat": "Malang",
+      "hp": "082233445566"
     }
   ],
   "karyawan": [
     {
       "id": "1cf9",
-      "nama": "andre",
-      "ket": "obhn",
-      "alamat": "garut",
+      "nama": "Andre",
+      "ket": "OBHN",
+      "alamat": "Garut",
       "hp": "0986756"
     },
     {
@@ -52,6 +66,13 @@
       "ket": "Staff TU",
       "alamat": "Sekolah",
       "hp": "0813333333"
+    },
+    {
+      "id": "k2",
+      "nama": "Bu Lina",
+      "ket": "Administrasi",
+      "alamat": "Kepanjen",
+      "hp": "082199887766"
     }
   ],
   "kategoriTagihan": [
@@ -87,20 +108,24 @@
     },
     {
       "id": "t3",
-      "nama": "Ryuzaki (L . Lawliet)",
-      "kelas": "12",
+      "siswaId": "2091",
+      "kategoriId": "kt2",
       "bulan": "Desember",
-      "jumlah": 0,
-      "status": "Belum Lunas",
-      "kategoriId": null
+      "jumlah": 100000,
+      "status": "Belum Lunas"
     }
   ],
-  "dashboard": {
-    "totalSiswa": 3,
-    "totalGuru": 3,
-    "totalKaryawan": 3,
-    "totalTagihan": 5,
-    "totalLunas": 2,
-    "totalBelumLunas": 1
-  }
+  "kelas": [
+    {
+      "id": "",
+      "nama": "Kelas",
+      "jurusan": "akl"
+    },
+    {
+      "id": "",
+      "nama": "Ambatukam",
+      "kelas": "10 ",
+      "jurusan": "Tkj"
+    }
+  ]
 }

@@ -40,7 +40,7 @@ export default function Sidnav() {
             <div className="flex flex-col ml-6 mt-1">
               <Link to="/apo" className="py-1 hover:text-blue-200">Kategori Data</Link>
               <Link to="/kelas" className="py-1 hover:text-blue-200">Kelas</Link>
-              <Link to="/masterdata" className="py-1 hover:text-blue-200">Masterdata</Link>
+              <Link to="/MasterData" className="py-1 hover:text-blue-200">Masterdata</Link>
             </div>
           )}
 
