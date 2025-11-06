@@ -10,6 +10,8 @@ import Edit from "./Editdata";
  import Masterdata from "./masterdata";
 import Kelas from "./Kelas";
 import Tagihan from "./tagihan";
+import KategoriTagihan from "./kategoritagihan";
+import RekapTagihan from "./rekaptagihan";
 import "./App.css";
 
 function App() {
@@ -30,7 +32,10 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/apo" element={<Data />} />
+          <Route path="/kategori" element={<KategoriTagihan />} />
           <Route path="/s" element={<Easteregg />} />
+          <Route path="/rekap" element={<RekapTagihan />} />
+        
           <Route path="/kelas" element={<Kelas />} />
           <Route path="/masterData" element={<Masterdata />} />
           <Route path="/tagihan" element={<Tagihan />} />

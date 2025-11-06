@@ -77,10 +77,6 @@
   ],
   "kategoriTagihan": [
     {
-      "id": "kt1",
-      "nama": "SPP"
-    },
-    {
       "id": "kt2",
       "nama": "Praktikum"
     },
@@ -91,41 +87,28 @@
   ],
   "tagihan": [
     {
-      "id": "t1",
+      "id": 1762414769890,
+      "kategori": "Siswa",
+      "userId": "521c",
+      "kategoriTagihanId": "kt3",
+      "deskripsi": "123"
+    },
+    {
+      "id": "a60f",
       "siswaId": "e1bc",
-      "kategoriId": "kt1",
-      "bulan": "November",
-      "jumlah": 150000,
-      "status": "Lunas"
-    },
-    {
-      "id": "t2",
-      "siswaId": "f82e",
-      "kategoriId": "kt1",
-      "bulan": "November",
-      "jumlah": 150000,
-      "status": "Lunas"
-    },
-    {
-      "id": "t3",
-      "siswaId": "2091",
-      "kategoriId": "kt2",
-      "bulan": "Desember",
-      "jumlah": 100000,
+      "nama": "alat kentu",
+      "kelas": "10 tk",
+      "bulan": "januari",
+      "jumlah": 1000000000000,
       "status": "Belum Lunas"
     }
   ],
   "kelas": [
     {
-      "id": "",
-      "nama": "Kelas",
-      "jurusan": "akl"
-    },
-    {
-      "id": "",
-      "nama": "Ambatukam",
-      "kelas": "10 ",
-      "jurusan": "Tkj"
+      "id": "k2",
+      "nama": "Andre",
+      "kelas": "11",
+      "jurusan": "AKL"
     }
   ]
 }

@@ -1,103 +1,45 @@
-import React, { useState } from "react";
-import Sidnav from "./Sidnav";
+import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 import "remixicon/fonts/remixicon.css";
 
 export default function TagihanDashboard() {
-  const [tagihan, setTagihan] = useState([
-     
-  ]);
-
+  const [tagihan, setTagihan] = useState([]);
+  const [siswa, setSiswa] = useState([]);
   const [modal, setModal] = useState({ open: false, type: "", data: {} });
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const getData = async () => {
+    try {
+      const [tagihanRes, siswaRes] = await Promise.all([
+        fetch("http://localhost:5000/tagihan"),
+        fetch("http://localhost:5000/siswa"),
+      ]);
+      const tagihanData = await tagihanRes.json();
+      const siswaData = await siswaRes.json();
+      setTagihan(tagihanData);
+      setSiswa(siswaData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      Swal.fire("Error", "Gagal memuat data. Coba lagi nanti.", "error");
+    }
+  };
 
   const totalTagihan = tagihan.length;
   const totalLunas = tagihan.filter(t => t.status === "Lunas").length;
   const totalBelum = tagihan.filter(t => t.status === "Belum Lunas").length;
   const totalNominal = tagihan.reduce((sum, t) => sum + t.jumlah, 0);
 
-  
- const handleBayar = (id) => {
-  const tagihanDipilih = tagihan.find(t => t.id === id);
-
-  Swal.fire({
-    title: "Masukkan Jumlah Pembayaran",
-    text: `Tagihan atas nama ${tagihanDipilih.nama} sebesar Rp ${tagihanDipilih.jumlah.toLocaleString()}`,
-    input: "number",
-    inputAttributes: {
-      min: 0,
-      max: tagihanDipilih.jumlah,
-      step: 1000,
-    },
-    inputPlaceholder: "Masukkan jumlah yang dibayar...",
-    showCancelButton: true,
-    confirmButtonText: "Bayar",
-    cancelButtonText: "Batal",
-    confirmButtonColor: "#16a34a",
-    cancelButtonColor: "#d33",
-    preConfirm: (value) => {
-      if (!value || value <= 0) {
-        Swal.showValidationMessage("Masukkan jumlah yang valid!");
-        return false;
-      }
-      if (value > tagihanDipilih.jumlah) {
-        Swal.showValidationMessage("Jumlah tidak boleh melebihi total tagihan!");
-        return false;
-      }
-      return value;
-    },
-  }).then((result) => {
-    if (result.isConfirmed) {
-      const jumlahBayar = parseInt(result.value);
-      const sisa = tagihanDipilih.jumlah - jumlahBayar;
-
-      if (sisa === 0) {
-        setTagihan(tagihan.map(t => (t.id === id ? { ...t, status: "Lunas" } : t)));
-        Swal.fire("Lunas!", "Tagihan telah dibayar penuh.", "success");
-      } else {
-        setTagihan(tagihan.map(t => (
-          t.id === id ? { ...t, jumlah: sisa, status: "Belum Lunas" } : t
-        )));
-        Swal.fire(
-          "Sebagian Terbayar",
-          `Pembayaran sebesar Rp ${jumlahBayar.toLocaleString()} berhasil.\nSisa tagihan: Rp ${sisa.toLocaleString()}`,
-          "info"
-        );
-      }
-    }
-  });
-};
-
-
-   
-  const handleHapus = (id) => {
-    Swal.fire({
-      title: "Hapus Data?",
-      text: "Data tagihan ini akan dihapus secara permanen!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Hapus",
-      cancelButtonText: "Batal",
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#6b7280",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setTagihan(tagihan.filter(t => t.id !== id));
-        Swal.fire("Terhapus!", "Data berhasil dihapus.", "success");
-      }
-    });
-  };
-
- 
-  const handleAdd = () => setModal({ open: true, type: "add", data: {} });
-  const handleEdit = (item) => setModal({ open: true, type: "edit", data: item });
-
   const handleSubmit = (e) => {
     e.preventDefault();
     const form = e.target;
     const data = {
+      siswaId: form.siswaId.value,
       nama: form.nama.value,
       kelas: form.kelas.value,
       bulan: form.bulan.value,
@@ -106,175 +48,176 @@ export default function TagihanDashboard() {
     };
 
     if (modal.type === "add") {
-      setTagihan([...tagihan, { ...data, id: Date.now() }]);
-      Swal.fire("Berhasil!", "Tagihan baru berhasil ditambahkan.", "success");
+      fetch("http://localhost:5000/tagihan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      })
+        .then(res => res.json())
+        .then(newTagihan => setTagihan([...tagihan, newTagihan]));
     } else {
-      setTagihan(tagihan.map(t => (t.id === modal.data.id ? { ...t, ...data } : t)));
-      Swal.fire("Diperbarui!", "Data tagihan berhasil diperbarui.", "success");
+      fetch(`http://localhost:5000/tagihan/${modal.data.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      })
+        .then(res => res.json())
+        .then(updated => setTagihan(tagihan.map(t => t.id === updated.id ? updated : t)));
     }
-
     setModal({ open: false, type: "", data: {} });
   };
 
+  const handleHapus = (id) => {
+    Swal.fire({
+      title: "Hapus Data?",
+      text: "Data tagihan ini akan dihapus!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Hapus",
+      cancelButtonText: "Batal",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`http://localhost:5000/tagihan/${id}`, { method: "DELETE" })
+          .then(() => setTagihan(tagihan.filter(t => t.id !== id)));
+      }
+    });
+  };
+
+  const handleBayar = (id) => {
+    const t = tagihan.find(t => t.id === id);
+    Swal.fire({
+      title: `Bayar Tagihan`,
+      text: `Tagihan atas nama ${t.nama} sebesar Rp ${t.jumlah.toLocaleString()}`,
+      input: "number",
+      inputAttributes: { min: 0, max: t.jumlah, step: 1000 },
+      showCancelButton: true,
+      confirmButtonText: "Bayar",
+      cancelButtonText: "Batal",
+    }).then(result => {
+      if (result.isConfirmed) {
+        const bayar = parseInt(result.value);
+        const sisa = t.jumlah - bayar;
+        const updated = { ...t, jumlah: sisa, status: sisa === 0 ? "Lunas" : "Belum Lunas" };
+        fetch(`http://localhost:5000/tagihan/${t.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updated),
+        })
+          .then(res => res.json())
+          .then(u => setTagihan(tagihan.map(tg => tg.id === u.id ? u : tg)))
+          .finally(() => {
+            Swal.fire(
+              sisa === 0 ? "Lunas!" : "Sebagian Terbayar",
+              sisa === 0 ? "Tagihan lunas." : `Sisa: Rp ${sisa.toLocaleString()}`,
+              sisa === 0 ? "success" : "info"
+            );
+          });
+      }
+    });
+  };
+
+  const handleAdd = () => setModal({ open: true, type: "add", data: {} });
+  const handleEdit = (item) => setModal({ open: true, type: "edit", data: item });
+
   const filtered = tagihan
-    .filter(t => t.nama.toLowerCase().includes(search.toLowerCase()))
+    .filter(t => t.nama && t.nama.toLowerCase().includes(search.toLowerCase()))  // Pastikan nama tidak undefined
     .filter(t => (filterStatus ? t.status === filterStatus : true));
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
-      <Sidnav />
-
-      <main className="flex-1 ml-48 p-8 transition-all duration-300">
-      
+    <div className="flex min-h-screen ml-50 bg-gradient-to-br from-blue-50 to-blue-100 p-6">
+      <div className="flex-1">
         <header className="mb-6">
-          <h1 className="text-3xl font-bold text-blue-900 flex items-center">
-            <i className="ri-money-dollar-circle-line text-blue-700 mr-2"></i>
-           Tagihan Siswa
+          <h1 className="text-3xl font-bold text-blue-900 flex items-center gap-2">
+            <i className="ri-money-dollar-circle-line"></i> Tagihan Siswa
           </h1>
-          <p className="text-gray-600 mt-1">
-            Kelola data tagihan siswa: lihat status, tambah, ubah, atau hapus.
-          </p>
         </header>
 
-     
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          {[
-            { label: "Total Tagihan", value: totalTagihan, color: "bg-blue-100 text-blue-800" },
+        {/* Ringkasan */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          {[{ label: "Total Tagihan", value: totalTagihan, color: "bg-blue-100 text-blue-800" },
             { label: "Lunas", value: totalLunas, color: "bg-green-100 text-green-800" },
             { label: "Belum Lunas", value: totalBelum, color: "bg-red-100 text-red-800" },
-            { label: "Total Nominal", value: `Rp ${totalNominal.toLocaleString()}`, color: "bg-yellow-100 text-yellow-800" },
-          ].map((card, i) => (
-            <div key={i} className={`${card.color} p-5 rounded-lg shadow-sm text-center`}>
-              <p className="text-sm font-medium">{card.label}</p>
-              <h2 className="text-2xl font-bold mt-1">{card.value}</h2>
-            </div>
-          ))}
-        </section>
+            { label: "Total Nominal", value: `Rp ${totalNominal.toLocaleString()}`, color: "bg-yellow-100 text-yellow-800" }].map((c,i)=>( 
+              <div key={i} className={`${c.color} p-5 rounded-lg shadow text-center`}>
+                <p>{c.label}</p>
+                <h2 className="text-2xl font-bold">{c.value}</h2>
+              </div>
+            ))}
+        </div>
 
-    
-        <div className="flex flex-col md:flex-row gap-3 mb-4 items-center">
-          <input
-            type="text"
-            placeholder="🔍 Cari nama siswa..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="border border-blue-300 px-4 py-2 rounded w-full md:w-1/3 focus:ring focus:ring-blue-200 outline-none"
-          />
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="border border-blue-300 px-4 py-2 rounded w-full md:w-1/4 focus:ring focus:ring-blue-200 outline-none"
-          >
+        {/* Pencarian / Filter / Tambah */}
+        <div className="flex flex-col md:flex-row gap-3 mb-4">
+          <input placeholder="Cari nama siswa..." value={search} onChange={e=>setSearch(e.target.value)}
+            className="border px-4 py-2 rounded w-full md:w-1/3"/>
+          <select value={filterStatus} onChange={e=>setFilterStatus(e.target.value)}
+            className="border px-4 py-2 rounded w-full md:w-1/4">
             <option value="">Semua Status</option>
             <option value="Belum Lunas">Belum Lunas</option>
             <option value="Lunas">Lunas</option>
           </select>
-          <button
-            onClick={handleAdd}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center gap-2 transition"
-          >
-            <i className="ri-add-circle-line text-lg"></i> Tambah
-          </button>
+          <button onClick={handleAdd} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Tambah</button>
         </div>
 
-        {/* === TABEL === */}
+        {/* Tabel */}
         <div className="overflow-x-auto bg-white rounded-lg shadow border border-blue-100">
           <table className="min-w-full text-sm border-collapse">
-            <thead className="bg-blue-50 text-blue-900 font-semibold">
+            <thead className="bg-blue-50 text-blue-900">
               <tr>
-                {["No", "Nama", "Kelas", "Bulan", "Jumlah", "Status", "Aksi"].map((h, i) => (
-                  <th key={i} className="border border-blue-200 px-4 py-2 text-center">
-                    {h}
-                  </th>
+                {["No","Nama","Kelas","Bulan","Jumlah","Status","Aksi"].map((h,i)=>( 
+                  <th key={i} className="border px-4 py-2">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {filtered.length ? (
-                filtered.map((t, i) => (
-                  <tr key={t.id} className="even:bg-blue-50 hover:bg-blue-100 transition">
-                    <td className="border border-blue-200 px-4 py-2 text-center">{i + 1}</td>
-                    <td className="border border-blue-200 px-4 py-2">{t.nama}</td>
-                    <td className="border border-blue-200 px-4 py-2">{t.kelas}</td>
-                    <td className="border border-blue-200 px-4 py-2">{t.bulan}</td>
-                    <td className="border border-blue-200 px-4 py-2 text-right">{t.jumlah.toLocaleString()}</td>
-                    <td
-                      className={`border border-blue-200 px-4 py-2 font-semibold ${
-                        t.status === "Lunas" ? "text-green-600" : "text-red-600"
-                      }`}
-                    >
-                      {t.status}
-                    </td>
-                    <td className="border border-blue-200 px-4 py-2 text-center">
-                      <div className="flex justify-center gap-2">
-                        {t.status === "Belum Lunas" && (
-                          <button
-                            onClick={() => handleBayar(t.id)}
-                            className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded"
-                          >
-                            Bayar
-                          </button>
-                        )}
-                        <button
-                          onClick={() => handleEdit(t)}
-                          className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleHapus(t.id)}
-                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
-                        >
-                          Hapus
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="7" className="text-center py-6 text-gray-600">
-                    Tidak ada data
+              {filtered.length ? filtered.map((t,i)=>( 
+                <tr key={t.id} className="hover:bg-blue-50">
+                  <td className="border px-4 py-2 text-center">{i+1}</td>
+                  <td className="border px-4 py-2">{t.nama}</td>
+                  <td className="border px-4 py-2">{t.kelas}</td>
+                  <td className="border px-4 py-2">{t.bulan}</td>
+                  <td className="border px-4 py-2 text-right">Rp {t.jumlah.toLocaleString()}</td>
+                  <td className={`border px-4 py-2 font-semibold ${t.status==="Lunas"?"text-green-600":"text-red-600"}`}>{t.status}</td>
+                  <td className="border px-4 py-2 flex justify-center gap-2">
+                    {t.status==="Belum Lunas" && <button onClick={()=>handleBayar(t.id)} className="bg-green-500 px-2 py-1 rounded text-white">Bayar</button>}
+                    <button onClick={()=>handleEdit(t)} className="bg-yellow-500 px-2 py-1 rounded text-white">Edit</button>
+                    <button onClick={()=>handleHapus(t.id)} className="bg-red-500 px-2 py-1 rounded text-white">Hapus</button>
                   </td>
                 </tr>
+              )):(
+                <tr><td colSpan="7" className="text-center p-4 text-gray-600">Tidak ada data</td></tr>
               )}
             </tbody>
           </table>
         </div>
 
-        {/* === MODAL === */}
+        {/* Modal */}
         {modal.open && (
-          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 animate-fadeIn">
-            <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md transform scale-100 transition">
-              <h2 className="text-xl mb-4 font-semibold text-blue-800 text-center">
-                {modal.type === "add" ? "Tambah Tagihan" : "Edit Tagihan"}
-              </h2>
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+              <h2 className="text-xl mb-4 font-semibold text-center">{modal.type==="add"?"Tambah Tagihan":"Edit Tagihan"}</h2>
               <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-                <input name="nama" defaultValue={modal.data.nama || ""} placeholder="Nama" className="border px-3 py-2 rounded" required />
-                <input name="kelas" defaultValue={modal.data.kelas || ""} placeholder="Kelas" className="border px-3 py-2 rounded" required />
-                <input name="bulan" defaultValue={modal.data.bulan || ""} placeholder="Bulan" className="border px-3 py-2 rounded" required />
-                <input name="jumlah" type="number" defaultValue={modal.data.jumlah || ""} placeholder="Jumlah" className="border px-3 py-2 rounded" required />
-                <select name="status" defaultValue={modal.data.status || "Belum Lunas"} className="border px-3 py-2 rounded">
+                <select name="siswaId" defaultValue={modal.data.siswaId||""} required className="border px-3 py-2 rounded">
+                  <option value="">-- Pilih Siswa --</option>
+                  {siswa.map(s=><option key={s.id} value={s.id}>{s.nama}</option>)}
+                </select>
+                <input name="nama" defaultValue={modal.data.nama||""} placeholder="Nama Tagihan" className="border px-3 py-2 rounded" required/>
+                <input name="kelas" defaultValue={modal.data.kelas||""} placeholder="Kelas" className="border px-3 py-2 rounded" required/>
+                <input name="bulan" defaultValue={modal.data.bulan||""} placeholder="Bulan" className="border px-3 py-2 rounded" required/>
+                <input type="number" name="jumlah" defaultValue={modal.data.jumlah||""} placeholder="Jumlah" className="border px-3 py-2 rounded" required/>
+                <select name="status" defaultValue={modal.data.status||"Belum Lunas"} className="border px-3 py-2 rounded">
                   <option value="Belum Lunas">Belum Lunas</option>
                   <option value="Lunas">Lunas</option>
                 </select>
                 <div className="flex justify-end gap-3 mt-4">
-                  <button
-                    type="button"
-                    onClick={() => setModal({ open: false, type: "", data: {} })}
-                    className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-                  >
-                    Batal
-                  </button>
-                  <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                    Simpan
-                  </button>
+                  <button type="button" onClick={()=>setModal({open:false,type:"",data:{}})} className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Batal</button>
+                  <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Simpan</button>
                 </div>
               </form>
             </div>
           </div>
         )}
-      </main>
+
+      </div>
     </div>
   );
 }

@@ -39,7 +39,7 @@ export default function Sidnav() {
           {openMenu === "database" && (
             <div className="flex flex-col ml-6 mt-1">
               <Link to="/apo" className="py-1 hover:text-blue-200">Kategori Data</Link>
-              <Link to="/kelas" className="py-1 hover:text-blue-200">Kelas</Link>
+             
               <Link to="/MasterData" className="py-1 hover:text-blue-200">Masterdata</Link>
             </div>
           )}
@@ -50,9 +50,9 @@ export default function Sidnav() {
           </button>
           {openMenu === "keuangan" && (
             <div className="flex flex-col ml-6 mt-1">
-              <Link to="/kategori-tagihan" className="py-1 hover:text-blue-200">Kategori Tagihan</Link>
+              <Link to="/kategori" className="py-1 hover:text-blue-200">Kategori Tagihan</Link>
               <Link to="/tagihan" className="py-1 hover:text-blue-200">Tagihan</Link>
-              <Link to="/rekap-tagihan" className="py-1 hover:text-blue-200">Rekap Tagihan</Link>
+              <Link to="/rekap" className="py-1 hover:text-blue-200">Rekap Tagihan</Link>
             </div>
           )}
         </nav>
