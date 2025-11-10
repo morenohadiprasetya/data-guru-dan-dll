@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Sidnav from "./Sidnav";
+import Sidnav from "./sidnav";
 import { useNavigate } from "react-router-dom";
 import "remixicon/fonts/remixicon.css";
 
@@ -30,7 +30,7 @@ export default function Dashboard() {
   const totalSiswa = data.siswa.length || 0;
   const totalGuru = data.guru.length || 0;
   const totalKaryawan = data.karyawan.length || 0;
-  const total = totalSiswa + totalGuru + totalKaryawan; // Calculate total of all groups
+  const total = totalSiswa + totalGuru + totalKaryawan;  
 
   const handleSelengkapnya = (kategori) => {
     nav(`/Apo?kategori=${kategori}`);
@@ -46,7 +46,7 @@ export default function Dashboard() {
         </h1>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-10">
-          {/* Cards for Siswa, Guru, Karyawan */}
+   
           {[{ color: "bg-green-500", icon: "ri-user-3-line", label: "Siswa", total: totalSiswa },
             { color: "bg-blue-500", icon: "ri-user-star-line", label: "Guru", total: totalGuru },
             { color: "bg-yellow-500", icon: "ri-building-4-line", label: "Karyawan", total: totalKaryawan },

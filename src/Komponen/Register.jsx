@@ -7,7 +7,6 @@ function Register() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    Username: "",
     email: "",
     password: "",
     confirm: "",
@@ -36,11 +35,9 @@ function Register() {
     setErrors({});
     setMessage("");
 
-    const { Username, email, password, confirm } = formData;
+    const { email, password, confirm } = formData;
     let newErrors = {};
 
-    if (Username.trim().length < 3)
-      newErrors.Username = "Username minimal 3 karakter.";
     if (!isValidEmail(email)) newErrors.email = "Masukkan email yang valid.";
     if (password.length < 6)
       newErrors.password = "Password minimal 6 karakter.";
@@ -63,7 +60,6 @@ function Register() {
     const hashed = await hashPassword(password);
     const newUser = {
       id: Date.now(),
-      Username,
       email,
       passwordHash: hashed,
       createdAt: new Date().toISOString(),
@@ -71,16 +67,15 @@ function Register() {
     users.push(newUser);
     localStorage.setItem(usersKey, JSON.stringify(users));
 
-    Swal.fire({
+    await Swal.fire({
       icon: "success",
       title: "Berhasil daftar!",
       text: "Akun kamu berhasil dibuat.",
-      confirmButtonText: "Lanjut",
-    }).then(() => {
-      navigate("/");
+      confirmButtonText: "Lanjut ke Login",
     });
 
-    setFormData({ Username: "", email: "", password: "", confirm: "" });
+    navigate("/"); 
+    setFormData({ email: "", password: "", confirm: "" });
   };
 
   return (
@@ -91,9 +86,6 @@ function Register() {
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-3">
-       
-         
-
           <div>
             <label className="font-medium text-gray-700">Email</label>
             <input
@@ -104,7 +96,9 @@ function Register() {
               placeholder="Masukkan email"
               className="w-full mt-1 p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
-            {errors.email && <p className="text-red-600 text-sm mt-1">{errors.email}</p>}
+            {errors.email && (
+              <p className="text-red-600 text-sm mt-1">{errors.email}</p>
+            )}
           </div>
 
           <div>
@@ -123,7 +117,9 @@ function Register() {
           </div>
 
           <div>
-            <label className="font-medium text-gray-700">Konfirmasi Password</label>
+            <label className="font-medium text-gray-700">
+              Konfirmasi Password
+            </label>
             <input
               type="password"
               name="confirm"

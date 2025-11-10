@@ -3,29 +3,29 @@
     {
       "id": "e1bc",
       "nama": "Ayyas",
-      "ket": "15 SMP",
+      "kelas": "15 SMP",
       "alamat": "Ngebrok",
       "hp": "0864553232"
     },
     {
       "id": "f82e",
       "nama": "Andretukam",
-      "ket": "15 SD",
+      "kelas": "15 SD",
       "alamat": "Garut",
       "hp": "0867645"
     },
     {
       "id": "2091",
       "nama": "Ryuzaki (L. Lawliet)",
-      "ket": "12 X TKJ",
+      "kelas": "12 X TKJ",
       "alamat": "Japan",
       "hp": "086786776575"
     },
     {
       "id": "521c",
-      "nama": "mas cahyo",
-      "ket": "100SD",
-      "alamat": "nGEBROK JERO BANYU",
+      "nama": "Mas Cahyo",
+      "kelas": "100SD",
+      "alamat": "Ngebruk Jero Banyu",
       "hp": "89321907390`17490`7"
     }
   ],
@@ -77,6 +77,10 @@
   ],
   "kategoriTagihan": [
     {
+      "id": "kt1",
+      "nama": "SPP Bulanan"
+    },
+    {
       "id": "kt2",
       "nama": "Praktikum"
     },
@@ -87,28 +91,41 @@
   ],
   "tagihan": [
     {
-      "id": 1762414769890,
-      "kategori": "Siswa",
-      "userId": "521c",
-      "kategoriTagihanId": "kt3",
-      "deskripsi": "123"
+      "id": 1,
+      "nama": "Ayyas",
+      "kelas": "9A",
+      "bulan": "Januari",
+      "jumlah": 50000,
+      "status": "Belum Lunas"
     },
     {
-      "id": "a60f",
-      "siswaId": "e1bc",
-      "nama": "alat kentu",
-      "kelas": "10 tk",
-      "bulan": "januari",
-      "jumlah": 1000000000000,
-      "status": "Belum Lunas"
+      "id": 2,
+      "nama": "Andretukam",
+      "kelas": "8B",
+      "bulan": "Februari",
+      "jumlah": 75000,
+      "status": "Lunas"
     }
   ],
   "kelas": [
     {
-      "id": "k2",
+      "id": "kls1",
       "nama": "Andre",
       "kelas": "11",
       "jurusan": "AKL"
+    },
+    {
+      "id": "kls2",
+      "nama": "Cahyo",
+      "kelas": "12",
+      "jurusan": "RPL"
+    }
+  ],
+  "level": [
+    {},
+    {
+      "name": "test123",
+      "id": "1503"
     }
   ]
 }

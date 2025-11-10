@@ -38,9 +38,9 @@ export default function Sidnav() {
           </button>
           {openMenu === "database" && (
             <div className="flex flex-col ml-6 mt-1">
-              <Link to="/apo" className="py-1 hover:text-blue-200">Kategori Data</Link>
+              <Link to="/kategoril" className="py-1 hover:text-blue-200">Kategori Data</Link>
              
-              <Link to="/MasterData" className="py-1 hover:text-blue-200">Masterdata</Link>
+              <Link to="/apo" className="py-1 hover:text-blue-200">Masterdata</Link>
             </div>
           )}
 

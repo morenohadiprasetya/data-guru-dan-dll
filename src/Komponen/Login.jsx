@@ -25,10 +25,10 @@ function Login() {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      // Tampilkan SweetAlert sukses
+     
       Swal.fire({
         title: "Login berhasil!",
-        text: "Selamat datang di dashboard.",
+        text: " ",
         icon: "success",
         showConfirmButton: false,
         timer: 1500,
@@ -42,10 +42,9 @@ function Login() {
         },
       });
 
-      // Reset form
+      
       setFormData({ email: "", password: "" });
-
-      // Pindah halaman setelah 1.5 detik
+ 
       setTimeout(() => {
         navigate("/dashboard");
       }, 1500);
@@ -62,7 +61,7 @@ function Login() {
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-lg shadow-md w-96"
       >
-        {/* Tombol ke web Apo */}
+        
         <button
           type="button"
           onClick={handleDirectToWeb}
@@ -73,10 +72,10 @@ function Login() {
 
         <h2 className="text-2xl font-bold text-center mb-4">Login</h2>
 
-        {/* Username */}
+ 
          
 
-        {/* Email */}
+      
         <div className="mb-4">
           <label className="block mb-1 font-medium">Email</label>
           <input
@@ -91,7 +90,7 @@ function Login() {
           )}
         </div>
 
-        {/* Password */}
+        
         <div className="mb-4">
           <label className="block mb-1 font-medium">Password</label>
           <input
@@ -106,7 +105,7 @@ function Login() {
           )}
         </div>
 
-        {/* Tombol login dengan SweetAlert */}
+    
         <button
           type="submit"
           className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition duration-200"
@@ -114,7 +113,7 @@ function Login() {
           Login
         </button>
 
-        {/* Link ke halaman register */}
+    
         <div className="text-center mt-6">
           <p className="text-gray-700">
             Belum punya akun?{" "}
