@@ -15,9 +15,9 @@ export default function Dashboard() {
     async function fetchAll() {
       try {
         const [resSiswa, resGuru, resKaryawan] = await Promise.all([
-          fetch("http://localhost:5000/siswa").then((r) => (r.ok ? r.json() : [])),
-          fetch("http://localhost:5000/guru").then((r) => (r.ok ? r.json() : [])),
-          fetch("http://localhost:5000/karyawan").then((r) => (r.ok ? r.json() : [])),
+          fetch("http://localhost:3000/siswa").then((r) => (r.ok ? r.json() : [])),
+          fetch("http://localhost:3000/guru").then((r) => (r.ok ? r.json() : [])),
+          fetch("http://localhost:3000/karyawan").then((r) => (r.ok ? r.json() : [])),
         ]);
         setData({ siswa: resSiswa, guru: resGuru, karyawan: resKaryawan });
       } catch (e) {

@@ -1,28 +1,21 @@
 {
   "siswa": [
     {
-      "id": "e1bc",
-      "nama": "Ayyas",
-      "kelas": "15 SMP",
-      "alamat": "Ngebrok",
-      "hp": "0864553232"
-    },
-    {
-      "id": "f82e",
+      "id": "s2",
       "nama": "Andretukam",
       "kelas": "15 SD",
       "alamat": "Garut",
       "hp": "0867645"
     },
     {
-      "id": "2091",
+      "id": "s3",
       "nama": "Ryuzaki (L. Lawliet)",
       "kelas": "12 X TKJ",
       "alamat": "Japan",
       "hp": "086786776575"
     },
     {
-      "id": "521c",
+      "id": "s4",
       "nama": "Mas Cahyo",
       "kelas": "100SD",
       "alamat": "Ngebruk Jero Banyu",
@@ -31,21 +24,21 @@
   ],
   "guru": [
     {
-      "id": "b4cd",
+      "id": "g1",
       "nama": "Pak Renz",
       "ket": "Ngawinesia",
       "alamat": "Ngebruk",
       "hp": "083877290876"
     },
     {
-      "id": "g1",
+      "id": "g2",
       "nama": "Ibu Siti",
       "ket": "Matematika",
       "alamat": "Sekolah",
       "hp": "0811111111"
     },
     {
-      "id": "g2",
+      "id": "g3",
       "nama": "Pak Budi",
       "ket": "Bahasa Inggris",
       "alamat": "Malang",
@@ -54,21 +47,21 @@
   ],
   "karyawan": [
     {
-      "id": "1cf9",
+      "id": "k1",
       "nama": "Andre",
       "ket": "OBHN",
       "alamat": "Garut",
       "hp": "0986756"
     },
     {
-      "id": "k1",
+      "id": "k2",
       "nama": "Pak Joko",
       "ket": "Staff TU",
       "alamat": "Sekolah",
       "hp": "0813333333"
     },
     {
-      "id": "k2",
+      "id": "k3",
       "nama": "Bu Lina",
       "ket": "Administrasi",
       "alamat": "Kepanjen",
@@ -77,55 +70,24 @@
   ],
   "kategoriTagihan": [
     {
-      "id": "kt1",
-      "nama": "SPP Bulanan"
-    },
-    {
       "id": "kt2",
-      "nama": "Praktikum"
-    },
-    {
-      "id": "kt3",
-      "nama": "Uang Kegiatan"
+      "nama": "ambatukam"
     }
   ],
-  "tagihan": [
-    {
-      "id": 1,
-      "nama": "Ayyas",
-      "kelas": "9A",
-      "bulan": "Januari",
-      "jumlah": 50000,
-      "status": "Belum Lunas"
-    },
-    {
-      "id": 2,
-      "nama": "Andretukam",
-      "kelas": "8B",
-      "bulan": "Februari",
-      "jumlah": 75000,
-      "status": "Lunas"
-    }
-  ],
+  "tagihan": [],
   "kelas": [
     {
-      "id": "kls1",
+      "id": "cls1",
       "nama": "Andre",
       "kelas": "11",
       "jurusan": "AKL"
     },
     {
-      "id": "kls2",
+      "id": "cls2",
       "nama": "Cahyo",
       "kelas": "12",
       "jurusan": "RPL"
     }
   ],
-  "level": [
-    {},
-    {
-      "name": "test123",
-      "id": "1503"
-    }
-  ]
+  "level": []
 }

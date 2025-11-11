@@ -28,7 +28,7 @@ export default function Sidnav() {
           <i className="ri-menu-line mr-2"></i>MENU
         </h2>
         <nav className="flex flex-col mt-4 space-y-2 px-3">
-          <Link to="/Dashboard" className="flex items-center gap-2 bg-blue-800 hover:bg-blue-700 rounded-md px-3 py-2 transition">
+          <Link to="/dashboard" className="flex items-center gap-2 bg-blue-800 hover:bg-blue-700 rounded-md px-3 py-2 transition">
             <i className="ri-dashboard-3-line text-xl"></i> Dashboard
           </Link>
 
@@ -50,7 +50,7 @@ export default function Sidnav() {
           </button>
           {openMenu === "keuangan" && (
             <div className="flex flex-col ml-6 mt-1">
-              <Link to="/kategori" className="py-1 hover:text-blue-200">Kategori Tagihan</Link>
+              <Link to="/kategori-tagihan" className="py-1 hover:text-blue-200">Kategori Tagihan</Link>
               <Link to="/tagihan" className="py-1 hover:text-blue-200">Tagihan</Link>
               <Link to="/rekap" className="py-1 hover:text-blue-200">Rekap Tagihan</Link>
             </div>

@@ -1,54 +1,49 @@
 import { Routes, Route, useLocation } from "react-router-dom";
-import Sidnav from "./Komponen/sidnav";
-import Login from "./Komponen/Login";
- import Register from "./Komponen/Register"
+
+import Sidnav from "./Komponen/Sidnav";
 import Dashboard from "./Komponen/Dashboard";
-import Easteregg from "./Easteregg";
-import TambahData from "./pages/masterdata/TambahData";
-import Edit from "./pages/masterdata/Editdata";
-//  import Masterdata from "./pages/tagihan/database/masterdata";
-import Kelas from "./Kelas";
+
 import Tagihan from "./pages/Tagihan/tagihan";
 import KategoriTagihan from "./pages/Tagihan/kategoritagihan";
 import RekapTagihan from "./pages/Tagihan/rekaptagihan";
-import "./App.css";
-import TabelDataPegawai from "./pages/masterdata/Masterdata";
-import TabelLevel from "./pages/kategori data/kategoridata";
-import TambahLevel from "./pages/kategori data/tambahkategorid";
-import EditLevel from "./pages/kategori data/editkategorid";
 
-function App() {
-  const location = useLocation();
+import Login from "./Komponen/Login";
+import Register from "./Komponen/Register";
 
-  const hideSidnav = ["/", "/register", "/s"];
-  const isHideSidnav = hideSidnav.includes(location.pathname);
+import Masterdata from "./pages/masterdata/Masterdata";
+import Ambatigori from "./pages/data/Ambatigori";
+import Tambahkategoridata from "./pages/data/tambahkategorid";
+import Edit from "./pages/masterdata/Editdata";
+import Tambahdata from "./pages/masterdata/TambahData"; // Pastikan ini konsisten
+
+export default function App() {
+  const loc = useLocation();
+  const hide = ["/", "/register"];
 
   return (
-    <div className="flex">
-      {!isHideSidnav && <Sidnav />}
-
-      <div className="flex-1 min-h-screen">
+    <div className="flex min-h-screen bg-gray-100">
+      {!hide.includes(loc.pathname) && <Sidnav />}
+      <div className="flex-1">
         <Routes>
+          {/* Auth */}
           <Route path="/" element={<Login />} />
-          <Route path="/Edit/:id" element={<Edit />} />
-          <Route path="/Tambahdata" element={<TambahData />} />
           <Route path="/register" element={<Register />} />
+
+          {/* Dashboard */}
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/apo" element={<TabelDataPegawai />} />
-          <Route path="/kategori" element={<KategoriTagihan />} />
-          <Route path="/s" element={<Easteregg />} />
-          <Route path="/rekap" element={<RekapTagihan />} />
-        
-          <Route path="/kelas" element={<Kelas />} />
+
+          {/* Tagihan */}
           <Route path="/tagihan" element={<Tagihan />} />
-          {/* kategori data */}
-          <Route path="/kategoril" element={<TabelLevel />} />
-          <Route path="/tambahkategoril" element={<TambahLevel />} />
-          <Route path="/editkategoril/:id" element={<EditLevel />} />
+          <Route path="/kategori-tagihan" element={<KategoriTagihan />} />
+          <Route path="/rekap" element={<RekapTagihan />} />
+
+          {/* Data */}
+          <Route path="/kategoril" element={<Ambatigori />} />
+          <Route path="/apo" element={<Masterdata />} />
+          <Route path="/tambahdata" element={<Tambahdata />} /> {/* Perbaiki penamaan */}
+          <Route path="/tambahkategoril" element={<Tambahkategoridata />} />
         </Routes>
       </div>
     </div>
   );
 }
-
-export default App;
