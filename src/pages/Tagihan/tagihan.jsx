@@ -118,7 +118,7 @@ export default function Tagihan() {
       <div className="bg-white p-6 rounded-2xl shadow-xl border border-blue-100">
         {/* Ganti tombol tambah dengan navigasi ke halaman form */}
         <button
-          onClick={() => navigate("/tambah-tagihan")} // Arahkan ke form tambah tagihan
+          onClick={() => navigate("/tambahkategoril")} // Arahkan ke form tambah tagihan
           className="mb-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow active:scale-95 transition"
         >
           + Tambah Tagihan

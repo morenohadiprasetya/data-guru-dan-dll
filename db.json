@@ -20,6 +20,13 @@
       "kelas": "100SD",
       "alamat": "Ngebruk Jero Banyu",
       "hp": "89321907390`17490`7"
+    },
+    {
+      "id": "1164",
+      "nama": "Ryuzaki (L . Lawliet)",
+      "ket": "12 x Tkj",
+      "alamat": "japan",
+      "hp": "086786776575"
     }
   ],
   "guru": [
@@ -70,11 +77,48 @@
   ],
   "kategoriTagihan": [
     {
-      "id": "kt2",
-      "nama": "ambatukam"
+      "id": "1762931915491",
+      "nama": "jo"
     }
   ],
-  "tagihan": [],
+  "tagihan": [
+    {
+      "id": "1762913024734",
+      "nama": "Ryuzaki (L . Lawliet)",
+      "kelas": "12",
+      "bulan": "mei",
+      "jumlah": 1000,
+      "status": "Lunas",
+      "kategori": "SPP"
+    },
+    {
+      "id": "1762913069484",
+      "nama": "Ryuzaki (L . Lawliet)",
+      "kelas": "12",
+      "bulan": "mei",
+      "jumlah": 1000,
+      "status": "Belum Lunas",
+      "kategori": "SPP"
+    },
+    {
+      "id": "1762916806585",
+      "nama": "bokep",
+      "kelas": "12 kentu",
+      "bulan": "bulan ngewe",
+      "jumlah": 5e+75,
+      "status": "Belum Lunas",
+      "kategori": "Kegiatan"
+    },
+    {
+      "id": "1762931119769",
+      "nama": "bokep",
+      "kelas": "12 kentu",
+      "bulan": "bulan ngewe",
+      "jumlah": 5e+75,
+      "status": "Belum Lunas",
+      "kategori": "SPP"
+    }
+  ],
   "kelas": [
     {
       "id": "cls1",

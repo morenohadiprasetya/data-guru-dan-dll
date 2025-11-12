@@ -41,7 +41,7 @@ export default function App() {
           <Route path="/kategoril" element={<Ambatigori />} />
           <Route path="/apo" element={<Masterdata />} />
           <Route path="/tambahdata" element={<Tambahdata />} /> {/* Perbaiki penamaan */}
-          <Route path="/tambahkategoril" element={<Tambahkategoridata />} />
+          <Route path="/tambahkategori" element={<Tambahkategoridata />} />
         </Routes>
       </div>
     </div>
