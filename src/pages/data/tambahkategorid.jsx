@@ -1,64 +1,52 @@
 import React, { useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { CCard, CCardBody, CFormInput, CButton } from "@coreui/react";
 import { useNavigate } from "react-router-dom";
 
-export default function TambahKategori() {
-  const navigate = useNavigate();
-  const API = "http://localhost:5000/kategoriTagihan";
+const API = "http://localhost:5000/kategoriData";
 
-  const [nama, setNama] = useState("");
+export default function Tambahkategoridata() {
+  const [form, setForm] = useState({ nama: "", ket: "", alamat: "", hp: "" });
+  const [saving, setSaving] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!nama.trim()) {
-      Swal.fire("Oops!", "Nama kategori wajib diisi!", "warning");
-      return;
-    }
-
+    if (!form.nama.trim()) return Swal.fire("Nama wajib diisi", "", "warning");
     try {
-      const newData = {
-        id: Date.now().toString(),
-        nama,
-      };
-
-      await axios.post(API, newData);
-      Swal.fire("Berhasil!", "Kategori baru berhasil ditambahkan!", "success").then(() =>
-        navigate("/kategori-tagihan")
-      );
-    } catch (error) {
-      Swal.fire("Error", "Gagal menyimpan kategori!", "error");
+      setSaving(true);
+      await axios.post(API, form); // json-server auto id
+      Swal.fire("Berhasil", "Data tersimpan", "success");
+      navigate("/kategoril");
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Gagal menyimpan", "error");
+    } finally {
+      setSaving(false);
     }
   };
 
   return (
-    <div className="flex-1 ml-48 mr-10 p-6 bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen">
-      <h2 className="text-2xl font-bold text-blue-700 mb-4">➕ Tambah Kategori Tagihan</h2>
+    <div className="p-6 ml-50">
+      <h2 className="text-2xl font-bold mb-4">Tambah Kategori Data</h2>
+      <form onSubmit={handleSubmit} className="max-w-lg bg-white p-4 rounded shadow">
+        <label className="block mb-1">Nama</label>
+        <input value={form.nama} onChange={(e)=>setForm({...form, nama:e.target.value})} className="w-full p-2 border mb-3 rounded" />
 
-      <CCard className="shadow-md border-0">
-        <CCardBody>
-          <form onSubmit={handleSubmit}>
-            <label>Nama Kategori</label>
-            <CFormInput
-              placeholder="Masukkan nama kategori..."
-              value={nama}
-              onChange={(e) => setNama(e.target.value)}
-              className="mb-3"
-            />
+        <label className="block mb-1">Keterangan / Kelas</label>
+        <input value={form.ket} onChange={(e)=>setForm({...form, ket:e.target.value})} className="w-full p-2 border mb-3 rounded" />
 
-            <div className="flex gap-3 mt-4">
-              <CButton color="primary" type="submit">
-                Simpan
-              </CButton>
-              <CButton color="secondary" onClick={() => navigate("/kategori-tagihan")}>
-                Batal
-              </CButton>
-            </div>
-          </form>
-        </CCardBody>
-      </CCard>
+        <label className="block mb-1">Alamat</label>
+        <input value={form.alamat} onChange={(e)=>setForm({...form, alamat:e.target.value})} className="w-full p-2 border mb-3 rounded" />
+
+        <label className="block mb-1">HP</label>
+        <input value={form.hp} onChange={(e)=>setForm({...form, hp:e.target.value})} className="w-full p-2 border mb-3 rounded" />
+
+        <div className="flex gap-2">
+          <button type="submit" disabled={saving} className="px-4 py-2 bg-blue-600 text-white rounded">{saving? "Menyimpan..." : "Simpan"}</button>
+          <button type="button" onClick={() => navigate(-1)} className="px-4 py-2 border rounded">Batal</button>
+        </div>
+      </form>
     </div>
   );
 }

@@ -1,60 +1,68 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { CCard, CCardBody, CFormInput, CButton } from "@coreui/react";
 import { useNavigate, useParams } from "react-router-dom";
 
-export default function EditLevel() {
+const API = "http://localhost:5000/kategoriData";
+
+export default function Editkategoridata() {
   const { id } = useParams();
-  const [name, setName] = useState("");
   const navigate = useNavigate();
-  const API = "http://localhost:5000/level";
+  const [form, setForm] = useState({ nama: "", ket: "", alamat: "", hp: "" });
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    axios.get(`${API}/${id}`).then((res) => {
-      setName(res.data.name);
-    });
+    if (!id) return;
+    setLoading(true);
+    axios.get(`${API}/${id}`)
+      .then(res => setForm(res.data || {}))
+      .catch(err => {
+        console.error(err);
+        Swal.fire("Error", "Gagal memuat data", "error");
+      })
+      .finally(() => setLoading(false));
   }, [id]);
 
-  const handleSubmit = async (e) => {
+  const save = async (e) => {
     e.preventDefault();
-
-    if (!name.trim()) {
-      Swal.fire("Oops!", "Nama level tidak boleh kosong!", "warning");
-      return;
+    if (!form.nama.trim()) return Swal.fire("Nama wajib diisi", "", "warning");
+    try {
+      setSaving(true);
+      await axios.put(`${API}/${id}`, form);
+      Swal.fire("Berhasil", "Perubahan disimpan", "success");
+      navigate("/kategoril");
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Gagal menyimpan", "error");
+    } finally {
+      setSaving(false);
     }
-
-    await axios.put(`${API}/${id}`, { name });
-
-    Swal.fire("Berhasil!", "Data level berhasil diperbarui!", "success").then(
-      () => navigate("/kategoril")
-    );
   };
 
+  if (loading) return <div className="p-6">Memuat...</div>;
+
   return (
-    <div className="flex-1 ml-48 mr-10 p-6 bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen">
-      <h4 className="mb-3">✏️ Edit Level</h4>
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-4">Edit Kategori Data</h2>
+      <form onSubmit={save} className="max-w-lg bg-white p-4 rounded shadow">
+        <label className="block mb-1">Nama</label>
+        <input value={form.nama} onChange={(e)=>setForm({...form, nama:e.target.value})} className="w-full p-2 border mb-3 rounded" />
 
-      <CCard className="p-3">
-        <CCardBody>
-          <form onSubmit={handleSubmit}>
-            <label>Nama Level</label>
-            <CFormInput
-              placeholder="Masukkan nama level..."
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="mb-3"
-            />
+        <label className="block mb-1">Keterangan / Kelas</label>
+        <input value={form.ket} onChange={(e)=>setForm({...form, ket:e.target.value})} className="w-full p-2 border mb-3 rounded" />
 
-            <CButton color="primary" type="submit" className="me-2">
-              Update
-            </CButton>
-            <CButton color="secondary" onClick={() => navigate("/level")}>
-              Batal
-            </CButton>
-          </form>
-        </CCardBody>
-      </CCard>
+        <label className="block mb-1">Alamat</label>
+        <input value={form.alamat} onChange={(e)=>setForm({...form, alamat:e.target.value})} className="w-full p-2 border mb-3 rounded" />
+
+        <label className="block mb-1">HP</label>
+        <input value={form.hp} onChange={(e)=>setForm({...form, hp:e.target.value})} className="w-full p-2 border mb-3 rounded" />
+
+        <div className="flex gap-2">
+          <button type="submit" disabled={saving} className="px-4 py-2 bg-blue-600 text-white rounded">{saving? "Menyimpan..." : "Simpan"}</button>
+          <button type="button" onClick={() => navigate(-1)} className="px-4 py-2 border rounded">Batal</button>
+        </div>
+      </form>
     </div>
   );
 }

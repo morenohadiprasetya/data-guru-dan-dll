@@ -24,6 +24,20 @@
     {
       "id": "1164",
       "nama": "Ryuzaki (L . Lawliet)",
+      "kelas": "12 X TKJ",
+      "alamat": "Japan",
+      "hp": "086786776575"
+    },
+    {
+      "id": "2cf6",
+      "nama": "Ryuzaki (L . Lawliet)",
+      "kelas": "12 X TKJ",
+      "alamat": "Japan",
+      "hp": "086786776575"
+    },
+    {
+      "id": "c3ea",
+      "nama": "Ryuzaki (L . Lawliet)",
       "ket": "12 x Tkj",
       "alamat": "japan",
       "hp": "086786776575"
@@ -75,48 +89,63 @@
       "hp": "082199887766"
     }
   ],
-  "kategoriTagihan": [
+  "kategoridata1": [
+     
     {
-      "id": "1762931915491",
-      "nama": "jo"
+      "id": "2f82",
+      "nama": "dfd",
+      "tipe": "Tahunan",
+      "deskripsi": "fsfs",
+      "kelas": "Semua"
     }
   ],
+  "kategoriTagihan": [],
   "tagihan": [
     {
       "id": "1762913024734",
-      "nama": "Ryuzaki (L . Lawliet)",
+      "nama": "SPP Mei 2025 - Ryuzaki",
+      "siswa_id": "1164",
       "kelas": "12",
-      "bulan": "mei",
-      "jumlah": 1000,
-      "status": "Lunas",
-      "kategori": "SPP"
+      "bulan": "Mei 2025",
+      "jumlah": 1000000,
+      "status": "Belum Lunas",
+      "kategori_id": "c13e703c-1aef-4ce2-8f32-e3f484809565",
+      "keterangan": "SPP bulan Mei"
     },
     {
       "id": "1762913069484",
-      "nama": "Ryuzaki (L . Lawliet)",
-      "kelas": "12",
-      "bulan": "mei",
-      "jumlah": 1000,
-      "status": "Belum Lunas",
-      "kategori": "SPP"
+      "nama": "Uang Bangunan - Andre",
+      "siswa_id": "s2",
+      "kelas": "15 SD",
+      "bulan": "2025",
+      "jumlah": 2500000,
+      "status": "Lunas",
+      "kategori_id": "2b8f9d1e-8f3a-4d8b-9f3b-111111111111",
+      "keterangan": "Kontribusi pembangunan"
+    }
+  ],
+  "pembayaran": [
+    {
+      "id": "pay-001",
+      "tagihan_id": "1762913069484",
+      "siswa_id": "s2",
+      "tanggal_bayar": "2025-05-11",
+      "nominal": 2500000,
+      "metode": "Transfer",
+      "status": "Valid",
+      "bukti": "",
+      "catatan": "Transfer via bank"
     },
     {
-      "id": "1762916806585",
-      "nama": "bokep",
-      "kelas": "12 kentu",
-      "bulan": "bulan ngewe",
-      "jumlah": 5e+75,
-      "status": "Belum Lunas",
-      "kategori": "Kegiatan"
-    },
-    {
-      "id": "1762931119769",
-      "nama": "bokep",
-      "kelas": "12 kentu",
-      "bulan": "bulan ngewe",
-      "jumlah": 5e+75,
-      "status": "Belum Lunas",
-      "kategori": "SPP"
+      "id": "pay-002",
+      "tagihan_id": "1762913024734",
+      "siswa_id": "1164",
+      "tanggal_bayar": "2025-05-20",
+      "nominal": 500000,
+      "metode": "Cash",
+      "status": "Pending",
+      "bukti": "",
+      "catatan": "Pembayaran sebagian"
     }
   ],
   "kelas": [

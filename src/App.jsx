@@ -13,18 +13,25 @@ import Register from "./Komponen/Register";
 import Masterdata from "./pages/masterdata/Masterdata";
 import Ambatigori from "./pages/data/Ambatigori";
 import Tambahkategoridata from "./pages/data/tambahkategorid";
+
 import Edit from "./pages/masterdata/Editdata";
-import Tambahdata from "./pages/masterdata/TambahData"; // Pastikan ini konsisten
+import Tambahdata from "./pages/masterdata/TambahData";
+
+import EditKategori from "./pages/data/editkategorid"; // ← PASTI BENAR
 
 export default function App() {
   const loc = useLocation();
-  const hide = ["/", "/register"];
+  const hideSidebar = ["/", "/register"];
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      {!hide.includes(loc.pathname) && <Sidnav />}
+      
+      {/* Sidebar hanya muncul jika bukan halaman login/register */}
+      {!hideSidebar.includes(loc.pathname) && <Sidnav />}
+
       <div className="flex-1">
         <Routes>
+
           {/* Auth */}
           <Route path="/" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -37,11 +44,16 @@ export default function App() {
           <Route path="/kategori-tagihan" element={<KategoriTagihan />} />
           <Route path="/rekap" element={<RekapTagihan />} />
 
-          {/* Data */}
-          <Route path="/kategoril" element={<Ambatigori />} />
+          {/* Master Data */}
           <Route path="/apo" element={<Masterdata />} />
-          <Route path="/tambahdata" element={<Tambahdata />} /> {/* Perbaiki penamaan */}
+          <Route path="/tambahdata" element={<Tambahdata />} />
+          <Route path="/editdata/:id" element={<Edit />} />
+
+          {/* Kategori Data */}
+          <Route path="/kategoril" element={<Ambatigori />} />
           <Route path="/tambahkategori" element={<Tambahkategoridata />} />
+          <Route path="/editkategori/:id" element={<EditKategori />} />  {/* ← FIX */}
+
         </Routes>
       </div>
     </div>
