@@ -34,13 +34,6 @@
       "kelas": "12 X TKJ",
       "alamat": "Japan",
       "hp": "086786776575"
-    },
-    {
-      "id": "c3ea",
-      "nama": "Ryuzaki (L . Lawliet)",
-      "ket": "12 x Tkj",
-      "alamat": "japan",
-      "hp": "086786776575"
     }
   ],
   "guru": [
@@ -89,17 +82,86 @@
       "hp": "082199887766"
     }
   ],
-  "kategoridata1": [
-     
+  "kategoridata": [
     {
-      "id": "2f82",
-      "nama": "dfd",
-      "tipe": "Tahunan",
-      "deskripsi": "fsfs",
-      "kelas": "Semua"
+      "id": "979d",
+      "nama": "ambatukam",
+      "ket": "10 X tkj",
+      "alamat": "beringin",
+      "hp": "0834042043"
+    },
+    {
+      "id": "9302",
+      "nama": "lili",
+      "tipe": "alat kentu",
+      "deskripsi": "assd",
+      "kelas": "garut",
+      "ket": "fesaesrf",
+      "alamat": "waw",
+      "hp": "weqwe"
+    },
+    {
+      "id": "5af6",
+      "nama": "Ryuzaki (L . Lawliet)",
+      "tipe": "alat reproduksi",
+      "deskripsi": "latihan biologi",
+      "kelas": "10 tk",
+      "ket": "ngawi",
+      "alamat": "ngawi",
+      "hp": "085285283"
+    },
+    {
+      "id": "f9d6",
+      "nama": "Ryuzaki (L . Lawliet)",
+      "tipe": "alat reproduksi",
+      "deskripsi": "sds",
+      "kelas": "10 tk"
+    },
+    {
+      "id": "4f8c",
+      "nama": "Ryuzaki (L . Lawliet)",
+      "tipe": "alat reproduksi",
+      "deskripsi": "ssf",
+      "kelas": "10 tk"
+    },
+    {
+      "id": "5849",
+      "nama": "Ryuzaki (L . Lawliet)",
+      "tipe": "alat reproduksi",
+      "deskripsi": " fgfgdfgds",
+      "kelas": "10 tk"
+    },
+    {
+      "id": "1efa",
+      "nama": "Ryuzaki (L . Lawliet)",
+      "tipe": "alat reproduksi",
+      "deskripsi": "afasas",
+      "kelas": "10 tk"
+    },
+    {
+      "id": "485b",
+      "nama": "Ryuzaki (L . Lawliet)",
+      "tipe": "alat reproduksi",
+      "deskripsi": "dsfsf",
+      "kelas": "10 tk"
+    },
+    {
+      "id": "94cf",
+      "nama": "Ryuzaki (L . Lawliet)",
+      "tipe": "alat reproduksi",
+      "deskripsi": "sdadas",
+      "kelas": "10 tk"
     }
   ],
-  "kategoriTagihan": [],
+  "kategoriTagihan": [
+    {
+      "id": "1763181531867",
+      "nama": "Ryuzaki (L . Lawliet)",
+      "tipe": "alat reproduksi",
+      "deskripsi": "saad",
+      "kelas": "10 tk"
+    }
+  ],
   "tagihan": [
     {
       "id": "1762913024734",
@@ -149,18 +211,7 @@
     }
   ],
   "kelas": [
-    {
-      "id": "cls1",
-      "nama": "Andre",
-      "kelas": "11",
-      "jurusan": "AKL"
-    },
-    {
-      "id": "cls2",
-      "nama": "Cahyo",
-      "kelas": "12",
-      "jurusan": "RPL"
-    }
+     
   ],
   "level": []
 }

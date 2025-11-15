@@ -3,11 +3,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 
-/**
- * KategoriTagihan.jsx
- * - Endpoint: /kategoriTagihan
- * - Features: fetch, search, sort, pagination, delete, navigate edit/add
- */
+ 
 
 const API = "http://localhost:5000/kategoriTagihan";
 
@@ -117,7 +113,7 @@ export default function KategoriTagihan() {
         <h1 className="text-2xl font-bold">Kategori Tagihan</h1>
         <div className="flex gap-2">
           <button
-            onClick={() => navigate("/tambahtagihan")}
+            onClick={() => navigate("/tambahkategori")}
             className="bg-blue-600 text-white px-4 py-2 rounded"
           >
             + Tambah

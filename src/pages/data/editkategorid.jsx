@@ -3,7 +3,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { useNavigate, useParams } from "react-router-dom";
 
-const API = "http://localhost:5000/kategoriData";
+const API = "http://localhost:5000/kategoridata";
 
 export default function Editkategoridata() {
   const { id } = useParams();
@@ -43,7 +43,7 @@ export default function Editkategoridata() {
   if (loading) return <div className="p-6">Memuat...</div>;
 
   return (
-    <div className="p-6">
+    <div className="p-6 ml-100">
       <h2 className="text-2xl font-bold mb-4">Edit Kategori Data</h2>
       <form onSubmit={save} className="max-w-lg bg-white p-4 rounded shadow">
         <label className="block mb-1">Nama</label>

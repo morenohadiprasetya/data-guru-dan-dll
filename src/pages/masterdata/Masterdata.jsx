@@ -19,9 +19,9 @@ export default function TabelDataPegawai() {
   const navigate = useNavigate();
 
   const API_LIST = {
-    siswa: "http://localhost:3000/siswa",
-    guru: "http://localhost:3000/guru",
-    karyawan: "http://localhost:3000/karyawan",
+    siswa: "http://localhost:5000/siswa",
+    guru: "http://localhost:5000/guru",
+    karyawan: "http://localhost:5000/karyawan",
   };
 
   const fetchData = async () => {

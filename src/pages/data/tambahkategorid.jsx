@@ -3,7 +3,8 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 
-const API = "http://localhost:5000/kategoriData";
+const API = "http://localhost:5000/kategoridata";
+
 
 export default function Tambahkategoridata() {
   const [form, setForm] = useState({ nama: "", ket: "", alamat: "", hp: "" });

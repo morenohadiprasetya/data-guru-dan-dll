@@ -158,7 +158,7 @@ export default function Dashboard() {
                 ]).map((k, i) => (
                   <tr key={i} className="odd:bg-white even:bg-gray-50 hover:bg-blue-50">
                     <td className="p-2 border border-gray-200">{k.nama}</td>
-                    <td className="p-2 border border-gray-200">{k.ket}</td>
+                    <td className="p-2 border border-gray-200">{k.kelas}</td>
                     <td className="p-2 border border-gray-200">{k.status || "Aktif"}</td>
                   </tr>
                 ))}

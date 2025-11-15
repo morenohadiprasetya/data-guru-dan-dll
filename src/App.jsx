@@ -17,7 +17,11 @@ import Tambahkategoridata from "./pages/data/tambahkategorid";
 import Edit from "./pages/masterdata/Editdata";
 import Tambahdata from "./pages/masterdata/TambahData";
 
-import EditKategori from "./pages/data/editkategorid"; // ← PASTI BENAR
+import EditKategori from "./pages/data/editkategorid";
+import Manoek from "./pages/Tagihan/Manoek";
+
+// FIXED (Huruf kapital)
+import Kelas from "./Komponen/Kelas";
 
 export default function App() {
   const loc = useLocation();
@@ -26,7 +30,6 @@ export default function App() {
   return (
     <div className="flex min-h-screen bg-gray-100">
       
-      {/* Sidebar hanya muncul jika bukan halaman login/register */}
       {!hideSidebar.includes(loc.pathname) && <Sidnav />}
 
       <div className="flex-1">
@@ -48,11 +51,13 @@ export default function App() {
           <Route path="/apo" element={<Masterdata />} />
           <Route path="/tambahdata" element={<Tambahdata />} />
           <Route path="/editdata/:id" element={<Edit />} />
+          <Route path="/kelas" element={<Kelas />} />
 
           {/* Kategori Data */}
           <Route path="/kategoril" element={<Ambatigori />} />
-          <Route path="/tambahkategori" element={<Tambahkategoridata />} />
-          <Route path="/editkategori/:id" element={<EditKategori />} />  {/* ← FIX */}
+          <Route path="/kategoridata" element={<Tambahkategoridata />} />
+          <Route path="/editkategori/:id" element={<EditKategori />} />
+          <Route path="/tambahkategori" element={<Manoek />} />
 
         </Routes>
       </div>
