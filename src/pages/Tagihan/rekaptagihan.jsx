@@ -1,25 +1,17 @@
 import React, { useEffect, useMemo, useState } from "react";
-
-/**
- * RekapTagihan.jsx
- * - Mengumpulkan tagihan per nama
- * - Menampilkan total, lunas, sisa, persen
- * - Filter / search / small summary
- *
- * Endpoint expected: http://localhost:5000/tagihan
- */
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faReceipt } from "@fortawesome/free-solid-svg-icons";
 
 const API = "http://localhost:5000/tagihan";
 
 function formatRp(n = 0) {
-  return "Rp " + Number(n).toLocaleString();
+  return "Rp " + Number(n).toLocaleString("id-ID");
 }
 
 export default function RekapTagihan() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [filterPercentMin, setFilterPercentMin] = useState(0); // filter: show only > persen
 
   useEffect(() => {
     let mounted = true;
@@ -40,14 +32,24 @@ export default function RekapTagihan() {
     return () => (mounted = false);
   }, []);
 
+  // Grouping data
   const grouped = useMemo(() => {
     const map = {};
+
     data.forEach((t) => {
       const name = t.nama || "Unknown";
-      if (!map[name]) map[name] = { nama: name, total: 0, lunas: 0, sisa: 0 };
+
+      if (!map[name]) {
+        map[name] = { nama: name, total: 0, lunas: 0, sisa: 0 };
+      }
+
       const jumlah = Number(t.jumlah || 0);
       map[name].total += jumlah;
-      if ((t.status || "").toLowerCase() === "lunas") map[name].lunas += jumlah;
+
+      if ((t.status || "").toLowerCase() === "lunas") {
+        map[name].lunas += jumlah;
+      }
+
       map[name].sisa = map[name].total - map[name].lunas;
     });
 
@@ -57,14 +59,15 @@ export default function RekapTagihan() {
     }));
   }, [data]);
 
+  // Search filter
   const filtered = useMemo(() => {
-    const s = search.trim().toLowerCase();
+    const q = search.toLowerCase();
     return grouped
-      .filter((g) => g.persen >= filterPercentMin)
-      .filter((g) => (s ? g.nama.toLowerCase().includes(s) : true))
-      .sort((a, b) => b.total - a.total); // largest first
-  }, [grouped, search, filterPercentMin]);
+      .filter((r) => (q ? r.nama.toLowerCase().includes(q) : true))
+      .sort((a, b) => b.total - a.total);
+  }, [grouped, search]);
 
+  // Total keseluruhan
   const totals = useMemo(() => {
     return grouped.reduce(
       (acc, cur) => {
@@ -78,90 +81,100 @@ export default function RekapTagihan() {
   }, [grouped]);
 
   return (
-    <div className="p-6">
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-2xl font-bold mb-4">Rekap Tagihan</h1>
+    <div className="p-6 ml-55 mr-8">
 
-        <div className="bg-white p-4 rounded shadow mb-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Cari nama..."
-              className="p-2 border rounded"
-            />
-            <div className="flex items-center gap-2">
-              <label className="text-sm text-gray-600">Minimal persen lunas:</label>
-              <input
-                type="number"
-                value={filterPercentMin}
-                onChange={(e) => setFilterPercentMin(Number(e.target.value || 0))}
-                className="p-2 border rounded w-20"
-                min={0}
-                max={100}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="text-sm text-gray-600">Total siswa:</div>
-              <div className="font-semibold">{grouped.length}</div>
-            </div>
-          </div>
+      {/* HEADER */}
+      <div className="flex items-center gap-3 mb-8">
+        <FontAwesomeIcon icon={faReceipt} className="text-blue-600 text-3xl" />
+        <h1 className="text-3xl font-semibold">Rekap Tagihan</h1>
+      </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div className="p-3 bg-gray-50 rounded">
-              <div className="text-sm text-gray-500">Total Semua Tagihan</div>
-              <div className="text-xl font-bold">{formatRp(totals.totalAll)}</div>
-            </div>
-            <div className="p-3 bg-gray-50 rounded">
-              <div className="text-sm text-gray-500">Total Terbayar</div>
-              <div className="text-xl font-bold text-green-600">{formatRp(totals.lunasAll)}</div>
-            </div>
-            <div className="p-3 bg-gray-50 rounded">
-              <div className="text-sm text-gray-500">Sisa</div>
-              <div className="text-xl font-bold text-red-600">{formatRp(totals.sisaAll)}</div>
-            </div>
-          </div>
+      {/* FILTER + SUMMARY */}
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 mb-8">
+
+        {/* Search */}
+        <div className="mb-6">
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="🔍 Cari nama siswa..."
+            className="p-3 w-full rounded-xl bg-gray-100 border border-gray-300 
+                       focus:ring-2 focus:ring-blue-400 outline-none transition"
+          />
         </div>
 
-        <div className="bg-white p-4 rounded shadow">
-          {loading ? (
-            <div className="p-6 text-center text-gray-600">Memuat rekap...</div>
-          ) : filtered.length === 0 ? (
-            <div className="p-6 text-center text-gray-600">Tidak ada hasil</div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full border">
-                <thead className="bg-gray-100">
-                  <tr>
-                    <th className="p-2 border">No</th>
-                    <th className="p-2 border">Nama</th>
-                    <th className="p-2 border text-right">Total</th>
-                    <th className="p-2 border text-right">Lunas</th>
-                    <th className="p-2 border text-right">Sisa</th>
-                    <th className="p-2 border text-center">%</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((r, i) => (
-                    <tr key={r.nama} className="odd:bg-white even:bg-gray-50">
-                      <td className="p-2 border">{i + 1}</td>
-                      <td className="p-2 border">{r.nama}</td>
-                      <td className="p-2 border text-right">{formatRp(r.total)}</td>
-                      <td className="p-2 border text-right text-green-600">{formatRp(r.lunas)}</td>
-                      <td className="p-2 border text-right text-red-600">{formatRp(r.sisa)}</td>
-                      <td className="p-2 border text-center font-bold">{r.persen}%</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-        <div className="mt-4 text-sm text-gray-500">
-          Catatan: Rekap ini menghitung berdasarkan field <code>jumlah</code> dan <code>status</code> pada endpoint <code>/tagihan</code>.
+          <div className="p-6 bg-blue-50 border border-blue-200 rounded-xl shadow-sm">
+            <p className="text-sm text-gray-600">Total Semua Tagihan</p>
+            <p className="text-3xl font-bold">{formatRp(totals.totalAll)}</p>
+          </div>
+
+          <div className="p-6 bg-green-50 border border-green-200 rounded-xl shadow-sm">
+            <p className="text-sm text-gray-600">Total Terbayar</p>
+            <p className="text-3xl font-bold text-green-600">
+              {formatRp(totals.lunasAll)}
+            </p>
+          </div>
+
+          <div className="p-6 bg-red-50 border border-red-200 rounded-xl shadow-sm">
+            <p className="text-sm text-gray-600">Total Sisa Pembayaran</p>
+            <p className="text-3xl font-bold text-red-600">
+              {formatRp(totals.sisaAll)}
+            </p>
+          </div>
+
         </div>
       </div>
+
+      {/* TABLE */}
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+        {loading ? (
+          <div className="p-8 text-center text-gray-600">Memuat rekap...</div>
+        ) : filtered.length === 0 ? (
+          <div className="p-8 text-center text-gray-600">Tidak ada data ditemukan</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+
+              <thead className="bg-blue-600 text-white">
+                <tr>
+                  <th className="p-3">No</th>
+                  <th className="p-3">Nama</th>
+                  <th className="p-3 text-right">Total</th>
+                  <th className="p-3 text-right">Lunas</th>
+                  <th className="p-3 text-right">Sisa</th>
+                  <th className="p-3 text-center">%</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {filtered.map((r, i) => (
+                  <tr
+                    key={r.nama}
+                    className="odd:bg-white even:bg-gray-50 border-b 
+                               hover:bg-blue-50 transition"
+                  >
+                    <td className="p-3">{i + 1}</td>
+                    <td className="p-3 font-medium">{r.nama}</td>
+                    <td className="p-3 text-right">{formatRp(r.total)}</td>
+                    <td className="p-3 text-right text-green-600">{formatRp(r.lunas)}</td>
+                    <td className="p-3 text-right text-red-600">{formatRp(r.sisa)}</td>
+                    <td className="p-3 text-center font-bold">{r.persen}%</td>
+                  </tr>
+                ))}
+              </tbody>
+
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* CATATAN */}
+      <p className="mt-4 text-sm text-gray-500">
+        Rekap dihitung berdasarkan field <code>jumlah</code> & <code>status</code> dari endpoint <code>/tagihan</code>.
+      </p>
     </div>
   );
 }

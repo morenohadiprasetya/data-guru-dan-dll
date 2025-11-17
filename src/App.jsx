@@ -11,17 +11,21 @@ import Login from "./Komponen/Login";
 import Register from "./Komponen/Register";
 
 import Masterdata from "./pages/masterdata/Masterdata";
+import Tambahdata from "./pages/masterdata/TambahData";
+import Edit from "./pages/masterdata/Editdata";
+
 import Ambatigori from "./pages/data/Ambatigori";
 import Tambahkategoridata from "./pages/data/tambahkategorid";
+import Editkategoridata from "./pages/data/editkategorid";
 
-import Edit from "./pages/masterdata/Editdata";
-import Tambahdata from "./pages/masterdata/TambahData";
+import TambahKelas from "./pages/kelas/TambahKelas";
+import Kelas from "./pages/kelas/Kelas";
+import EditKelas from "./pages/kelas/Editkelas";
+ 
+import Ekategori from "./pages/Tagihan/Ekategori"
+import Tkategori from "./pages/Tagihan/Tkategori"
+import TambahTagihan from "./pages/Tagihan/Tambahtagihan";
 
-import EditKategori from "./pages/data/editkategorid";
-import Manoek from "./pages/Tagihan/Manoek";
-
-// FIXED (Huruf kapital)
-import Kelas from "./Komponen/Kelas";
 
 export default function App() {
   const loc = useLocation();
@@ -29,35 +33,45 @@ export default function App() {
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      
       {!hideSidebar.includes(loc.pathname) && <Sidnav />}
 
       <div className="flex-1">
         <Routes>
 
-          {/* Auth */}
+          {/* AUTH */}
           <Route path="/" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* Dashboard */}
+          {/* DASHBOARD */}
           <Route path="/dashboard" element={<Dashboard />} />
 
-          {/* Tagihan */}
+          {/* TAGIHAN */}
           <Route path="/tagihan" element={<Tagihan />} />
           <Route path="/kategori-tagihan" element={<KategoriTagihan />} />
           <Route path="/rekap" element={<RekapTagihan />} />
+          <Route path="/garoet" element={<TambahTagihan />} />
 
-          {/* Master Data */}
+
+          {/* MASTER DATA */}
           <Route path="/apo" element={<Masterdata />} />
           <Route path="/tambahdata" element={<Tambahdata />} />
           <Route path="/editdata/:id" element={<Edit />} />
-          <Route path="/kelas" element={<Kelas />} />
 
-          {/* Kategori Data */}
+          {/* KELAS */}
+          <Route path="/kelas" element={<Kelas />} />
+          <Route path="/brngn/:id" element={<EditKelas />} />
+          <Route path="/tkelas" element={<TambahKelas />} />
+        
+          <Route path="/Ekategori/:id" element={<Ekategori />} />
+       
+          <Route path="/tmbh" element={<Tkategori />} />
+       
+       
+
+          {/* KATEGORI DATA */}
           <Route path="/kategoril" element={<Ambatigori />} />
-          <Route path="/kategoridata" element={<Tambahkategoridata />} />
-          <Route path="/editkategori/:id" element={<EditKategori />} />
-          <Route path="/tambahkategori" element={<Manoek />} />
+          <Route path="/kategori-data/tambah" element={<Tambahkategoridata />} />
+          <Route path="/kategori-data/edit/:id" element={<Editkategoridata />} />
 
         </Routes>
       </div>

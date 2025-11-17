@@ -1,13 +1,15 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import "remixicon/fonts/remixicon.css";
 
 export default function Sidnav() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [openMenu, setOpenMenu] = useState(null);
 
-  const toggleMenu = (menu) => setOpenMenu(openMenu === menu ? null : menu);
+  const toggleMenu = (menu) =>
+    setOpenMenu(openMenu === menu ? null : menu);
 
   const handleLogout = () => {
     Swal.fire({
@@ -21,47 +23,113 @@ export default function Sidnav() {
     });
   };
 
+  const isActive = (path) =>
+    location.pathname === path
+      ? "bg-blue-700 text-white shadow-md"
+      : "text-blue-100 hover:bg-blue-800 hover:text-white";
+
   return (
-    <div className="fixed top-0 left-0 h-screen w-48 bg-blue-900 text-white flex flex-col justify-between shadow-lg z-50">
+    <div className="fixed top-0 left-0 h-screen w-56 bg-blue-900/95 backdrop-blur-xl 
+                    text-white shadow-2xl border-r border-blue-800 flex flex-col justify-between z-50 transition-all">
+
+      {/* HEADER */}
       <div>
-        <h2 className="text-lg font-bold text-center py-4 border-b border-blue-700 cursor-pointer hover:bg-blue-800 transition" onClick={() => navigate("/")}>
-          <i className="ri-menu-line mr-2"></i>MENU
-        </h2>
-        <nav className="flex flex-col mt-4 space-y-2 px-3">
-          <Link to="/dashboard" className="flex items-center gap-2 bg-blue-800 hover:bg-blue-700 rounded-md px-3 py-2 transition">
-            <i className="ri-dashboard-3-line text-xl"></i> Dashboard
+        <div
+          onClick={() => navigate("/")}
+          className="flex items-center justify-center gap-2 text-xl font-bold py-4 
+                     bg-blue-800/40 hover:bg-blue-700/40 transition cursor-pointer border-b border-blue-700"
+        >
+          <i className="ri-menu-line text-2xl"></i>
+          MENU
+        </div>
+
+        <nav className="flex flex-col mt-4 px-3 space-y-2">
+
+          {/* DASHBOARD */}
+          <Link
+            to="/dashboard"
+            className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-all ${isActive("/dashboard")}`}
+          >
+            <i className="ri-dashboard-2-line text-xl"></i>
+            Dashboard
           </Link>
 
-          <button onClick={() => toggleMenu("database")} className="flex justify-between items-center px-3 py-2 hover:bg-blue-800 rounded-md transition">
-            <div className="flex items-center gap-2"><i className="ri-database-2-line"></i> Database</div>
-            <span>{openMenu === "database" ? "▲" : "▼"}</span>
+          {/* DATABASE MENU */}
+          <button
+            onClick={() => toggleMenu("database")}
+            className="flex justify-between items-center px-4 py-2 rounded-lg text-blue-100 
+                       hover:bg-blue-800 transition"
+          >
+            <span className="flex items-center gap-3">
+              <i className="ri-folder-2-line text-xl"></i>
+              Database
+            </span>
+            <i className={`ri-arrow-down-s-line transition-transform ${openMenu === "database" ? "rotate-180" : ""}`}></i>
           </button>
+
+          {/* SUBMENU DATABASE */}
           {openMenu === "database" && (
-            <div className="flex flex-col ml-6 mt-1">
-              <Link to="/kategoril" className="py-1 hover:text-blue-200">Kategori Data</Link>
-              <Link to="/kelas" className="py-1 hover:text-blue-200">Kelas</Link>
-             
-              <Link to="/apo" className="py-1 hover:text-blue-200">Masterdata</Link>
+            <div className="ml-7 mt-1 flex flex-col gap-1 animate-fadeIn text-sm">
+
+              <Link to="/kategoril" className="py-1 flex items-center gap-2 hover:text-blue-200">
+                <i className="ri-price-tag-3-line"></i> Kategori Data
+              </Link>
+
+              <Link to="/kelas" className="py-1 flex items-center gap-2 hover:text-blue-200">
+                <i className="ri-building-2-line"></i> Kelas
+              </Link>
+
+              <Link to="/apo" className="py-1 flex items-center gap-2 hover:text-blue-200">
+                <i className="ri-user-3-line"></i> Masterdata
+              </Link>
+
             </div>
           )}
 
-          <button onClick={() => toggleMenu("keuangan")} className="flex justify-between items-center px-3 py-2 hover:bg-blue-800 rounded-md transition">
-            <div className="flex items-center gap-2"><i className="ri-money-dollar-circle-line"></i> Keuangan</div>
-            <span>{openMenu === "keuangan" ? "▲" : "▼"}</span>
+          {/* KEUANGAN */}
+          <button
+            onClick={() => toggleMenu("keuangan")}
+            className="flex justify-between items-center px-4 py-2 rounded-lg text-blue-100 
+                       hover:bg-blue-800 transition"
+          >
+            <span className="flex items-center gap-3">
+              <i className="ri-money-dollar-circle-line text-xl"></i>
+              Keuangan
+            </span>
+            <i className={`ri-arrow-down-s-line transition-transform ${openMenu === "keuangan" ? "rotate-180" : ""}`}></i>
           </button>
+
+          {/* SUBMENU KEUANGAN */}
           {openMenu === "keuangan" && (
-            <div className="flex flex-col ml-6 mt-1">
-              <Link to="/kategori-tagihan" className="py-1 hover:text-blue-200">Kategori Tagihan</Link>
-              <Link to="/tagihan" className="py-1 hover:text-blue-200">Tagihan</Link>
-              <Link to="/rekap" className="py-1 hover:text-blue-200">Rekap Tagihan</Link>
+            <div className="ml-7 mt-1 flex flex-col gap-1 animate-fadeIn text-sm">
+
+              <Link to="/kategori-tagihan" className="py-1 flex items-center gap-2 hover:text-blue-200">
+                <i className="ri-list-check-2"></i> Kategori Tagihan
+              </Link>
+
+              <Link to="/tagihan" className="py-1 flex items-center gap-2 hover:text-blue-200">
+                <i className="ri-receipt-line"></i> Tagihan
+              </Link>
+
+              <Link to="/rekap" className="py-1 flex items-center gap-2 hover:text-blue-200">
+                <i className="ri-bar-chart-box-line"></i> Rekap Tagihan
+              </Link>
+
             </div>
           )}
+
         </nav>
       </div>
 
+      {/* LOGOUT */}
       <div className="p-4">
-        <button onClick={handleLogout} className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white w-full py-2 rounded-md transition">
-          <i className="ri-logout-box-r-line"></i> Logout
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center justify-center gap-2 bg-red-600 
+                     hover:bg-red-700 transition text-white py-2 rounded-lg shadow-md"
+        >
+          <i className="ri-logout-box-r-line text-xl"></i>
+          Logout
         </button>
       </div>
     </div>

@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 
 const API = "http://localhost:5000/kategoridata";
 
-
 export default function Tambahkategoridata() {
   const [form, setForm] = useState({ nama: "", ket: "", alamat: "", hp: "" });
   const [saving, setSaving] = useState(false);
@@ -16,9 +15,9 @@ export default function Tambahkategoridata() {
     if (!form.nama.trim()) return Swal.fire("Nama wajib diisi", "", "warning");
     try {
       setSaving(true);
-      await axios.post(API, form); // json-server auto id
+      await axios.post(API, form);
       Swal.fire("Berhasil", "Data tersimpan", "success");
-      navigate("/kategoril");
+      navigate("/kategoril"); // Diperbaiki
     } catch (err) {
       console.error(err);
       Swal.fire("Error", "Gagal menyimpan", "error");
@@ -28,7 +27,7 @@ export default function Tambahkategoridata() {
   };
 
   return (
-    <div className="p-6 ml-50">
+    <div className="p-6 ml-150"> 
       <h2 className="text-2xl font-bold mb-4">Tambah Kategori Data</h2>
       <form onSubmit={handleSubmit} className="max-w-lg bg-white p-4 rounded shadow">
         <label className="block mb-1">Nama</label>

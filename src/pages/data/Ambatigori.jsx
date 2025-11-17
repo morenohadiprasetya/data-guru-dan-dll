@@ -5,30 +5,23 @@ import { useNavigate } from "react-router-dom";
 
 const API = "http://localhost:5000/kategoridata";
 
-
 export default function Ambatigori() {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
   const [q, setQ] = useState("");
-  const [page, setPage] = useState(1);
-  const perPage = 8;
 
   const navigate = useNavigate();
 
   const fetchAll = async () => {
     setLoading(true);
-    setError(null);
     try {
       const res = await axios.get(API);
+
       setList(Array.isArray(res.data) ? res.data : []);
-    } catch (err) {
-      console.error(err);
-      setError("Gagal memuat data master.");
-    } finally {
-      setLoading(false);
+    } catch {
+      Swal.fire("Error", "Gagal memuat data", "error");
     }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -36,110 +29,133 @@ export default function Ambatigori() {
   }, []);
 
   const filtered = useMemo(() => {
-    const s = q.trim().toLowerCase();
-    if (!s) return list.slice();
-    return list.filter(
-      (i) =>
-        (i.nama || "").toLowerCase().includes(s) ||
-        (i.ket || "").toLowerCase().includes(s) ||
-        (i.alamat || "").toLowerCase().includes(s) ||
-        (i.hp || "").toLowerCase().includes(s)
+    const s = q.toLowerCase().trim();
+    if (!s) return list;
+
+    return list.filter((i) =>
+      [i.nama, i.ket, i.alamat, i.hp].some((x) =>
+        (x || "").toLowerCase().includes(s)
+      )
     );
-  }, [list, q]);
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
-  useEffect(() => {
-    if (page > totalPages) setPage(totalPages);
-  }, [totalPages]);
-
-  const pageItems = useMemo(() => {
-    const start = (page - 1) * perPage;
-    return filtered.slice(start, start + perPage);
-  }, [filtered, page]);
+  }, [q, list]);
 
   const handleDelete = async (id) => {
     const ok = await Swal.fire({
-      title: "Hapus data?",
       icon: "warning",
+      title: "Hapus data ini?",
+      text: "Data yang dihapus tidak bisa dikembalikan!",
       showCancelButton: true,
-      confirmButtonText: "Hapus",
+      confirmButtonText: "Ya, Hapus",
+      cancelButtonText: "Batal",
     });
+
     if (!ok.isConfirmed) return;
+
     try {
       await axios.delete(`${API}/${id}`);
-      Swal.fire("Dihapus", "", "success");
+      Swal.fire("Berhasil!", "Data berhasil dihapus", "success");
       fetchAll();
-    } catch (err) {
-      console.error(err);
-      Swal.fire("Error", "Gagal menghapus", "error");
+    } catch {
+      Swal.fire("Error", "Gagal menghapus data", "error");
     }
   };
 
   return (
-    <div className="p-6 ml-50">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold">Kategori Data</h2>
-        <div className="flex gap-2">
-          <button onClick={() => navigate("/tambahkategori")} className="px-4 py-2 bg-blue-600 text-white rounded">+ Tambah</button>
-        </div>
+    <div className="p-6 ml-55 min-h-screen bg-gray-50">
+      
+      {/* HEADER */}
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-3xl font-extrabold text-blue-700 flex items-center gap-2">
+          📂 Kategori Data
+        </h2>
+
+        <button
+          onClick={() => navigate("/kategori-data/tambah")}
+          className="px-5 py-2 bg-blue-600 hover:bg-blue-700 transition text-white rounded-xl shadow active:scale-95"
+        >
+          + Tambah Data
+        </button>
       </div>
 
-      <div className="mb-4">
-        <input value={q} onChange={(e)=>{setQ(e.target.value); setPage(1);}} placeholder="Cari nama/ket/alamat/hp..." className="border p-2 rounded w-72" />
-        <button onClick={()=>{setQ(""); setPage(1);}} className="ml-2 px-3 py-1 border rounded">Reset</button>
+      {/* Search Box */}
+      <div className="mb-5">
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="🔍 Cari kategori..."
+          className="border p-3 rounded-xl w-80 shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none"
+        />
       </div>
 
-      {loading ? (
-        <div className="p-6 text-center text-gray-600">Memuat...</div>
-      ) : error ? (
-        <div className="p-4 text-red-600">{error}</div>
-      ) : filtered.length === 0 ? (
-        <div className="p-6 text-gray-600">Belum ada data.</div>
-      ) : (
-        <>
-          <div className="overflow-x-auto bg-white rounded shadow">
-            <table className="w-full">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="p-2">No</th>
-                  <th className="p-2">Nama</th>
-                  <th className="p-2">Keterangan</th>
-                  <th className="p-2">Alamat</th>
-                  <th className="p-2">HP</th>
-                  <th className="p-2">Aksi</th>
+      {/* CARD CONTAINER */}
+      <div className="bg-white shadow-xl rounded-2xl border border-blue-100 overflow-hidden">
+
+        {/* LOADING */}
+        {loading ? (
+          <div className="p-6 text-center text-gray-500">⏳ Memuat data...</div>
+        ) : filtered.length === 0 ? (
+          <div className="p-6 text-center text-gray-500">
+            Tidak ada data ditemukan.
+          </div>
+        ) : (
+          <table className="w-full">
+            <thead className="bg-blue-600 text-white">
+              <tr>
+                <th className="p-3 text-left">Nama</th>
+                <th className="p-3 text-left">Keterangan</th>
+                <th className="p-3 text-left">Alamat</th>
+                <th className="p-3 text-left">HP</th>
+                <th className="p-3 text-center">Aksi</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {filtered.map((d, i) => (
+                <tr
+                  key={d.id}
+                  className="border-b hover:bg-blue-50 transition"
+                >
+                  <td className="p-3 font-semibold text-blue-700">{d.nama}</td>
+                  <td className="p-3">
+                    {d.ket ? (
+                      d.ket
+                    ) : (
+                      <span className="px-2 py-1 bg-gray-200 text-gray-600 rounded text-xs">
+                        Tidak ada keterangan
+                      </span>
+                    )}
+                  </td>
+                  <td className="p-3">{d.alamat || "-"}</td>
+                  <td className="p-3">{d.hp || "-"}</td>
+
+                  <td className="p-3">
+                    <div className="flex justify-center gap-3">
+
+                      {/* EDIT BUTTON */}
+                      <button
+                        onClick={() => navigate(`/kategori-data/edit/${d.id}`)}
+                        className="px-3 py-1 bg-yellow-400 hover:bg-yellow-500 text-white rounded shadow"
+                      >
+                        ✏ Edit
+                      </button>
+
+                      {/* DELETE BUTTON */}
+                      <button
+                        onClick={() => handleDelete(d.id)}
+                        className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded shadow"
+                      >
+                        🗑 Hapus
+                      </button>
+                    </div>
+                  </td>
+
                 </tr>
-              </thead>
-              <tbody>
-                {pageItems.map((d, i) => (
-                  <tr key={d.id} className="border-t">
-                    <td className="p-2">{(page-1)*perPage + i + 1}</td>
-                    <td className="p-2">{d.nama}</td>
-                    <td className="p-2">{d.ket}</td>
-                    <td className="p-2">{d.alamat}</td>
-                    <td className="p-2">{d.hp}</td>
-                    <td className="p-2">
-                      <div className="inline-flex gap-2">
-                        <button onClick={()=>navigate(`/editkategori/${d.id}`)} className="px-3 py-1 bg-yellow-400 rounded">Edit</button>
-                        <button onClick={()=>handleDelete(d.id)} className="px-3 py-1 bg-red-600 text-white rounded">Hapus</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
+        )}
 
-          <div className="flex items-center justify-between mt-4">
-            <div className="text-sm text-gray-600">Menampilkan {filtered.length} item — halaman {page}/{totalPages}</div>
-            <div className="flex gap-2">
-              <button onClick={()=>setPage(1)} disabled={page===1} className="px-3 py-1 border rounded">⏮</button>
-              <button onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page===1} className="px-3 py-1 border rounded">◀</button>
-              <button onClick={()=>setPage(p=>Math.min(totalPages,p+1))} disabled={page===totalPages} className="px-3 py-1 border rounded">▶</button>
-              <button onClick={()=>setPage(totalPages)} disabled={page===totalPages} className="px-3 py-1 border rounded">⏭</button>
-            </div>
-          </div>
-        </>
-      )}
+      </div>
     </div>
-  );    
+  );
 }

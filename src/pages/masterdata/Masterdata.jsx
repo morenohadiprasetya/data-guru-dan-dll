@@ -9,27 +9,28 @@ import {
   CButton,
 } from "@coreui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faTrash, faFolderOpen } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 
-export default function TabelDataPegawai() {
+export default function Masterdata() {
   const [kategori, setKategori] = useState("siswa");
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
-  const API_LIST = {
+  const API = {
     siswa: "http://localhost:5000/siswa",
     guru: "http://localhost:5000/guru",
     karyawan: "http://localhost:5000/karyawan",
   };
 
+  // Fetch Data
   const fetchData = async () => {
     try {
-      const response = await axios.get(API_LIST[kategori]);
-      setData(response.data);
+      const res = await axios.get(API[kategori]);
+      setData(Array.isArray(res.data) ? res.data : []);
     } catch (error) {
-      console.log("Gagal mengambil data:", error);
+      Swal.fire("Error", "Gagal mengambil data", "error");
     }
   };
 
@@ -37,128 +38,117 @@ export default function TabelDataPegawai() {
     fetchData();
   }, [kategori]);
 
-  const filteredData = data.filter((item) =>
-    item.nama?.toLowerCase().includes(search.toLowerCase()) ||
-    item.alamat?.toLowerCase().includes(search.toLowerCase())
-  );
+  // Filter search
+  const filteredData = data.filter((item) => {
+    const q = search.toLowerCase();
+    return (
+      item.nama?.toLowerCase().includes(q) ||
+      item.alamat?.toLowerCase().includes(q)
+    );
+  });
 
   const handleDelete = (id) => {
     Swal.fire({
       title: "Yakin ingin menghapus?",
-      text: "Data tidak dapat dikembalikan setelah dihapus!",
+      text: "Data tidak dapat dikembalikan!",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Ya, hapus!",
-      cancelButtonText: "Batal",
+      confirmButtonText: "Hapus",
     }).then((result) => {
       if (result.isConfirmed) {
-        axios.delete(`${API_LIST[kategori]}/${id}`).then(() => {
-          Swal.fire("Berhasil!", "Data telah dihapus.", "success");
-          fetchData();
-        });
+        axios
+          .delete(`${API[kategori]}/${id}`)
+          .then(() => {
+            Swal.fire("Berhasil", "Data terhapus", "success");
+            fetchData();
+          })
+          .catch(() => Swal.fire("Error", "Gagal menghapus", "error"));
       }
     });
   };
 
   const handleEdit = (id) => {
-    navigate(`/edit/${id}`);
+    navigate(`/editdata/${id}?kategori=${kategori}`);
   };
+
   return (
-    <div className="flex-1 ml-48 mr-10 p-6 bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen">
-      <h4 className="mb-3">📋 Tabel Data {kategori.toUpperCase()}</h4>
+    <div className="ml-55 mr-10 p-6">
+      
+      {/* HEADER + ICON */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <FontAwesomeIcon icon={faFolderOpen} className="text-yellow-600 text-3xl" />
+          <h1 className="text-3xl font-semibold">Kategori Data</h1>
+        </div>
 
-      {/* Filter & Search */}
-      <div className="d-flex gap-3 align-items-center mb-3">
-        <span>Kategori:</span>
-
-        <CFormSelect
-          value={kategori}
-          onChange={(e) => setKategori(e.target.value)}
-          style={{ width: "180px" }}
+        {/* Button Tambah */}
+        <button
+          onClick={() => navigate(`/tambahdata?kategori=${kategori}`)}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded shadow"
         >
-          <option value="siswa">Siswa</option>
-          <option value="guru">Guru</option>
-          <option value="karyawan">Karyawan</option>
-        </CFormSelect>
-
-        <CFormInput
-          placeholder="Cari nama / alamat..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          style={{ width: "340px" }}
-        />
-
-        <CButton color="primary" onClick={() => navigate("/Tambahdata")}>
-          Tambah Data
-        </CButton>
+          + Tambah Data
+        </button>
       </div>
 
-      {/* Table */}
-      <CCard>
-        <CCardBody>
-          <table className="table table-hover text-center">
-            <thead style={{ backgroundColor: "#E9F3FF" }}>
-              <tr>
-                <th>No</th>
-                <th>Nama</th>
-                <th>Kelas</th>
-                <th>Jabatan</th>
-                <th>Alamat</th>
-                <th>No HP</th>
-                <th>Aksi</th>
-              </tr>
-            </thead>
+      {/* SEARCH BAR */}
+      <div className="mb-4">
+        <input
+          className="w-96 p-3 rounded-xl bg-gray-100 border shadow-sm"
+          placeholder="🔍 Cari kategori..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
 
-            <tbody>
-              {filteredData.length > 0 ? (
-                filteredData.map((item, index) => (
-                  <tr key={item.id}>
-                    <td>{index + 1}</td>
-                    <td>{item.nama}</td>
+      {/* CARD WRAPPER */}
+      <div className="bg-white rounded-xl shadow-lg p-0 overflow-hidden border border-gray-200">
+        
+        {/* TABLE HEADER (BIRU) */}
+        <div className="w-full bg-blue-600 text-white font-semibold p-3 grid grid-cols-6">
+          <div className="">Nama</div>
+          <div className="">Keterangan</div>
+          <div className="">Alamat</div>
+          <div className="">HP</div>
+          <div className="text-center">Aksi</div>
+        </div>
 
-                    <td>
-                      {kategori === "guru"
-                        ? "-"
-                        : item.kelas || "-"}
-                    </td>
+        {/* TABLE ROWS */}
+        <div>
+          {filteredData.map((x) => (
+            <div
+              key={x.id}
+              className="grid grid-cols-6 border-t p-3 items-center hover:bg-gray-50"
+            >
+              <div className="font-medium text-blue-700">{x.nama}</div>
+              <div>{x.ket || "-"}</div>
+              <div>{x.alamat}</div>
+              <div>{x.hp}</div>
 
-                    <td>
-                      {kategori === "siswa"
-                        ? "-"
-                        : item.ket || "-"}
-                    </td>
+              {/* Aksi */}
+              <div className="flex gap-2 justify-center">
+                
+                <button
+                  onClick={() => handleEdit(x.id)}
+                  className="flex items-center gap-2 bg-yellow-400 text-white px-4 py-2 rounded shadow hover:bg-yellow-500"
+                >
+                  <FontAwesomeIcon icon={faEdit} />
+                  Edit
+                </button>
 
-                    <td>{item.alamat}</td>
-                    <td>{item.hp}</td>
+                <button
+                  onClick={() => handleDelete(x.id)}
+                  className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded shadow hover:bg-red-700"
+                >
+                  <FontAwesomeIcon icon={faTrash} />
+                  Hapus
+                </button>
 
-                    <td>
-                      <button
-                        className="btn btn-warning btn-sm me-2"
-                        onClick={() => handleEdit(item.id)}
-                      >
-                        <FontAwesomeIcon icon={faEdit} />
-                      </button>
+              </div>
+            </div>
+          ))}
+        </div>
 
-                      <button
-                        className="btn btn-danger btn-sm"
-                        onClick={() => handleDelete(item.id)}
-                      >
-                        <FontAwesomeIcon icon={faTrash} />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="7" className="text-center py-3 text-secondary">
-                    Tidak ada data ditemukan
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </CCardBody>
-      </CCard>
+      </div>
     </div>
   );
 }

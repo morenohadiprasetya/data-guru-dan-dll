@@ -84,11 +84,11 @@
   ],
   "kategoridata": [
     {
-      "id": "979d",
+      "id": "s2",
       "nama": "ambatukam",
       "ket": "10 X tkj",
-      "alamat": "beringin",
-      "hp": "0834042043"
+      "alamat": " Beringin 969",
+      "hp": "083404204 "
     },
     {
       "id": "9302",
@@ -96,9 +96,9 @@
       "tipe": "alat kentu",
       "deskripsi": "assd",
       "kelas": "garut",
-      "ket": "fesaesrf",
-      "alamat": "waw",
-      "hp": "weqwe"
+      "ket": "Karyawan",
+      "alamat": "Ngawindo,ngawi bagian timoer,stm kapal karam",
+      "hp": "0836237423"
     },
     {
       "id": "5af6",
@@ -111,79 +111,104 @@
       "hp": "085285283"
     },
     {
-      "id": "f9d6",
-      "nama": "Ryuzaki (L . Lawliet)",
-      "tipe": "alat reproduksi",
-      "deskripsi": "sds",
-      "kelas": "10 tk"
+      "id": "f672",
+      "nama": "moreno",
+      "ket": "X",
+      "alamat": "Ngebruk",
+      "hp": "08387290876"
     },
     {
-      "id": "4f8c",
-      "nama": "Ryuzaki (L . Lawliet)",
-      "tipe": "alat reproduksi",
-      "deskripsi": "ssf",
-      "kelas": "10 tk"
-    },
-    {
-      "id": "5849",
-      "nama": "Ryuzaki (L . Lawliet)",
-      "tipe": "alat reproduksi",
-      "deskripsi": " fgfgdfgds",
-      "kelas": "10 tk"
-    },
-    {
-      "id": "1efa",
-      "nama": "Ryuzaki (L . Lawliet)",
-      "tipe": "alat reproduksi",
-      "deskripsi": "afasas",
-      "kelas": "10 tk"
-    },
-    {
-      "id": "485b",
-      "nama": "Ryuzaki (L . Lawliet)",
-      "tipe": "alat reproduksi",
-      "deskripsi": "dsfsf",
-      "kelas": "10 tk"
-    },
-    {
-      "id": "94cf",
-      "nama": "Ryuzaki (L . Lawliet)",
-      "tipe": "alat reproduksi",
-      "deskripsi": "sdadas",
-      "kelas": "10 tk"
+      "id": "a0ca",
+      "nama": "Kang rusdi",
+      "ket": "Guru",
+      "alamat": "Kampoeng ngawi all base,timoer laoet",
+      "hp": "089692327"
     }
   ],
   "kategoriTagihan": [
     {
-      "id": "1763181531867",
-      "nama": "Ryuzaki (L . Lawliet)",
-      "tipe": "alat reproduksi",
-      "deskripsi": "saad",
-      "kelas": "10 tk"
+      "id": "1763347287243",
+      "nama": "Andre (garut)",
+      "tipe": " Bulanan",
+      "deskripsi": "membayar spp",
+      "kelas": "XII"
+    },
+    {
+      "id": "1763350686707",
+      "nama": "Ambatukam",
+      "tipe": "Bulanan",
+      "deskripsi": "Bayar spp",
+      "kelas": "X"
+    },
+    {
+      "id": "1763350748642",
+      "nama": "Moreno (Semarang)",
+      "tipe": "VIP",
+      "deskripsi": "VIP",
+      "kelas": "X-XII"
+    },
+    {
+      "id": "1763350789969",
+      "nama": "Ayyas",
+      "tipe": "Bulanan",
+      "deskripsi": "Uang gedung",
+      "kelas": "X"
+    },
+    {
+      "id": "1763350822985",
+      "nama": "Nugraha Fadhil Mahardika",
+      "tipe": "BPJS",
+      "deskripsi": "rak niat sekolah",
+      "kelas": "X"
     }
   ],
   "tagihan": [
     {
       "id": "1762913024734",
-      "nama": "SPP Mei 2025 - Ryuzaki",
-      "siswa_id": "1164",
-      "kelas": "12",
+      "nama": "Ryuzaki",
+      "kelas": "12 TSM",
       "bulan": "Mei 2025",
-      "jumlah": 1000000,
+      "jumlah": 600000,
       "status": "Belum Lunas",
-      "kategori_id": "c13e703c-1aef-4ce2-8f32-e3f484809565",
-      "keterangan": "SPP bulan Mei"
+      "kategori": "Kegiatan"
     },
     {
-      "id": "1762913069484",
-      "nama": "Uang Bangunan - Andre",
-      "siswa_id": "s2",
-      "kelas": "15 SD",
-      "bulan": "2025",
-      "jumlah": 2500000,
-      "status": "Lunas",
-      "kategori_id": "2b8f9d1e-8f3a-4d8b-9f3b-111111111111",
-      "keterangan": "Kontribusi pembangunan"
+      "id": "1763350042914",
+      "nama": "Moreno ",
+      "kelas": "12 X TKJ",
+      "bulan": "Juli 2025",
+      "jumlah": 150000,
+      "status": "Belum Lunas",
+      "kategori": "Uang Gedung"
+    },
+    {
+      "id": "1763350183341",
+      "nama": "Lawliet (L)",
+      "siswa_id": "s3",
+      "kelas": "12 X TKJ",
+      "bulan": "Oktober 2025",
+      "jumlah": "250000",
+      "status": "Belum Lunas",
+      "kategori": "SPP",
+      "keterangan": ""
+    },
+    {
+      "id": "1763350254977",
+      "nama": "Nugraha Fadhil Mahardika",
+      "kelas": "10 TKJ (Bootcamp)",
+      "bulan": "JULY 2025",
+      "jumlah": 75000,
+      "status": "Belum Lunas",
+      "kategori": "Pendaftaran"
+    },
+    {
+      "id": "1763350419662",
+      "nama": "Ambatukam",
+      "kelas": "11 DPB",
+      "bulan": "Desember",
+      "jumlah": 1000000,
+      "status": "Belum Lunas",
+      "kategori": "Lain-lain"
     }
   ],
   "pembayaran": [
@@ -211,7 +236,36 @@
     }
   ],
   "kelas": [
-     
+    {
+      "id": "624b",
+      "namaKelas": "X Akutansi",
+      "tingkat": "X",
+      "jurusan": "Akutansi"
+    },
+    {
+      "id": "df12",
+      "namaKelas": " X TKJ",
+      "tingkat": "X",
+      "jurusan": "TKJ"
+    },
+    {
+      "id": "062b",
+      "namaKelas": "XII TKJ",
+      "tingkat": "XII",
+      "jurusan": "TKJ"
+    },
+    {
+      "id": "e7fc",
+      "namaKelas": "XI TSM",
+      "tingkat": "XI",
+      "jurusan": "TSM"
+    },
+    {
+      "id": "9864",
+      "namaKelas": "XI Akutansi",
+      "tingkat": "XI",
+      "jurusan": "Akutansi"
+    }
   ],
   "level": []
 }

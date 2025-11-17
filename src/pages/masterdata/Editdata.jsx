@@ -1,112 +1,115 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { CCard, CCardBody, CFormInput, CFormSelect, CFormTextarea, CButton } from "@coreui/react";
-import { useNavigate, useParams } from "react-router-dom";
+import { CFormInput, CFormSelect, CButton, CCard, CCardBody } from "@coreui/react";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 
-export default function EditKategori() {
+export default function EditData() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const API = "http://localhost:5000/kategoriTagihan";
+  const location = useLocation();
+
+  const kategori = new URLSearchParams(location.search).get("kategori");
+
+  const API = {
+    siswa: "http://localhost:5000/siswa",
+    guru: "http://localhost:5000/guru",
+    karyawan: "http://localhost:5000/karyawan",
+  };
 
   const [data, setData] = useState({
     nama: "",
-    tipe: "Bulanan",
-    deskripsi: "",
-    kelas: "Semua",
+    alamat: "",
+    hp: "",
+    kelas: "",
+    ket: "",
   });
-  const [loading, setLoading] = useState(false);
-
-  const fetchKategori = async () => {
-    try {
-      const res = await axios.get(`${API}/${id}`);
-      setData({
-        nama: res.data.nama || "",
-        tipe: res.data.tipe || "Bulanan",
-        deskripsi: res.data.deskripsi || "",
-        kelas: res.data.kelas || "Semua",
-      });
-    } catch (err) {
-      console.error(err);
-      Swal.fire("Error", "Gagal mengambil data kategori.", "error");
-    }
-  };
 
   useEffect(() => {
-    if (id) fetchKategori();
-    // eslint-disable-next-line
-  }, [id]);
+    axios.get(`${API[kategori]}/${id}`)
+      .then(res => {
+        if (!res.data) {
+          Swal.fire("Error", "Data tidak ditemukan", "error");
+          navigate("/masterdata");
+          return;
+        }
+        setData(res.data);
+      })
+      .catch(() => {
+        Swal.fire("Error", "Gagal mengambil data", "error");
+        navigate("/masterdata");
+      });
+  }, [id, kategori, navigate]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
     if (!data.nama.trim()) {
-      Swal.fire("Oops!", "Nama kategori wajib diisi!", "warning");
-      return;
+      return Swal.fire("Nama wajib diisi", "", "warning");
     }
 
-    try {
-      setLoading(true);
-      await axios.put(`${API}/${id}`, { ...data });
-      setLoading(false);
-      Swal.fire("Berhasil", "Kategori berhasil diperbarui.", "success").then(() => {
-        navigate("/kategori-tagihan");
-      });
-    } catch (err) {
-      setLoading(false);
-      console.error(err);
-      Swal.fire("Error", "Gagal memperbarui kategori.", "error");
-    }
+    axios
+      .put(`${API[kategori]}/${id}`, data)
+      .then(() => {
+        Swal.fire("Berhasil", "Data berhasil diperbarui", "success").then(() => {
+          navigate("/masterdata");
+        });
+      })
+      .catch(() => Swal.fire("Error", "Gagal menyimpan", "error"));
   };
 
   return (
     <div className="flex-1 ml-48 mr-10 p-6 bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen">
-      <h2 className="text-2xl font-bold text-blue-700 mb-4">✏️ Edit Kategori Tagihan</h2>
+      <h2 className="text-2xl font-bold mb-4">✏️ Edit Data {kategori.toUpperCase()}</h2>
 
-      <CCard className="shadow-md border-0">
+      <CCard>
         <CCardBody>
           <form onSubmit={handleSubmit}>
-            <label className="block mb-1">Nama Kategori</label>
+            <label>Nama</label>
             <CFormInput
-              placeholder="Contoh: SPP"
               value={data.nama}
               onChange={(e) => setData({ ...data, nama: e.target.value })}
               className="mb-3"
             />
 
-            <label className="block mb-1">Tipe</label>
-            <CFormSelect value={data.tipe} onChange={(e) => setData({ ...data, tipe: e.target.value })} className="mb-3">
-              <option>Bulanan</option>
-              <option>Tahunan</option>
-              <option>Bebas</option>
-              <option>Sekali</option>
-            </CFormSelect>
-
-            <label className="block mb-1">Deskripsi</label>
-            <CFormTextarea
-              placeholder="Deskripsi singkat kategori..."
-              value={data.deskripsi}
-              onChange={(e) => setData({ ...data, deskripsi: e.target.value })}
-              className="mb-3"
-              rows="3"
-            />
-
-            <label className="block mb-1">Kelas</label>
+            <label>Alamat</label>
             <CFormInput
-              placeholder="Semua / X / XI / XII / dsb"
-              value={data.kelas}
-              onChange={(e) => setData({ ...data, kelas: e.target.value })}
+              value={data.alamat}
+              onChange={(e) => setData({ ...data, alamat: e.target.value })}
               className="mb-3"
             />
 
-            <div className="flex gap-3 mt-4">
-              <CButton color="primary" type="submit" disabled={loading}>
-                {loading ? "Menyimpan..." : "Simpan Perubahan"}
-              </CButton>
-              <CButton color="secondary" onClick={() => navigate("/kategori-tagihan")}>
-                Batal
-              </CButton>
-            </div>
+            <label>Nomor HP</label>
+            <CFormInput
+              value={data.hp}
+              onChange={(e) => setData({ ...data, hp: e.target.value })}
+              className="mb-3"
+            />
+
+            {kategori === "siswa" && (
+              <>
+                <label>Kelas</label>
+                <CFormInput
+                  value={data.kelas}
+                  onChange={(e) => setData({ ...data, kelas: e.target.value })}
+                  className="mb-3"
+                />
+              </>
+            )}
+
+            {kategori !== "siswa" && (
+              <>
+                <label>Jabatan</label>
+                <CFormInput
+                  value={data.ket}
+                  onChange={(e) => setData({ ...data, ket: e.target.value })}
+                  className="mb-3"
+                />
+              </>
+            )}
+
+            <CButton type="submit" color="primary">Simpan</CButton>
+            <CButton className="ms-2" color="secondary" onClick={() => navigate("/apo")}>Batal</CButton>
           </form>
         </CCardBody>
       </CCard>
