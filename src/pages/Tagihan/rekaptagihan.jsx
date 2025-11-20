@@ -90,7 +90,7 @@ export default function RekapTagihan() {
       </div>
 
       {/* FILTER + SUMMARY */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 mb-8">
+      <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-8">
 
         {/* Search */}
         <div className="mb-6">

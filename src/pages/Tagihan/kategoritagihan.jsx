@@ -102,7 +102,7 @@ export default function KategoriTagihan() {
 
         <button
           onClick={() => navigate("/tmbh")}
-          className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow active:scale-95 transition"
+          className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded shadow active:scale-95 transition"
         >
           + Tambah
         </button>
@@ -111,7 +111,6 @@ export default function KategoriTagihan() {
       {/* SEARCH CARD */}
       <div className="bg-white p-4 rounded-xl shadow-md border border-blue-100 mb-5">
         <div className="flex flex-col sm:flex-row justify-between gap-3">
-
           <input
             value={q}
             onChange={(e) => {
@@ -122,15 +121,7 @@ export default function KategoriTagihan() {
             className="border p-3 rounded-xl w-72 shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none"
           />
 
-          <button
-            onClick={() => {
-              setQ("");
-              setPage(1);
-            }}
-            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-xl shadow"
-          >
-            Reset
-          </button>
+           
         </div>
       </div>
 
@@ -152,10 +143,16 @@ export default function KategoriTagihan() {
               <thead className="bg-blue-600 text-white">
                 <tr>
                   <th className="p-3">No</th>
-                  <th onClick={() => toggleSort("nama")} className="p-3 cursor-pointer">
-                    Nama {sortBy === "nama" ? (order === "asc" ? "⬆" : "⬇") : ""}
+                  <th
+                    onClick={() => toggleSort("nama")}
+                    className="p-3 cursor-pointer"
+                  >
+                    Nama
                   </th>
-                  <th onClick={() => toggleSort("tipe")} className="p-3 cursor-pointer">
+                  <th
+                    onClick={() => toggleSort("tipe")}
+                    className="p-3 cursor-pointer"
+                  >
                     Tipe {sortBy === "tipe" ? (order === "asc" ? "⬆" : "⬇") : ""}
                   </th>
                   <th className="p-3">Deskripsi</th>
@@ -201,15 +198,13 @@ export default function KategoriTagihan() {
                 disabled={page === 1}
                 onClick={() => setPage((p) => p - 1)}
                 className={`px-4 py-2 rounded-lg shadow ${
-                  page === 1 ? "bg-gray-200" : "bg-blue-600 text-white hover:bg-blue-700"
+                  page === 1
+                    ? "bg-gray-200"
+                    : "bg-blue-600 text-white hover:bg-blue-700"
                 }`}
-              >
-                ⬅ Prev
-              </button>
+              ></button>
 
-              <span className="font-semibold text-gray-700">
-                Page {page} / {totalPages}
-              </span>
+              {/* Bagian angka 1/1 sudah DIHAPUS TOTAL */}
 
               <button
                 disabled={page === totalPages}
@@ -219,9 +214,7 @@ export default function KategoriTagihan() {
                     ? "bg-gray-200"
                     : "bg-blue-600 text-white hover:bg-blue-700"
                 }`}
-              >
-                Next ➡
-              </button>
+              ></button>
             </div>
           </>
         )}

@@ -43,7 +43,7 @@ export default function TambahTagihan() {
   };
 
   return (
-    <div className="flex-1 ml-48 mr-10 p-6 bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen">
+    <div className="flex-1 ml-55 mr-10 p-6 bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen">
       <h2 className="text-2xl font-bold text-blue-700 mb-4">➕ Tambah Tagihan Baru</h2>
 
       <CCard className="shadow-md">

@@ -71,7 +71,7 @@ export default function Kelas() {
 
         <button
           onClick={() => navigate("/tkelas")}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl shadow active:scale-95 transition"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded shadow active:scale-95 transition"
         >
           + Tambah Kelas
         </button>
@@ -112,17 +112,7 @@ export default function Kelas() {
             <option value="DPB">DPB</option>
           </select>
 
-          <button
-            onClick={() => {
-              setSearch("");
-              setFilterKelas("");
-              setFilterJurusan("");
-              getData();
-            }}
-            className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg shadow transition active:scale-95"
-          >
-            Reset
-          </button>
+          
         </div>
       </div>
 

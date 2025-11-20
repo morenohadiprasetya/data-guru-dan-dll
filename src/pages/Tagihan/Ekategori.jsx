@@ -54,7 +54,7 @@ export default function EditKategoriTagihan() {
   };
 
   return (
-    <div className="flex-1 ml-48 mr-10 p-6 bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen">
+    <div className="flex-1 ml-53 mr-10 p-6 bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen">
       <h2 className="text-2xl font-bold mb-4 text-blue-700">✏️ Edit Kategori Tagihan</h2>
 
       <CCard>

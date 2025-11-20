@@ -1,13 +1,6 @@
 {
   "siswa": [
     {
-      "id": "s2",
-      "nama": "Andretukam",
-      "kelas": "15 SD",
-      "alamat": "Garut",
-      "hp": "0867645"
-    },
-    {
       "id": "s3",
       "nama": "Ryuzaki (L. Lawliet)",
       "kelas": "12 X TKJ",
@@ -34,6 +27,16 @@
       "kelas": "12 X TKJ",
       "alamat": "Japan",
       "hp": "086786776575"
+    },
+    {
+      "id": "0960",
+      "nama": "Ryuzaki (L . Lawliet)",
+      "ket": "",
+      "alamat": "rqwreqwe",
+      "hp": "qwewqe",
+      "level": "Siswa",
+      "kelas": "df12",
+      "jurusan": "TKJ"
     }
   ],
   "guru": [
@@ -84,45 +87,16 @@
   ],
   "kategoridata": [
     {
-      "id": "s2",
-      "nama": "ambatukam",
-      "ket": "10 X tkj",
-      "alamat": " Beringin 969",
-      "hp": "083404204 "
+      "id": "l1",
+      "nama": "Siswa"
     },
     {
-      "id": "9302",
-      "nama": "lili",
-      "tipe": "alat kentu",
-      "deskripsi": "assd",
-      "kelas": "garut",
-      "ket": "Karyawan",
-      "alamat": "Ngawindo,ngawi bagian timoer,stm kapal karam",
-      "hp": "0836237423"
+      "id": "l2",
+      "nama": "Guru"
     },
     {
-      "id": "5af6",
-      "nama": "Ryuzaki (L . Lawliet)",
-      "tipe": "alat reproduksi",
-      "deskripsi": "latihan biologi",
-      "kelas": "10 tk",
-      "ket": "ngawi",
-      "alamat": "ngawi",
-      "hp": "085285283"
-    },
-    {
-      "id": "f672",
-      "nama": "moreno",
-      "ket": "X",
-      "alamat": "Ngebruk",
-      "hp": "08387290876"
-    },
-    {
-      "id": "a0ca",
-      "nama": "Kang rusdi",
-      "ket": "Guru",
-      "alamat": "Kampoeng ngawi all base,timoer laoet",
-      "hp": "089692327"
+      "id": "l3",
+      "nama": "Karyawan"
     }
   ],
   "kategoriTagihan": [
@@ -135,7 +109,7 @@
     },
     {
       "id": "1763350686707",
-      "nama": "Ambatukam",
+      "nama": "Ambatukam(ngawi)",
       "tipe": "Bulanan",
       "deskripsi": "Bayar spp",
       "kelas": "X"
@@ -149,7 +123,7 @@
     },
     {
       "id": "1763350789969",
-      "nama": "Ayyas",
+      "nama": "Ayyas(krapyak)",
       "tipe": "Bulanan",
       "deskripsi": "Uang gedung",
       "kelas": "X"
@@ -168,8 +142,8 @@
       "nama": "Ryuzaki",
       "kelas": "12 TSM",
       "bulan": "Mei 2025",
-      "jumlah": 600000,
-      "status": "Belum Lunas",
+      "jumlah": 0,
+      "status": "Lunas",
       "kategori": "Kegiatan"
     },
     {
@@ -177,7 +151,7 @@
       "nama": "Moreno ",
       "kelas": "12 X TKJ",
       "bulan": "Juli 2025",
-      "jumlah": 150000,
+      "jumlah": 100000,
       "status": "Belum Lunas",
       "kategori": "Uang Gedung"
     },
@@ -265,7 +239,26 @@
       "namaKelas": "XI Akutansi",
       "tingkat": "XI",
       "jurusan": "Akutansi"
+    },
+    {
+      "id": "c2f8",
+      "namaKelas": "XI TKJ",
+      "tingkat": "XI",
+      "jurusan": "TKJ"
     }
   ],
-  "level": []
+  "level": [
+    {
+      "id": "l1",
+      "nama": "Siswa"
+    },
+    {
+      "id": "l2",
+      "nama": "Guru"
+    },
+    {
+      "id": "l3",
+      "nama": "Karyawan"
+    }
+  ]
 }

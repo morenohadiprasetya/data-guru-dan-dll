@@ -48,7 +48,7 @@ export default function Editkategoridata() {
   };
 
   return (
-    <div className="p-6 ml-48">
+    <div className="p-6 ml-150">
       <h2 className="text-2xl font-bold mb-4">Edit Kategori Data</h2>
 
       <form onSubmit={submit} className="bg-white p-4 rounded shadow w-96">

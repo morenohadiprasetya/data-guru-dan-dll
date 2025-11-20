@@ -14,18 +14,18 @@ import Masterdata from "./pages/masterdata/Masterdata";
 import Tambahdata from "./pages/masterdata/TambahData";
 import Edit from "./pages/masterdata/Editdata";
 
-import Ambatigori from "./pages/data/Ambatigori";
+ 
 import Tambahkategoridata from "./pages/data/tambahkategorid";
 import Editkategoridata from "./pages/data/editkategorid";
+import KategoriDataCRUD from "./pages/data/ambatigori";
 
 import TambahKelas from "./pages/kelas/TambahKelas";
 import Kelas from "./pages/kelas/Kelas";
 import EditKelas from "./pages/kelas/Editkelas";
- 
-import Ekategori from "./pages/Tagihan/Ekategori"
-import Tkategori from "./pages/Tagihan/Tkategori"
-import TambahTagihan from "./pages/Tagihan/Tambahtagihan";
 
+import Ekategori from "./pages/Tagihan/Ekategori";
+import Tkategori from "./pages/Tagihan/Tkategori";
+import TambahTagihan from "./pages/Tagihan/Tambahtagihan";
 
 export default function App() {
   const loc = useLocation();
@@ -51,7 +51,6 @@ export default function App() {
           <Route path="/rekap" element={<RekapTagihan />} />
           <Route path="/garoet" element={<TambahTagihan />} />
 
-
           {/* MASTER DATA */}
           <Route path="/apo" element={<Masterdata />} />
           <Route path="/tambahdata" element={<Tambahdata />} />
@@ -61,15 +60,15 @@ export default function App() {
           <Route path="/kelas" element={<Kelas />} />
           <Route path="/brngn/:id" element={<EditKelas />} />
           <Route path="/tkelas" element={<TambahKelas />} />
-        
+
+          {/* Kategori Tagihan */}
           <Route path="/Ekategori/:id" element={<Ekategori />} />
-       
           <Route path="/tmbh" element={<Tkategori />} />
-       
-       
+<Route path="/kategori-data" element={<KategoriDataCRUD />} />
+<Route path="/kategori-data/:id" element={<KategoriDataCRUD />} />
 
           {/* KATEGORI DATA */}
-          <Route path="/kategoril" element={<Ambatigori />} />
+      
           <Route path="/kategori-data/tambah" element={<Tambahkategoridata />} />
           <Route path="/kategori-data/edit/:id" element={<Editkategoridata />} />
 

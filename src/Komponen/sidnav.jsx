@@ -57,7 +57,7 @@ export default function Sidnav() {
           {/* DATABASE MENU */}
           <button
             onClick={() => toggleMenu("database")}
-            className="flex justify-between items-center px-4 py-2 rounded-lg text-blue-100 
+            className="flex justify-between items-center px-4 py-2 rounded-lg
                        hover:bg-blue-800 transition"
           >
             <span className="flex items-center gap-3">
@@ -71,15 +71,15 @@ export default function Sidnav() {
           {openMenu === "database" && (
             <div className="ml-7 mt-1 flex flex-col gap-1 animate-fadeIn text-sm">
 
-              <Link to="/kategoril" className="py-1 flex items-center gap-2 hover:text-blue-200">
+              <Link to="/kategori-data" className="py-1 flex items-center gap-2 text-white hover:text-blue-200">
                 <i className="ri-price-tag-3-line"></i> Kategori Data
               </Link>
 
-              <Link to="/kelas" className="py-1 flex items-center gap-2 hover:text-blue-200">
+              <Link to="/kelas" className="py-1 flex items-center gap-2 text-white hover:text-blue-200">
                 <i className="ri-building-2-line"></i> Kelas
               </Link>
 
-              <Link to="/apo" className="py-1 flex items-center gap-2 hover:text-blue-200">
+              <Link to="/apo" className="py-1 flex items-center gap-2 text-white hover:text-blue-200">
                 <i className="ri-user-3-line"></i> Masterdata
               </Link>
 
@@ -103,15 +103,15 @@ export default function Sidnav() {
           {openMenu === "keuangan" && (
             <div className="ml-7 mt-1 flex flex-col gap-1 animate-fadeIn text-sm">
 
-              <Link to="/kategori-tagihan" className="py-1 flex items-center gap-2 hover:text-blue-200">
+              <Link to="/kategori-tagihan" className="py-1 flex items-center gap-2 text-white hover:text-blue-200">
                 <i className="ri-list-check-2"></i> Kategori Tagihan
               </Link>
 
-              <Link to="/tagihan" className="py-1 flex items-center gap-2 hover:text-blue-200">
+              <Link to="/tagihan" className="py-1 flex items-center gap-2 text-white hover:text-blue-200">
                 <i className="ri-receipt-line"></i> Tagihan
               </Link>
 
-              <Link to="/rekap" className="py-1 flex items-center gap-2 hover:text-blue-200">
+              <Link to="/rekap" className="py-1 flex items-center gap-2 text-white hover:text-blue-200">
                 <i className="ri-bar-chart-box-line"></i> Rekap Tagihan
               </Link>
 

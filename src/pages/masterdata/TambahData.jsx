@@ -1,44 +1,78 @@
-import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import Swal from "sweetalert2";
-import "remixicon/fonts/remixicon.css";
+import { useNavigate, useLocation } from "react-router-dom";
 
-export default function Ta() {
+export default function TambahData() {
   const nav = useNavigate();
   const loc = useLocation();
   const q = new URLSearchParams(loc.search);
-  const kategori = q.get("kategori") || "Siswa";
+  // keep lowercase for consistency
+  const kategoriParam = (q.get("kategori") || "siswa").toLowerCase();
 
-  const [form, setForm] = useState({ nama: "", ket: "", alamat: "", hp: "" });
-  const [loading, setLoading] = useState(false);
+  // ensure all fields default to empty strings (never undefined)
+  const [form, setForm] = useState({
+    nama: "",
+    ket: "",     // untuk mapel/jabatan atau kelas teks fallback
+    alamat: "",
+    hp: "",
+    kelas: "",   // for siswa: store namaKelas or id depending on your schema
+  });
+  const [saving, setSaving] = useState(false);
+  const [kelasList, setKelasList] = useState([]);
+
+  useEffect(() => {
+    // load kelas only if needed (siswa)
+    if (kategoriParam === "siswa") {
+      axios.get("http://localhost:5000/kelas")
+        .then(res => setKelasList(Array.isArray(res.data) ? res.data : []))
+        .catch(() => setKelasList([]));
+    }
+    // ensure form shape when kategori changes
+    setForm({
+      nama: "",
+      ket: "",
+      alamat: "",
+      hp: "",
+      kelas: ""
+    });
+  }, [kategoriParam]);
 
   function handleChange(e) {
-    setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    // always keep string values
+    setForm(prev => ({ ...prev, [name]: value ?? "" }));
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
-
-    if (!form.nama || !form.ket || !form.alamat || !form.hp) {
-      Swal.fire({ icon: "warning", title: "Lengkapi semua kolom!" });
-      return;
+    // basic validation
+    if (!form.nama.trim()) return Swal.fire({ icon: "warning", title: "Nama wajib diisi" });
+    // if siswa, require kelas (optional)
+    if (kategoriParam === "siswa" && !form.kelas) {
+      return Swal.fire({ icon: "warning", title: "Pilih kelas untuk siswa" });
     }
 
     try {
-      setLoading(true);
-      const resp = await fetch(`http://localhost:5000/${kategori.toLowerCase()}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      if (!resp.ok) throw new Error("Gagal menyimpan data");
+      setSaving(true);
+      const api = `http://localhost:5000/${kategoriParam}`;
+      // send payload — ensure all props exist (no undefined)
+      const payload = {
+        nama: form.nama || "",
+        ket: form.ket || "",
+        alamat: form.alamat || "",
+        hp: form.hp || "",
+        kelas: form.kelas || ""
+      };
+      await axios.post(api, payload);
       Swal.fire({ icon: "success", title: "Data tersimpan!" });
-      nav(`/Apo?kategori=${kategori}`);
+      // navigate back to masterdata (adjust route if you use /apo or /masterdata)
+      nav(`/apo?kategori=${kategoriParam}`);
     } catch (err) {
       console.error(err);
-      Swal.fire({ icon: "error", title: "Gagal menyimpan", text: "Periksa koneksi ke server." });
+      Swal.fire({ icon: "error", title: "Gagal menyimpan", text: "Periksa server atau koneksi." });
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   }
 
@@ -46,64 +80,74 @@ export default function Ta() {
     <div className="min-h-screen bg-blue-50 p-6">
       <div className="max-w-3xl mx-auto">
         <div className="bg-white rounded-xl shadow-md border border-blue-100 p-6">
-           
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-blue-900 flex items-center gap-2">
-              <i className="ri-add-circle-line text-green-600"></i>
-              Tambah Data {kategori}
-            </h2>
-            <button
-              onClick={() => nav(-1)}
-              className="flex items-center gap-1 text-sm  bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 transition"
-            >
-              <i className="ri-arrow-left-line"></i> Kembali
-            </button>
+            <h2 className="text-xl font-bold text-blue-900">Tambah Data {kategoriParam.toUpperCase()}</h2>
+            <button onClick={() => nav(-1)} className="text-sm bg-blue-600 text-white px-3 py-2 rounded-md">Kembali</button>
           </div>
 
-          
           <form onSubmit={handleSubmit} className="space-y-5">
-            {[
-              { name: "nama", label: "Nama" },
-              {
-                name: "ket",
-                label:
-                  kategori === "Siswa"
-                    ? "Kelas"
-                    : kategori === "Guru"
-                    ? "Mapel"
-                    : "Jabatan",
-              },
-              { name: "alamat", label: "Alamat" },
-              { name: "hp", label: "Nomor HP" },
-            ].map((field) => (
-              <div key={field.name}>
-                <label className="block text-sm font-semibold text-blue-700 mb-1">
-                  {field.label}
-                </label>
-                <input
-                  name={field.name}
-                  value={form[field.name]}
-                  onChange={handleChange}
-                  className="w-full rounded-lg border border-blue-200 p-2.5 focus:ring-2 focus:ring-blue-300 focus:outline-none transition bg-white"
-                />
-              </div>
-            ))}
+            <div>
+              <label className="block text-sm font-semibold text-blue-700 mb-1">Nama</label>
+              <input
+                name="nama"
+                value={form.nama || ""}
+                onChange={handleChange}
+                className="w-full rounded-lg border p-2"
+              />
+            </div>
 
-            
+            {/* For siswa show kelas select, otherwise ket input */}
+            {kategoriParam === "siswa" ? (
+              <>
+                <div>
+                  <label className="block text-sm font-semibold text-blue-700 mb-1">Kelas</label>
+                  <select
+                    name="kelas"
+                    value={form.kelas || ""}
+                    onChange={handleChange}
+                    className="w-full rounded-lg border p-2"
+                  >
+                    <option value="">-- Pilih Kelas --</option>
+                    {kelasList.map(k => (
+                      // use k.id or k.namaKelas depending on your db; here we use namaKelas
+                      <option key={k.id} value={k.namaKelas || k.id}>
+                        {k.namaKelas}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-blue-700 mb-1">Alamat</label>
+                  <input name="alamat" value={form.alamat || ""} onChange={handleChange} className="w-full rounded-lg border p-2" />
+                </div>
+              </>
+            ) : (
+              <>
+                <div>
+                  <label className="block text-sm font-semibold text-blue-700 mb-1">
+                    {kategoriParam === "guru" ? "Mapel" : "Jabatan"}
+                  </label>
+                  <input name="ket" value={form.ket || ""} onChange={handleChange} className="w-full rounded-lg border p-2" />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-blue-700 mb-1">Alamat</label>
+                  <input name="alamat" value={form.alamat || ""} onChange={handleChange} className="w-full rounded-lg border p-2" />
+                </div>
+              </>
+            )}
+
+            <div>
+              <label className="block text-sm font-semibold text-blue-700 mb-1">Nomor HP</label>
+              <input name="hp" value={form.hp || ""} onChange={handleChange} className="w-full rounded-lg border p-2" />
+            </div>
+
             <div className="flex justify-end gap-3 pt-4 border-t border-blue-100">
-               
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex items-center gap-1 px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition disabled:opacity-70"
-              >
-                {loading ? (
-                  "Menyimpan..."
-                ) : (
-                  <>
-                    <i className="ri-save-3-line"></i> Simpan
-                  </>
-                )}
+              <button type="submit" disabled={saving} className="px-4 py-2 rounded-md bg-blue-600 text-white">
+                {saving ? "Menyimpan..." : "Simpan"}
+              </button>
+              <button type="button" onClick={() => nav(-1)} className="px-4 py-2 rounded-md border">
+                Batal
               </button>
             </div>
           </form>
@@ -112,4 +156,3 @@ export default function Ta() {
     </div>
   );
 }
-  

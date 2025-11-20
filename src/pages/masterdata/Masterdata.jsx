@@ -1,3 +1,4 @@
+// Masterdata.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -22,6 +23,7 @@ export default function Masterdata() {
     siswa: "http://localhost:5000/siswa",
     guru: "http://localhost:5000/guru",
     karyawan: "http://localhost:5000/karyawan",
+    level:"http://localhost:5000/level"
   };
 
   // Fetch Data
@@ -43,7 +45,9 @@ export default function Masterdata() {
     const q = search.toLowerCase();
     return (
       item.nama?.toLowerCase().includes(q) ||
-      item.alamat?.toLowerCase().includes(q)
+      item.alamat?.toLowerCase().includes(q) ||
+      (item.ket || "").toLowerCase().includes(q) ||
+      (item.kelas || "").toLowerCase().includes(q)
     );
   });
 
@@ -73,7 +77,6 @@ export default function Masterdata() {
 
   return (
     <div className="ml-55 mr-10 p-6">
-      
       {/* HEADER + ICON */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
@@ -81,13 +84,25 @@ export default function Masterdata() {
           <h1 className="text-3xl font-semibold">Kategori Data</h1>
         </div>
 
-        {/* Button Tambah */}
-        <button
-          onClick={() => navigate(`/tambahdata?kategori=${kategori}`)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded shadow"
-        >
-          + Tambah Data
-        </button>
+        <div className="flex items-center gap-3">
+          <select
+            value={kategori}
+            onChange={(e) => setKategori(e.target.value)}
+            className="border p-2 rounded"
+          >
+            <option value="siswa">Siswa</option>
+            <option value="guru">Guru</option>
+            <option value="karyawan">Karyawan</option>
+          </select>
+
+          {/* Button Tambah */}
+          <button
+            onClick={() => navigate(`/tambahdata?kategori=${kategori}`)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded shadow"
+          >
+            + Tambah Data
+          </button>
+        </div>
       </div>
 
       {/* SEARCH BAR */}
@@ -102,7 +117,6 @@ export default function Masterdata() {
 
       {/* CARD WRAPPER */}
       <div className="bg-white rounded-xl shadow-lg p-0 overflow-hidden border border-gray-200">
-        
         {/* TABLE HEADER (BIRU) */}
         <div className="w-full bg-blue-600 text-white font-semibold p-3 grid grid-cols-6">
           <div className="">Nama</div>
@@ -120,13 +134,12 @@ export default function Masterdata() {
               className="grid grid-cols-6 border-t p-3 items-center hover:bg-gray-50"
             >
               <div className="font-medium text-blue-700">{x.nama}</div>
-              <div>{x.ket || "-"}</div>
+              <div>{x.ket || x.kelas || "-"}</div>
               <div>{x.alamat}</div>
               <div>{x.hp}</div>
 
               {/* Aksi */}
               <div className="flex gap-2 justify-center">
-                
                 <button
                   onClick={() => handleEdit(x.id)}
                   className="flex items-center gap-2 bg-yellow-400 text-white px-4 py-2 rounded shadow hover:bg-yellow-500"
@@ -152,3 +165,4 @@ export default function Masterdata() {
     </div>
   );
 }
+
