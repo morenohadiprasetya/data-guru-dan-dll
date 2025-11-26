@@ -1,186 +1,246 @@
 import React, { useEffect, useState } from "react";
-import Sidnav from "./sidnav";
-import { useNavigate } from "react-router-dom";
-import "remixicon/fonts/remixicon.css";
 
 export default function Dashboard() {
-  const nav = useNavigate();
-  const [data, setData] = useState({
-    siswa: [],
-    guru: [],
-    karyawan: [],
-  });
+  const [kelas, setKelas] = useState([]);
+  const [siswa, setSiswa] = useState([]);
+  const [guru, setGuru] = useState([]);
+  const [karyawan, setKaryawan] = useState([]);
+  const [tagihan, setTagihan] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
-    async function fetchAll() {
+    const fetchData = async () => {
+      setLoading(true);
       try {
-        const [resSiswa, resGuru, resKaryawan] = await Promise.all([
-          fetch("http://localhost:5000/siswa").then((r) => (r.ok ? r.json() : [])),
-          fetch("http://localhost:5000/guru").then((r) => (r.ok ? r.json() : [])),
-          fetch("http://localhost:5000/karyawan").then((r) => (r.ok ? r.json() : [])),
-        ]);
-        setData({ siswa: resSiswa, guru: resGuru, karyawan: resKaryawan });
-      } catch (e) {
-        console.error("Fetch error:", e);
+        const kelasData = [
+          { id: 1, nama: "10A" },
+          { id: 2, nama: "11B" }
+        ];
+        const siswaData = [
+          { id: "s1", nama: "Andi", kelas: "10A", alamat: "Jakarta", hp: "081234" },
+          { id: "s2", nama: "Budi", kelas: "11B", alamat: "Bandung", hp: "081235" }
+        ];
+        const guruData = [{ id: "g1", nama: "Pak Joko", mapel: "Matematika" }];
+        const karyawanData = [{ id: "k1", nama: "Ibu Ani", jabatan: "TU" }];
+        const tagihanData = [
+          { id: "t1", siswa: "Andi", kategori: "SPP", jumlah: 500000, status: "Lunas" },
+          { id: "t2", siswa: "Budi", kategori: "Ujian", jumlah: 200000, status: "Belum Lunas" }
+        ];
+
+        setKelas(kelasData);
+        setSiswa(siswaData);
+        setGuru(guruData);
+        setKaryawan(karyawanData);
+        setTagihan(tagihanData);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
       }
-    }
-    fetchAll();
+    };
+
+    fetchData();
   }, []);
 
-  const totalSiswa = data.siswa.length || 0;
-  const totalGuru = data.guru.length || 0;
-  const totalKaryawan = data.karyawan.length || 0;
-  const total = totalSiswa + totalGuru + totalKaryawan;
+  if (loading) return <div style={{ padding: 50, fontSize: 22 }}>Loading...</div>;
 
-  const handleSelengkapnya = (kategori) => {
-    nav(`/Apo?kategori=${kategori}`);
+  // Ringkasan tagihan
+  const summaryTagihan = tagihan.reduce(
+    (acc, t) => {
+      acc.total += t.jumlah;
+      if (t.status === "Lunas") acc.lunas += t.jumlah;
+      else acc.sisa += t.jumlah;
+      return acc;
+    },
+    { total: 0, lunas: 0, sisa: 0 }
+  );
+
+  const filteredSiswa = siswa.filter((s) =>
+    s.nama.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const formatRp = (n) => "Rp " + n.toLocaleString();
+
+  // Styles
+  const cardStyle = (bg) => ({
+    background: bg,
+    color: "white",
+    padding: 25,
+    borderRadius: 15,
+    flex: 1,
+    textAlign: "center",
+    boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
+    transition: "transform 0.3s, box-shadow 0.3s",
+    cursor: "default",
+  });
+
+  const cardContainer = { display: "flex", gap: 20, marginBottom: 30, flexWrap: "wrap" };
+
+  const tableStyle = {
+    width: "100%",
+    borderCollapse: "collapse",
+    borderRadius: 10,
+    overflow: "hidden",
+    boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
+    background: "white",
   };
 
+  const thStyle = {
+    borderBottom: "2px solid #ddd",
+    padding: 14,
+    background: "#f0f0f0",
+    textAlign: "left",
+    color: "#333",
+    fontWeight: "600",
+  };
+
+  const tdStyle = {
+    borderBottom: "1px solid #eee",
+    padding: 12,
+    color: "#555",
+  };
+
+  const containerStyle = {
+    padding: "40px 50px",
+    fontFamily: "Segoe UI, sans-serif",
+    background: "#e6ebf2",
+    minHeight: "100vh",
+  };
+
+  const statusStyle = (status) => ({
+    color: status === "Lunas" ? "#2e7d32" : "#d32f2f",
+    fontWeight: "bold",
+  });
+
   return (
-    <div className="flex">
-      <Sidnav />
+    <div style={containerStyle}>
+      <h1 style={{ fontSize: 36, marginBottom: 35, color: "#333" }}>Dashboard Sekolah</h1>
 
-      <div className="flex-1 ml-48 p-8 bg-gray-50 min-h-screen">
-        {/* TITLE DASHBOARD */}
-        <h1 className="text-3xl font-extrabold text-blue-700 mb-10 flex items-center gap-3">
-          <i className="ri-dashboard-3-line text-blue-600"></i> Dashboard Sekolah
-        </h1>
-
-        {/* ======================= CARD SUMMARY ======================= */}
-        <div className="flex flex-wrap justify-center gap-6 mb-12">
-
-          {[
-            { color: "bg-green-500", icon: "ri-user-3-line", label: "Siswa", total: totalSiswa },
-            { color: "bg-blue-500", icon: "ri-user-star-line", label: "Guru", total: totalGuru },
-            { color: "bg-yellow-500", icon: "ri-building-4-line", label: "Karyawan", total: totalKaryawan },
-          ].map((item, i) => (
-            <div
-              key={i}
-              className={`${item.color} text-white rounded-2xl shadow-lg p-6 w-44 flex flex-col justify-center items-center hover:scale-105 transition-transform duration-200`}
-            >
-              <i className={`${item.icon} text-4xl mb-2`}></i>
-              <h2 className="font-semibold text-md">{item.label}</h2>
-              <p className="text-3xl font-bold mt-1">{item.total}</p>
-            </div>
-          ))}
-
-          {/* TOTAL */}
-          <div className="bg-purple-500 text-white rounded-2xl shadow-lg p-6 w-44 flex flex-col justify-center items-center hover:scale-105 transition-transform duration-200">
-            <i className="ri-equalizer-line text-4xl mb-2"></i>
-            <h2 className="font-semibold text-md">Total</h2>
-            <p className="text-3xl font-bold mt-1">{total}</p>
-          </div>
+      {/* Ringkasan */}
+      <div style={cardContainer}>
+        <div style={cardStyle("linear-gradient(135deg, #43e97b, #38f9d7)")}>
+          <div>Kelas</div>
+          <div style={{ fontSize: 28, fontWeight: "bold" }}>{kelas.length}</div>
         </div>
-
-        {/* ======================= TABEL SISWA ======================= */}
-        <div className="bg-white rounded shadow-md p-6 mb-10">
-          <h3 className="font-bold text-lg text-gray-700 mb-3">Data Siswa</h3>
-          <div className="max-h-56 overflow-y-auto border border-gray-200 rounded-lg">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-100 sticky top-0">
-                <tr>
-                  <th className="p-2 border border-gray-300 text-left">Nama</th>
-                  <th className="p-2 border border-gray-300 text-left">Kelas</th>
-                  <th className="p-2 border border-gray-300 text-left">Status</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {(data.siswa.length ? data.siswa : [
-                  { nama: "Budi", kelas: "XII IPA 1", status: "Aktif" },
-                  { nama: "Ani", kelas: "XI IPS 2", status: "Aktif" },
-                ]).map((s, i) => (
-                  <tr key={i} className="odd:bg-white even:bg-gray-50 hover:bg-blue-50">
-                    <td className="p-2 border border-gray-200">{s.nama}</td>
-                    <td className="p-2 border border-gray-200">{s.kelas || s.ket || "-"}</td>
-                    <td className="p-2 border border-gray-200">{s.status || "Aktif"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <button
-            onClick={() => handleSelengkapnya("Siswa")}
-            className="mt-3 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition text-sm"
-          >
-            Selengkapnya
-          </button>
+        <div style={cardStyle("linear-gradient(135deg, #36d1dc, #5b86e5)")}>
+          <div>Siswa</div>
+          <div style={{ fontSize: 28, fontWeight: "bold" }}>{siswa.length}</div>
         </div>
-
-        {/* ======================= TABEL GURU ======================= */}
-        <div className="bg-white rounded shadow-md p-6 mb-10">
-          <h3 className="font-bold text-lg text-gray-700 mb-3">Data Guru</h3>
-
-          <div className="max-h-56 overflow-y-auto border border-gray-200 rounded-lg">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-100 sticky top-0">
-                <tr>
-                  <th className="p-2 border border-gray-300 text-left">Nama</th>
-                  <th className="p-2 border border-gray-300 text-left">Mapel</th>
-                  <th className="p-2 border border-gray-300 text-left">Status</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {(data.guru.length ? data.guru : [
-                  { nama: "Ibu Siti", ket: "Matematika", status: "Aktif" },
-                  { nama: "Pak Deni", ket: "Bahasa Inggris", status: "Aktif" },
-                ]).map((g, i) => (
-                  <tr key={i} className="odd:bg-white even:bg-gray-50 hover:bg-blue-50">
-                    <td className="p-2 border border-gray-200">{g.nama}</td>
-                    <td className="p-2 border border-gray-200">{g.ket}</td>
-                    <td className="p-2 border border-gray-200">{g.status || "Aktif"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <button
-            onClick={() => handleSelengkapnya("Guru")}
-            className="mt-3 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition text-sm"
-          >
-            Selengkapnya
-          </button>
+        <div style={cardStyle("linear-gradient(135deg, #ff9a9e, #fad0c4)")}>
+          <div>Guru</div>
+          <div style={{ fontSize: 28, fontWeight: "bold" }}>{guru.length}</div>
         </div>
-
-        {/* ======================= TABEL KARYAWAN ======================= */}
-        <div className="bg-white rounded-xl shadow-md p-6">
-          <h3 className="font-bold text-lg text-gray-700 mb-3">Data Karyawan</h3>
-
-          <div className="max-h-56 overflow-y-auto border border-gray-200 rounded-lg">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-100 sticky top-0">
-                <tr>
-                  <th className="p-2 border border-gray-300 text-left">Nama</th>
-                  <th className="p-2 border border-gray-300 text-left">Jabatan</th>
-                  <th className="p-2 border border-gray-300 text-left">Status</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {(data.karyawan.length ? data.karyawan : [
-                  { nama: "Pak Joko", ket: "Staff TU", status: "Aktif" },
-                  { nama: "Bu Nani", ket: "Kebersihan", status: "Aktif" },
-                ]).map((k, i) => (
-                  <tr key={i} className="odd:bg-white even:bg-gray-50 hover:bg-blue-50">
-                    <td className="p-2 border border-gray-200">{k.nama}</td>
-                    <td className="p-2 border border-gray-200">{k.ket || k.jabatan || "-"}</td>
-                    <td className="p-2 border border-gray-200">{k.status || "Aktif"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <button
-            onClick={() => handleSelengkapnya("Karyawan")}
-            className="mt-3 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition text-sm"
-          >
-            Selengkapnya
-          </button>
+        <div style={cardStyle("linear-gradient(135deg, #f6d365, #fda085)")}>
+          <div>Karyawan</div>
+          <div style={{ fontSize: 28, fontWeight: "bold" }}>{karyawan.length}</div>
         </div>
       </div>
+
+      {/* Ringkasan Tagihan */}
+      <div style={cardContainer}>
+        <div style={cardStyle("linear-gradient(135deg, #a18cd1, #fbc2eb)")}>
+          <div>Total Tagihan</div>
+          <div style={{ fontSize: 22, fontWeight: "bold" }}>{formatRp(summaryTagihan.total)}</div>
+        </div>
+        <div style={cardStyle("linear-gradient(135deg, #43cea2, #185a9d)")}>
+          <div>Lunas</div>
+          <div style={{ fontSize: 22, fontWeight: "bold" }}>{formatRp(summaryTagihan.lunas)}</div>
+        </div>
+        <div style={cardStyle("linear-gradient(135deg, #f857a6, #ff5858)")}>
+          <div>Sisa</div>
+          <div style={{ fontSize: 22, fontWeight: "bold" }}>{formatRp(summaryTagihan.sisa)}</div>
+        </div>
+      </div>
+
+      {/* Search */}
+      <input
+        type="text"
+        placeholder="Cari siswa..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        style={{
+          padding: 16,
+          width: "100%",
+          borderRadius: 12,
+          border: "1px solid #ccc",
+          marginBottom: 30,
+          fontSize: 16,
+          outline: "none",
+        }}
+      />
+
+      {/* Table Siswa */}
+      <h2 style={{ marginBottom: 15, color: "#444" }}>Daftar Siswa</h2>
+      <table style={tableStyle}>
+        <thead>
+          <tr>
+            <th style={thStyle}>ID</th>
+            <th style={thStyle}>Nama</th>
+            <th style={thStyle}>Kelas</th>
+            <th style={thStyle}>Alamat</th>
+            <th style={thStyle}>HP</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredSiswa.map((s, idx) => (
+            <tr
+              key={s.id}
+              style={{
+                cursor: "pointer",
+                background: idx % 2 === 0 ? "#fff" : "#f9f9f9",
+                transition: "background 0.3s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#e0f7fa")}
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.background = idx % 2 === 0 ? "#fff" : "#f9f9f9")
+              }
+            >
+              <td style={tdStyle}>{s.id}</td>
+              <td style={tdStyle}>{s.nama}</td>
+              <td style={tdStyle}>{s.kelas}</td>
+              <td style={tdStyle}>{s.alamat}</td>
+              <td style={tdStyle}>{s.hp}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {/* Table Tagihan */}
+      <h2 style={{ margin: "30px 0 15px 0", color: "#444" }}>Daftar Tagihan</h2>
+      <table style={tableStyle}>
+        <thead>
+          <tr>
+            <th style={thStyle}>ID</th>
+            <th style={thStyle}>Siswa</th>
+            <th style={thStyle}>Kategori</th>
+            <th style={thStyle}>Jumlah</th>
+            <th style={thStyle}>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {tagihan.map((t, idx) => (
+            <tr
+              key={t.id}
+              style={{
+                cursor: "pointer",
+                background: idx % 2 === 0 ? "#fff" : "#f9f9f9",
+                transition: "background 0.3s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#e0f7fa")}
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.background = idx % 2 === 0 ? "#fff" : "#f9f9f9")
+              }
+            >
+              <td style={tdStyle}>{t.id}</td>
+              <td style={tdStyle}>{t.siswa}</td>
+              <td style={tdStyle}>{t.kategori}</td>
+              <td style={tdStyle}>{formatRp(t.jumlah)}</td>
+              <td style={{ ...tdStyle, ...statusStyle(t.status) }}>{t.status}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

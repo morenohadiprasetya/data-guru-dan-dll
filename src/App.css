@@ -1,1 +1,11 @@
- 
+ .menu-wrapper {
+  overflow: hidden;
+  transition: max-height 0.35s ease, opacity 0.25s ease;
+  opacity: 0;
+  max-height: 0;
+}
+
+.menu-wrapper.open {
+  opacity: 1;
+  max-height: 500px; /* cukup besar biar muat semua */
+}

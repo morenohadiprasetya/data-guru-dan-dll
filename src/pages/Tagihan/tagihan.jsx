@@ -215,7 +215,7 @@ export default function Tagihan() {
       <div className="bg-white p-6 rounded-2xl shadow-xl border border-blue-100">
         <button
           onClick={() => navigate("/garoet")}
-          className="mb-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow active:scale-95 transition"
+          className="mb-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded shadow active:scale-95 transition"
         >
           + Tambah Tagihan
         </button>

@@ -6,10 +6,10 @@ import "remixicon/fonts/remixicon.css";
 export default function Sidnav() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [openMenu, setOpenMenu] = useState(null);
 
-  const toggleMenu = (menu) =>
-    setOpenMenu(openMenu === menu ? null : menu);
+  // Pisah state
+  const [openDatabase, setOpenDatabase] = useState(false);
+  const [openKeuangan, setOpenKeuangan] = useState(false);
 
   const handleLogout = () => {
     Swal.fire({
@@ -48,28 +48,26 @@ export default function Sidnav() {
           {/* DASHBOARD */}
           <Link
             to="/dashboard"
-            className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-all ${isActive("/dashboard")}`}
+            className={`flex items-center gap-3 px-4 py-2 text-white rounded-lg transition-all ${isActive("/dashboard")}`}
           >
             <i className="ri-dashboard-2-line text-xl"></i>
             Dashboard
           </Link>
 
-          {/* DATABASE MENU */}
+          {/* DATABASE */}
           <button
-            onClick={() => toggleMenu("database")}
-            className="flex justify-between items-center px-4 py-2 rounded-lg
-                       hover:bg-blue-800 transition"
+            onClick={() => setOpenDatabase(!openDatabase)}
+            className="flex justify-between items-center px-4 py-2 rounded-lg hover:bg-blue-800 transition"
           >
             <span className="flex items-center gap-3">
               <i className="ri-folder-2-line text-xl"></i>
               Database
             </span>
-            <i className={`ri-arrow-down-s-line transition-transform ${openMenu === "database" ? "rotate-180" : ""}`}></i>
+            <i className={`ri-arrow-down-s-line transition-transform ${openDatabase ? "rotate-180" : ""}`}></i>
           </button>
 
-          {/* SUBMENU DATABASE */}
-          {openMenu === "database" && (
-            <div className="ml-7 mt-1 flex flex-col gap-1 animate-fadeIn text-sm">
+          {openDatabase && (
+            <div className="ml-7 mt-1 flex flex-col gap-1 text-sm animate-slideFade">
 
               <Link to="/kategori-data" className="py-1 flex items-center gap-2 text-white hover:text-blue-200">
                 <i className="ri-price-tag-3-line"></i> Kategori Data
@@ -79,7 +77,7 @@ export default function Sidnav() {
                 <i className="ri-building-2-line"></i> Kelas
               </Link>
 
-              <Link to="/apo" className="py-1 flex items-center gap-2 text-white hover:text-blue-200">
+              <Link to="/Masterdata" className="py-1 flex items-center gap-2 text-white hover:text-blue-200">
                 <i className="ri-user-3-line"></i> Masterdata
               </Link>
 
@@ -88,7 +86,7 @@ export default function Sidnav() {
 
           {/* KEUANGAN */}
           <button
-            onClick={() => toggleMenu("keuangan")}
+            onClick={() => setOpenKeuangan(!openKeuangan)}
             className="flex justify-between items-center px-4 py-2 rounded-lg text-blue-100 
                        hover:bg-blue-800 transition"
           >
@@ -96,12 +94,11 @@ export default function Sidnav() {
               <i className="ri-money-dollar-circle-line text-xl"></i>
               Keuangan
             </span>
-            <i className={`ri-arrow-down-s-line transition-transform ${openMenu === "keuangan" ? "rotate-180" : ""}`}></i>
+            <i className={`ri-arrow-down-s-line transition-transform ${openKeuangan ? "rotate-180" : ""}`}></i>
           </button>
 
-          {/* SUBMENU KEUANGAN */}
-          {openMenu === "keuangan" && (
-            <div className="ml-7 mt-1 flex flex-col gap-1 animate-fadeIn text-sm">
+          {openKeuangan && (
+            <div className="ml-7 mt-1 flex flex-col gap-1 text-sm animate-slideFade">
 
               <Link to="/kategori-tagihan" className="py-1 flex items-center gap-2 text-white hover:text-blue-200">
                 <i className="ri-list-check-2"></i> Kategori Tagihan
@@ -122,11 +119,11 @@ export default function Sidnav() {
       </div>
 
       {/* LOGOUT */}
-      <div className="p-4">
+      <div className="p-4 rounded">
         <button
           onClick={handleLogout}
           className="w-full flex items-center justify-center gap-2 bg-red-600 
-                     hover:bg-red-700 transition text-white py-2 rounded-lg shadow-md"
+                     hover:bg-red-700 transition text-white py-2 rounded shadow-md"
         >
           <i className="ri-logout-box-r-line text-xl"></i>
           Logout

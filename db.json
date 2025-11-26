@@ -37,6 +37,15 @@
       "level": "Siswa",
       "kelas": "df12",
       "jurusan": "TKJ"
+    },
+    {
+      "id": "19d5",
+      "nama": "Ryuzaki (L . Lawliet)",
+      "ket": "",
+      "alamat": "rqwreqwe",
+      "hp": "qwewqe",
+      "kelas": " X TKJ",
+      "level": "siswa"
     }
   ],
   "guru": [
@@ -87,16 +96,16 @@
   ],
   "kategoridata": [
     {
-      "id": "l1",
-      "nama": "Siswa"
-    },
-    {
-      "id": "l2",
-      "nama": "Guru"
-    },
-    {
       "id": "l3",
       "nama": "Karyawan"
+    },
+    {
+      "id": "7911",
+      "nama": "guru"
+    },
+    {
+      "id": "d775",
+      "nama": "siswa"
     }
   ],
   "kategoriTagihan": [

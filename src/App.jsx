@@ -52,7 +52,7 @@ export default function App() {
           <Route path="/garoet" element={<TambahTagihan />} />
 
           {/* MASTER DATA */}
-          <Route path="/apo" element={<Masterdata />} />
+          <Route path="/Masterdata" element={<Masterdata />} />
           <Route path="/tambahdata" element={<Tambahdata />} />
           <Route path="/editdata/:id" element={<Edit />} />
 
