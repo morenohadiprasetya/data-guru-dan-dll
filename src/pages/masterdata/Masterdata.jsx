@@ -1,4 +1,4 @@
-// Masterdata.jsx
+// Masterdatagurjsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -81,7 +81,7 @@ export default function Masterdata() {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <FontAwesomeIcon icon={faFolderOpen} className="text-yellow-600 text-3xl" />
-          <h1 className="text-3xl font-semibold">Kategori Data</h1>
+          <h1 className="text-3xl font-semibold">Master Data</h1>
         </div>
 
         <div className="flex items-center gap-3">

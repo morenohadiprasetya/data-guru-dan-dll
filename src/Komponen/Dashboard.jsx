@@ -1,246 +1,300 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import axios from "axios";
+import "remixicon/fonts/remixicon.css";
+
+const API_TAGIHAN = "http://localhost:5000/tagihan";
+const API_KELAS = "http://localhost:5000/kelas";
+const API_KATEGORI = "http://localhost:5000/kategoriTagihan";
+const API_SISWA = "http://localhost:5000/siswa";
+const API_GURU = "http://localhost:5000/guru";
+const API_KARYAWAN = "http://localhost:5000/karyawan";
+
+function formatRp(n = 0) {
+  return "Rp " + Number(n).toLocaleString("id-ID");
+}
 
 export default function Dashboard() {
-  const [kelas, setKelas] = useState([]);
-  const [siswa, setSiswa] = useState([]);
-  const [guru, setGuru] = useState([]);
-  const [karyawan, setKaryawan] = useState([]);
-  const [tagihan, setTagihan] = useState([]);
+  const [tagihanData, setTagihanData] = useState([]);
+  const [kelasData, setKelasData] = useState([]);
+  const [kategoriTagihan, setKategoriTagihan] = useState([]);
+  const [siswaData, setSiswaData] = useState([]);
+  const [guruData, setGuruData] = useState([]);
+  const [karyawanData, setKaryawanData] = useState([]);
+
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  const [error, setError] = useState(null);
 
+  const [searchTagihan, setSearchTagihan] = useState("");
+  const [searchSiswa, setSearchSiswa] = useState("");
+  const [searchGuru, setSearchGuru] = useState("");
+  const [searchKaryawan, setSearchKaryawan] = useState("");
+
+  // ================================
+  // LOAD ALL DATA
+  // ================================
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
+    async function loadData() {
       try {
-        const kelasData = [
-          { id: 1, nama: "10A" },
-          { id: 2, nama: "11B" }
-        ];
-        const siswaData = [
-          { id: "s1", nama: "Andi", kelas: "10A", alamat: "Jakarta", hp: "081234" },
-          { id: "s2", nama: "Budi", kelas: "11B", alamat: "Bandung", hp: "081235" }
-        ];
-        const guruData = [{ id: "g1", nama: "Pak Joko", mapel: "Matematika" }];
-        const karyawanData = [{ id: "k1", nama: "Ibu Ani", jabatan: "TU" }];
-        const tagihanData = [
-          { id: "t1", siswa: "Andi", kategori: "SPP", jumlah: 500000, status: "Lunas" },
-          { id: "t2", siswa: "Budi", kategori: "Ujian", jumlah: 200000, status: "Belum Lunas" }
-        ];
+        const [tagihanRes, kelasRes, kategoriRes, siswaRes, guruRes, karyawanRes] =
+          await Promise.all([
+            axios.get(API_TAGIHAN),
+            axios.get(API_KELAS),
+            axios.get(API_KATEGORI),
+            axios.get(API_SISWA),
+            axios.get(API_GURU),
+            axios.get(API_KARYAWAN),
+          ]);
 
-        setKelas(kelasData);
-        setSiswa(siswaData);
-        setGuru(guruData);
-        setKaryawan(karyawanData);
-        setTagihan(tagihanData);
+        setTagihanData(Array.isArray(tagihanRes.data) ? tagihanRes.data : []);
+        setKelasData(Array.isArray(kelasRes.data) ? kelasRes.data : []);
+        setKategoriTagihan(Array.isArray(kategoriRes.data) ? kategoriRes.data : []);
+        setSiswaData(Array.isArray(siswaRes.data) ? siswaRes.data : []);
+        setGuruData(Array.isArray(guruRes.data) ? guruRes.data : []);
+        setKaryawanData(Array.isArray(karyawanRes.data) ? karyawanRes.data : []);
       } catch (err) {
+        setError("Gagal memuat data");
         console.error(err);
       } finally {
         setLoading(false);
       }
-    };
-
-    fetchData();
+    }
+    loadData();
   }, []);
 
-  if (loading) return <div style={{ padding: 50, fontSize: 22 }}>Loading...</div>;
+  // ================================
+  // GROUPING TAGIHAN (tanpa persen)
+  // ================================
+  const groupedTagihan = useMemo(() => {
+    const map = {};
+    tagihanData.forEach((t) => {
+      const name = t.nama || t.namaTagihan || "Unknown";
+      if (!map[name]) map[name] = { nama: name, total: 0, lunas: 0, sisa: 0 };
 
-  // Ringkasan tagihan
-  const summaryTagihan = tagihan.reduce(
-    (acc, t) => {
-      acc.total += t.jumlah;
-      if (t.status === "Lunas") acc.lunas += t.jumlah;
-      else acc.sisa += t.jumlah;
+      const jumlah = Number(t.jumlah ?? t.total ?? 0);
+      map[name].total += jumlah;
+
+      if ((t.status || "").toLowerCase() === "lunas") map[name].lunas += jumlah;
+      map[name].sisa = map[name].total - map[name].lunas;
+    });
+
+    return Object.values(map);
+  }, [tagihanData]);
+
+  const filteredTagihan = groupedTagihan.filter((x) =>
+    x.nama.toLowerCase().includes(searchTagihan.toLowerCase())
+  );
+
+  const totals = groupedTagihan.reduce(
+    (acc, cur) => {
+      acc.totalAll += cur.total;
+      acc.lunasAll += cur.lunas;
+      acc.sisaAll += cur.sisa;
       return acc;
     },
-    { total: 0, lunas: 0, sisa: 0 }
+    { totalAll: 0, lunasAll: 0, sisaAll: 0 }
   );
 
-  const filteredSiswa = siswa.filter((s) =>
-    s.nama.toLowerCase().includes(search.toLowerCase())
+  // ================================
+  // HEADER COMPONENT
+  // ================================
+  const Header = () => (
+    <header className="bg-white p-4 border-b flex justify-between items-center">
+      <div>
+        <div className="text-xl font-bold flex items-center gap-2">
+          <i className="ri-dashboard-2-line text-blue-600"></i> Dashboard
+        </div>
+        <div className="text-gray-500 text-sm">Ringkasan data sekolah</div>
+      </div>
+      <div className="flex items-center gap-3">
+        <div className="w-9 h-9 rounded-full bg-blue-200 flex items-center justify-center">
+          <i className="ri-user-fill text-blue-700"></i>
+        </div>
+      </div>
+    </header>
   );
 
-  const formatRp = (n) => "Rp " + n.toLocaleString();
-
-  // Styles
-  const cardStyle = (bg) => ({
-    background: bg,
-    color: "white",
-    padding: 25,
-    borderRadius: 15,
-    flex: 1,
-    textAlign: "center",
-    boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
-    transition: "transform 0.3s, box-shadow 0.3s",
-    cursor: "default",
-  });
-
-  const cardContainer = { display: "flex", gap: 20, marginBottom: 30, flexWrap: "wrap" };
-
-  const tableStyle = {
-    width: "100%",
-    borderCollapse: "collapse",
-    borderRadius: 10,
-    overflow: "hidden",
-    boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
-    background: "white",
-  };
-
-  const thStyle = {
-    borderBottom: "2px solid #ddd",
-    padding: 14,
-    background: "#f0f0f0",
-    textAlign: "left",
-    color: "#333",
-    fontWeight: "600",
-  };
-
-  const tdStyle = {
-    borderBottom: "1px solid #eee",
-    padding: 12,
-    color: "#555",
-  };
-
-  const containerStyle = {
-    padding: "40px 50px",
-    fontFamily: "Segoe UI, sans-serif",
-    background: "#e6ebf2",
-    minHeight: "100vh",
-  };
-
-  const statusStyle = (status) => ({
-    color: status === "Lunas" ? "#2e7d32" : "#d32f2f",
-    fontWeight: "bold",
-  });
+  if (loading) return <div className="p-6">Memuat data...</div>;
+  if (error) return <div className="p-6 text-red-600">{error}</div>;
 
   return (
-    <div style={containerStyle}>
-      <h1 style={{ fontSize: 36, marginBottom: 35, color: "#333" }}>Dashboard Sekolah</h1>
+    <div className="flex bg-gray-50 ml-59 min-h-screen">
+      <div className="flex-1 flex flex-col">
+        <Header />
 
-      {/* Ringkasan */}
-      <div style={cardContainer}>
-        <div style={cardStyle("linear-gradient(135deg, #43e97b, #38f9d7)")}>
-          <div>Kelas</div>
-          <div style={{ fontSize: 28, fontWeight: "bold" }}>{kelas.length}</div>
-        </div>
-        <div style={cardStyle("linear-gradient(135deg, #36d1dc, #5b86e5)")}>
-          <div>Siswa</div>
-          <div style={{ fontSize: 28, fontWeight: "bold" }}>{siswa.length}</div>
-        </div>
-        <div style={cardStyle("linear-gradient(135deg, #ff9a9e, #fad0c4)")}>
-          <div>Guru</div>
-          <div style={{ fontSize: 28, fontWeight: "bold" }}>{guru.length}</div>
-        </div>
-        <div style={cardStyle("linear-gradient(135deg, #f6d365, #fda085)")}>
-          <div>Karyawan</div>
-          <div style={{ fontSize: 28, fontWeight: "bold" }}>{karyawan.length}</div>
-        </div>
+        <main className="p-6 space-y-6">
+          {/* SUMMARY */}
+          <section className="grid grid-cols-2 md:grid-cols-6 gap-4">
+            <div className="p-4 bg-white rounded-xl shadow border">
+              <div className="text-gray-500 text-sm">Total Tagihan</div>
+              <div className="text-2xl font-bold">{formatRp(totals.totalAll)}</div>
+            </div>
+            <div className="p-4 bg-white rounded-xl shadow border">
+              <div className="text-gray-500 text-sm">Terbayar</div>
+              <div className="text-2xl font-bold text-green-600">
+                {formatRp(totals.lunasAll)}
+              </div>
+            </div>
+            <div className="p-4 bg-white rounded-xl shadow border">
+              <div className="text-gray-500 text-sm">Belum Lunas</div>
+              <div className="text-2xl font-bold text-red-600">
+                {formatRp(totals.sisaAll)}
+              </div>
+            </div>
+            <div className="p-4 bg-white rounded-xl shadow border">
+              <div className="text-gray-500 text-sm">Siswa</div>
+              <div className="text-2xl font-bold">{siswaData.length}</div>
+            </div>
+            <div className="p-4 bg-white rounded-xl shadow border">
+              <div className="text-gray-500 text-sm">Guru</div>
+              <div className="text-2xl font-bold">{guruData.length}</div>
+            </div>
+            <div className="p-4 bg-white rounded-xl shadow border">
+              <div className="text-gray-500 text-sm">Karyawan</div>
+              <div className="text-2xl font-bold">{karyawanData.length}</div>
+            </div>
+          </section>
+
+          {/* TABEL TAGIHAN */}
+          <section className="bg-white rounded-2xl shadow p-5 border">
+            <h2 className="text-lg font-semibold flex items-center gap-2 mb-4">
+              <i className="ri-file-list-3-fill text-blue-600"></i> Rekap Tagihan
+            </h2>
+            <input
+              className="w-full p-2 border rounded mb-3"
+              placeholder="Cari tagihan..."
+              value={searchTagihan}
+              onChange={(e) => setSearchTagihan(e.target.value)}
+            />
+            <div className="overflow-auto">
+              <table className="w-full border rounded-lg">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="p-2 border">Nama</th>
+                    <th className="p-2 border">Total</th>
+                    <th className="p-2 border">Lunas</th>
+                    <th className="p-2 border">Belum Lunas</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredTagihan.map((t, idx) => (
+                    <tr key={idx}>
+                      <td className="p-2 border">{t.nama}</td>
+                      <td className="p-2 text-right border">{formatRp(t.total)}</td>
+                      <td className="p-2 text-right border text-green-600">{formatRp(t.lunas)}</td>
+                      <td className="p-2 text-right border text-red-600">{formatRp(t.sisa)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          {/* TABEL SISWA */}
+          <section className="bg-white rounded-2xl shadow p-5 border">
+            <h2 className="text-lg font-semibold flex items-center gap-2 mb-4">
+              <i className="ri-user-fill text-green-600"></i> Siswa
+            </h2>
+            <input
+              className="w-full p-2 border rounded mb-3"
+              placeholder="Cari siswa..."
+              value={searchSiswa}
+              onChange={(e) => setSearchSiswa(e.target.value)}
+            />
+            <div className="overflow-auto">
+              <table className="w-full border rounded-lg">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="p-2 border">Nama</th>
+                    <th className="p-2 border">Kelas</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {siswaData
+                    .filter((s) =>
+                      (s.nama || "").toLowerCase().includes(searchSiswa.toLowerCase())
+                    )
+                    .map((s, idx) => (
+                      <tr key={idx}>
+                        <td className="p-2 border">{s.nama}</td>
+                        <td className="p-2 border">{s.kelas}</td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          {/* TABEL GURU */}
+          <section className="bg-white rounded-2xl shadow p-5 border">
+            <h2 className="text-lg font-semibold flex items-center gap-2 mb-4">
+              <i className="ri-user-star-fill text-yellow-600"></i> Guru
+            </h2>
+            <input
+              className="w-full p-2 border rounded mb-3"
+              placeholder="Cari guru..."
+              value={searchGuru}
+              onChange={(e) => setSearchGuru(e.target.value)}
+            />
+            <div className="overflow-auto">
+              <table className="w-full border rounded-lg">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="p-2 border">Nama</th>
+                    <th className="p-2 border">Mata Pelajaran</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {guruData
+                    .filter((g) =>
+                      (g.nama || "").toLowerCase().includes(searchGuru.toLowerCase())
+                    )
+                    .map((g, idx) => (
+                      <tr key={idx}>
+                        <td className="p-2 border">{g.nama}</td>
+                        <td className="p-2 border">{g.ket}</td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          {/* TABEL KARYAWAN */}
+          <section className="bg-white rounded-2xl shadow p-5 border">
+            <h2 className="text-lg font-semibold flex items-center gap-2 mb-4">
+              <i className="ri-briefcase-fill text-indigo-600"></i> Karyawan
+            </h2>
+            <input
+              className="w-full p-2 border rounded mb-3"
+              placeholder="Cari karyawan..."
+              value={searchKaryawan}
+              onChange={(e) => setSearchKaryawan(e.target.value)}
+            />
+            <div className="overflow-auto">
+              <table className="w-full border rounded-lg">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="p-2 border">Nama</th>
+                    <th className="p-2 border">Jabatan</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {karyawanData
+                    .filter((k) =>
+                      (k.nama || "").toLowerCase().includes(searchKaryawan.toLowerCase())
+                    )
+                    .map((k, idx) => (
+                      <tr key={idx}>
+                        <td className="p-2 border">{k.nama}</td>
+                        <td className="p-2 border">{k.ket}</td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </main>
       </div>
-
-      {/* Ringkasan Tagihan */}
-      <div style={cardContainer}>
-        <div style={cardStyle("linear-gradient(135deg, #a18cd1, #fbc2eb)")}>
-          <div>Total Tagihan</div>
-          <div style={{ fontSize: 22, fontWeight: "bold" }}>{formatRp(summaryTagihan.total)}</div>
-        </div>
-        <div style={cardStyle("linear-gradient(135deg, #43cea2, #185a9d)")}>
-          <div>Lunas</div>
-          <div style={{ fontSize: 22, fontWeight: "bold" }}>{formatRp(summaryTagihan.lunas)}</div>
-        </div>
-        <div style={cardStyle("linear-gradient(135deg, #f857a6, #ff5858)")}>
-          <div>Sisa</div>
-          <div style={{ fontSize: 22, fontWeight: "bold" }}>{formatRp(summaryTagihan.sisa)}</div>
-        </div>
-      </div>
-
-      {/* Search */}
-      <input
-        type="text"
-        placeholder="Cari siswa..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        style={{
-          padding: 16,
-          width: "100%",
-          borderRadius: 12,
-          border: "1px solid #ccc",
-          marginBottom: 30,
-          fontSize: 16,
-          outline: "none",
-        }}
-      />
-
-      {/* Table Siswa */}
-      <h2 style={{ marginBottom: 15, color: "#444" }}>Daftar Siswa</h2>
-      <table style={tableStyle}>
-        <thead>
-          <tr>
-            <th style={thStyle}>ID</th>
-            <th style={thStyle}>Nama</th>
-            <th style={thStyle}>Kelas</th>
-            <th style={thStyle}>Alamat</th>
-            <th style={thStyle}>HP</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredSiswa.map((s, idx) => (
-            <tr
-              key={s.id}
-              style={{
-                cursor: "pointer",
-                background: idx % 2 === 0 ? "#fff" : "#f9f9f9",
-                transition: "background 0.3s",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "#e0f7fa")}
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.background = idx % 2 === 0 ? "#fff" : "#f9f9f9")
-              }
-            >
-              <td style={tdStyle}>{s.id}</td>
-              <td style={tdStyle}>{s.nama}</td>
-              <td style={tdStyle}>{s.kelas}</td>
-              <td style={tdStyle}>{s.alamat}</td>
-              <td style={tdStyle}>{s.hp}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {/* Table Tagihan */}
-      <h2 style={{ margin: "30px 0 15px 0", color: "#444" }}>Daftar Tagihan</h2>
-      <table style={tableStyle}>
-        <thead>
-          <tr>
-            <th style={thStyle}>ID</th>
-            <th style={thStyle}>Siswa</th>
-            <th style={thStyle}>Kategori</th>
-            <th style={thStyle}>Jumlah</th>
-            <th style={thStyle}>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {tagihan.map((t, idx) => (
-            <tr
-              key={t.id}
-              style={{
-                cursor: "pointer",
-                background: idx % 2 === 0 ? "#fff" : "#f9f9f9",
-                transition: "background 0.3s",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "#e0f7fa")}
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.background = idx % 2 === 0 ? "#fff" : "#f9f9f9")
-              }
-            >
-              <td style={tdStyle}>{t.id}</td>
-              <td style={tdStyle}>{t.siswa}</td>
-              <td style={tdStyle}>{t.kategori}</td>
-              <td style={tdStyle}>{formatRp(t.jumlah)}</td>
-              <td style={{ ...tdStyle, ...statusStyle(t.status) }}>{t.status}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
     </div>
   );
 }

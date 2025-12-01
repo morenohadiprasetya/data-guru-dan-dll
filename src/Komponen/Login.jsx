@@ -58,7 +58,7 @@ function Login() {
           onClick={handleDirectToWeb}
           className="text-blue-900 mb-2 text-sm"
         >
-        .
+        
         </button>
 
         {/* ICON + TITLE */}

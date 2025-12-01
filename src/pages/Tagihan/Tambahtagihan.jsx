@@ -8,7 +8,8 @@ export default function TambahTagihan() {
   const navigate = useNavigate();
 
   const API = {
-    tagihan: "http://localhost:5000/tagihan"
+    tagihan: "http://localhost:5000/tagihan",
+    kelas: "http://localhost:5000/kelas", // API untuk ambil daftar kelas
   };
 
   const [data, setData] = useState({
@@ -17,10 +18,20 @@ export default function TambahTagihan() {
     bulan: "",
     jumlah: "",
     status: "Belum Lunas",
-    kategori: ""
+    kategori: "",
   });
 
+  const [kelasList, setKelasList] = useState([]); // state untuk daftar kelas
+
   const kategoriList = ["SPP", "Uang Gedung", "Pendaftaran", "Lain-lain"];
+
+  // Ambil daftar kelas dari API
+  useEffect(() => {
+    axios
+      .get(API.kelas)
+      .then((res) => setKelasList(res.data))
+      .catch(() => Swal.fire("Error", "Gagal memuat daftar kelas", "error"));
+  }, []);
 
   const submit = (e) => {
     e.preventDefault();
@@ -29,10 +40,14 @@ export default function TambahTagihan() {
       return Swal.fire("Nama tagihan wajib diisi", "", "warning");
     }
 
+    if (!data.kelas) {
+      return Swal.fire("Kelas wajib dipilih", "", "warning");
+    }
+
     axios
       .post(API.tagihan, {
         ...data,
-        id: Date.now().toString()
+        id: Date.now().toString(),
       })
       .then(() => {
         Swal.fire("Berhasil!", "Tagihan berhasil ditambahkan", "success").then(() =>
@@ -59,6 +74,19 @@ export default function TambahTagihan() {
               onChange={(e) => setData({ ...data, nama: e.target.value })}
             />
 
+            {/* Kelas */}
+            <label>Kelas</label>
+            <CFormSelect
+              className="mb-3"
+              value={data.kelas}
+              onChange={(e) => setData({ ...data, kelas: e.target.value })}
+            >
+              <option value="">-- Pilih Kelas --</option>
+              {kelasList.map((k) => (
+                <option key={k.id} value={k.nama}>{k.nama}</option>
+              ))}
+            </CFormSelect>
+
             {/* Kategori */}
             <label>Kategori Tagihan</label>
             <CFormSelect
@@ -68,9 +96,7 @@ export default function TambahTagihan() {
             >
               <option value="">-- Pilih Kategori --</option>
               {kategoriList.map((k, i) => (
-                <option key={i} value={k}>
-                  {k}
-                </option>
+                <option key={i} value={k}>{k}</option>
               ))}
             </CFormSelect>
 
