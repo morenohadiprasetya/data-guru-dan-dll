@@ -7,7 +7,7 @@ export default function TambahData() {
   const nav = useNavigate();
   const loc = useLocation();
 
-  // Level yg dipilih
+  // Level yg dipilih dari query
   const q = new URLSearchParams(loc.search);
   const kategoriParam = (q.get("kategori") || "siswa").toLowerCase();
 
@@ -17,6 +17,7 @@ export default function TambahData() {
     alamat: "",
     hp: "",
     kelas: "",
+    nomorUnik: "",   // ⬅⬅⬅ DITAMBAHKAN
     level: kategoriParam,
   });
 
@@ -24,25 +25,27 @@ export default function TambahData() {
   const [kelasList, setKelasList] = useState([]);
   const [levelList, setLevelList] = useState([]);
 
-  // Ambil level dari CRUD Level
+  // Ambil daftar level
   useEffect(() => {
-    axios.get("http://localhost:5000/kategoridata")
-      .then(res => setLevelList(res.data || []))
+    axios
+      .get("http://localhost:5000/kategoridata")
+      .then((res) => setLevelList(res.data || []))
       .catch(() => setLevelList([]));
   }, []);
 
-  // Ambil kelas hanya jika level === siswa
+  // Ambil kelas jika level === siswa
   useEffect(() => {
     if (form.level === "siswa") {
-      axios.get("http://localhost:5000/kelas")
-        .then(res => setKelasList(Array.isArray(res.data) ? res.data : []))
+      axios
+        .get("http://localhost:5000/kelas")
+        .then((res) => setKelasList(res.data || []))
         .catch(() => setKelasList([]));
     }
   }, [form.level]);
 
   function handleChange(e) {
     const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+    setForm((prev) => ({ ...prev, [name]: value }));
   }
 
   async function handleSubmit(e) {
@@ -51,16 +54,24 @@ export default function TambahData() {
     if (!form.nama.trim())
       return Swal.fire({ icon: "warning", title: "Nama wajib diisi" });
 
+    if (!form.nomorUnik.trim())
+      return Swal.fire({ icon: "warning", title: "Nomor unik wajib diisi" });
+
     if (form.level === "siswa" && !form.kelas)
-      return Swal.fire({ icon: "warning", title: "Pilih kelas untuk siswa" });
+      return Swal.fire({
+        icon: "warning",
+        title: "Pilih kelas untuk siswa",
+      });
 
     try {
       setSaving(true);
-      const api = `http://localhost:5000/${form.level}`;
 
+      const api = `http://localhost:5000/${form.level}`;
       await axios.post(api, form);
+
       Swal.fire({ icon: "success", title: "Data tersimpan!" });
-      nav(`/apo?kategori=${form.level}`);
+
+      nav(`/masterdata?kategori=${form.level}`);
     } catch (err) {
       Swal.fire({ icon: "error", title: "Gagal menyimpan" });
     } finally {
@@ -75,17 +86,21 @@ export default function TambahData() {
 
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-blue-900">Tambah Data</h2>
-            <button onClick={() => nav(-1)} className="text-sm bg-blue-600 text-white px-3 py-2 rounded-md">Kembali</button>
+            <button
+              onClick={() => nav(-1)}
+              className="text-sm bg-blue-600 text-white px-3 py-2 rounded-md"
+            >
+              Kembali
+            </button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
 
-            {/* PILIH LEVEL */}
-           
-
-            {/* NAMA */}
+            {/* Nama */}
             <div>
-              <label className="block text-sm font-semibold text-blue-700 mb-1">Nama</label>
+              <label className="block text-sm font-semibold text-blue-700 mb-1">
+                Nama
+              </label>
               <input
                 name="nama"
                 value={form.nama}
@@ -93,8 +108,26 @@ export default function TambahData() {
                 className="w-full rounded-lg border p-2"
               />
             </div>
- <div>
-              <label className="block text-sm font-semibold text-blue-700 mb-1">Level</label>
+
+            {/* Nomor Unik */}
+            <div>
+              <label className="block text-sm font-semibold text-blue-700 mb-1">
+                Nomor Unik
+              </label>
+              <input
+                name="nomorUnik"
+                value={form.nomorUnik}
+                onChange={handleChange}
+                className="w-full rounded-lg border p-2"
+                placeholder="Contoh: S-2025001 / G-003 / K-45"
+              />
+            </div>
+
+            {/* Level */}
+            <div>
+              <label className="block text-sm font-semibold text-blue-700 mb-1">
+                Level
+              </label>
               <select
                 name="level"
                 value={form.level}
@@ -102,16 +135,21 @@ export default function TambahData() {
                 className="w-full rounded-lg border p-2"
               >
                 <option value="">-- Pilih Level --</option>
-                {levelList.map(l => (
-                  <option key={l.id} value={l.nama}>{l.nama}</option>
+                {levelList.map((l) => (
+                  <option key={l.id} value={l.nama}>
+                    {l.nama}
+                  </option>
                 ))}
               </select>
             </div>
-           
+
+            {/* Jika siswa */}
             {form.level === "siswa" ? (
               <>
                 <div>
-                  <label className="block text-sm font-semibold text-blue-700 mb-1">Kelas</label>
+                  <label className="block text-sm font-semibold text-blue-700 mb-1">
+                    Kelas
+                  </label>
                   <select
                     name="kelas"
                     value={form.kelas}
@@ -119,42 +157,83 @@ export default function TambahData() {
                     className="w-full rounded-lg border p-2"
                   >
                     <option value="">-- Pilih Kelas --</option>
-                    {kelasList.map(k => (
-                      <option key={k.id} value={k.namaKelas}>{k.namaKelas}</option>
+                    {kelasList.map((k) => (
+                      <option key={k.id} value={k.namaKelas}>
+                        {k.namaKelas}
+                      </option>
                     ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-blue-700 mb-1">Alamat</label>
-                  <input name="alamat" value={form.alamat} onChange={handleChange} className="w-full rounded-lg border p-2" />
+                  <label className="block text-sm font-semibold text-blue-700 mb-1">
+                    Alamat
+                  </label>
+                  <input
+                    name="alamat"
+                    value={form.alamat}
+                    onChange={handleChange}
+                    className="w-full rounded-lg border p-2"
+                  />
                 </div>
               </>
             ) : (
               <>
-                {/* guru = mapel, karyawan = jabatan */}
                 <div>
-                  <label className="block text-sm font-semibold text-blue-700 mb-1">{form.level === "guru" ? "Mapel" : "Jabatan"}</label>
-                  <input name="ket" value={form.ket} onChange={handleChange} className="w-full rounded-lg border p-2" />
+                  <label className="block text-sm font-semibold text-blue-700 mb-1">
+                    {form.level === "guru" ? "Mapel" : "Jabatan"}
+                  </label>
+                  <input
+                    name="ket"
+                    value={form.ket}
+                    onChange={handleChange}
+                    className="w-full rounded-lg border p-2"
+                  />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-blue-700 mb-1">Alamat</label>
-                  <input name="alamat" value={form.alamat} onChange={handleChange} className="w-full rounded-lg border p-2" />
+                  <label className="block text-sm font-semibold text-blue-700 mb-1">
+                    Alamat
+                  </label>
+                  <input
+                    name="alamat"
+                    value={form.alamat}
+                    onChange={handleChange}
+                    className="w-full rounded-lg border p-2"
+                  />
                 </div>
               </>
             )}
 
+            {/* HP */}
             <div>
-              <label className="block text-sm font-semibold text-blue-700 mb-1">Nomor HP</label>
-              <input name="hp" value={form.hp} onChange={handleChange} className="w-full rounded-lg border p-2" />
+              <label className="block text-sm font-semibold text-blue-700 mb-1">
+                Nomor HP
+              </label>
+              <input
+                name="hp"
+                value={form.hp}
+                onChange={handleChange}
+                className="w-full rounded-lg border p-2"
+              />
             </div>
 
             <div className="flex justify-end gap-3 pt-4 border-t border-blue-100">
-              <button type="submit" disabled={saving} className="px-4 py-2 rounded-md bg-blue-600 text-white">
+              <button
+                type="submit"
+                disabled={saving}
+                className="px-4 py-2 rounded-md bg-blue-600 text-white"
+              >
                 {saving ? "Menyimpan..." : "Simpan"}
               </button>
-              <button type="button" onClick={() => nav(-1)} className="px-4 py-2 rounded-md border">Batal</button>
+
+              <button
+                type="button"
+                onClick={() => nav(-1)}
+                className="px-4 py-2 rounded-md border"
+              >
+                Batal
+              </button>
             </div>
 
           </form>

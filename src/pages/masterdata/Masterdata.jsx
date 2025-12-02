@@ -1,4 +1,3 @@
-// Masterdatagurjsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -23,7 +22,7 @@ export default function Masterdata() {
     siswa: "http://localhost:5000/siswa",
     guru: "http://localhost:5000/guru",
     karyawan: "http://localhost:5000/karyawan",
-    level:"http://localhost:5000/level"
+    level: "http://localhost:5000/level",
   };
 
   // Fetch Data
@@ -40,14 +39,15 @@ export default function Masterdata() {
     fetchData();
   }, [kategori]);
 
-  // Filter search
+  // Filter search (termasuk nomorUnik)
   const filteredData = data.filter((item) => {
     const q = search.toLowerCase();
     return (
       item.nama?.toLowerCase().includes(q) ||
       item.alamat?.toLowerCase().includes(q) ||
       (item.ket || "").toLowerCase().includes(q) ||
-      (item.kelas || "").toLowerCase().includes(q)
+      (item.kelas || "").toLowerCase().includes(q) ||
+      (item.nomorUnik || "").toLowerCase().includes(q)
     );
   });
 
@@ -109,7 +109,7 @@ export default function Masterdata() {
       <div className="mb-4">
         <input
           className="w-96 p-3 rounded-xl bg-gray-100 border shadow-sm"
-          placeholder="🔍 Cari kategori..."
+          placeholder="🔍 Cari nama, kelas, alamat, nomor unik..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -117,12 +117,13 @@ export default function Masterdata() {
 
       {/* CARD WRAPPER */}
       <div className="bg-white rounded-xl shadow-lg p-0 overflow-hidden border border-gray-200">
-        {/* TABLE HEADER (BIRU) */}
-        <div className="w-full bg-blue-600 text-white font-semibold p-3 grid grid-cols-6">
-          <div className="">Nama</div>
-          <div className="">Keterangan</div>
-          <div className="">Alamat</div>
-          <div className="">HP</div>
+        {/* TABLE HEADER */}
+        <div className="w-full bg-blue-600 text-white font-semibold p-3 grid grid-cols-7">
+          <div>Nama</div>
+          <div>Keterangan</div>
+          <div>Alamat</div>
+          <div>HP</div>
+          <div>Nomor Unik</div>
           <div className="text-center">Aksi</div>
         </div>
 
@@ -131,12 +132,15 @@ export default function Masterdata() {
           {filteredData.map((x) => (
             <div
               key={x.id}
-              className="grid grid-cols-6 border-t p-3 items-center hover:bg-gray-50"
+              className="grid grid-cols-7 border-t p-3 items-center hover:bg-gray-50"
             >
               <div className="font-medium text-blue-700">{x.nama}</div>
               <div>{x.ket || x.kelas || "-"}</div>
               <div>{x.alamat}</div>
               <div>{x.hp}</div>
+              <div className="font-semibold text-green-700">
+                {x.nomorUnik || "-"}
+              </div>
 
               {/* Aksi */}
               <div className="flex gap-2 justify-center">
@@ -155,7 +159,6 @@ export default function Masterdata() {
                   <FontAwesomeIcon icon={faTrash} />
                   Hapus
                 </button>
-
               </div>
             </div>
           ))}
@@ -165,4 +168,3 @@ export default function Masterdata() {
     </div>
   );
 }
-

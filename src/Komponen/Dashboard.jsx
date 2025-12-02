@@ -35,19 +35,27 @@ export default function Dashboard() {
   useEffect(() => {
     async function loadData() {
       try {
-        const [tagihanRes, kelasRes, kategoriRes, siswaRes, guruRes, karyawanRes] =
-          await Promise.all([
-            axios.get(API_TAGIHAN),
-            axios.get(API_KELAS),
-            axios.get(API_KATEGORI),
-            axios.get(API_SISWA),
-            axios.get(API_GURU),
-            axios.get(API_KARYAWAN),
-          ]);
+        const [
+          tagihanRes,
+          kelasRes,
+          kategoriRes,
+          siswaRes,
+          guruRes,
+          karyawanRes,
+        ] = await Promise.all([
+          axios.get(API_TAGIHAN),
+          axios.get(API_KELAS),
+          axios.get(API_KATEGORI),
+          axios.get(API_SISWA),
+          axios.get(API_GURU),
+          axios.get(API_KARYAWAN),
+        ]);
 
         setTagihanData(Array.isArray(tagihanRes.data) ? tagihanRes.data : []);
         setKelasData(Array.isArray(kelasRes.data) ? kelasRes.data : []);
-        setKategoriTagihan(Array.isArray(kategoriRes.data) ? kategoriRes.data : []);
+        setKategoriTagihan(
+          Array.isArray(kategoriRes.data) ? kategoriRes.data : []
+        );
         setSiswaData(Array.isArray(siswaRes.data) ? siswaRes.data : []);
         setGuruData(Array.isArray(guruRes.data) ? guruRes.data : []);
         setKaryawanData(Array.isArray(karyawanRes.data) ? karyawanRes.data : []);
@@ -62,18 +70,42 @@ export default function Dashboard() {
   }, []);
 
   // ================================
-  // GROUPING TAGIHAN (tanpa persen)
+  // GROUPING TAGIHAN (AUTO FIX LUNAS)
   // ================================
   const groupedTagihan = useMemo(() => {
     const map = {};
+
     tagihanData.forEach((t) => {
       const name = t.nama || t.namaTagihan || "Unknown";
-      if (!map[name]) map[name] = { nama: name, total: 0, lunas: 0, sisa: 0 };
+
+      if (!map[name]) {
+        map[name] = { nama: name, total: 0, lunas: 0, sisa: 0 };
+      }
 
       const jumlah = Number(t.jumlah ?? t.total ?? 0);
       map[name].total += jumlah;
 
-      if ((t.status || "").toLowerCase() === "lunas") map[name].lunas += jumlah;
+      const status = (t.status || "").toLowerCase().trim();
+      const statusLunas = [
+        "lunas",
+        "sudah bayar",
+        "sudah dibayar",
+        "dibayar",
+        "paid",
+        "true",
+        "yes",
+      ];
+
+      const isLunas =
+        statusLunas.includes(status) ||
+        t.status === 1 ||
+        t.status === true ||
+        t.lunas === true;
+
+      if (isLunas) {
+        map[name].lunas += jumlah;
+      }
+
       map[name].sisa = map[name].total - map[name].lunas;
     });
 
@@ -95,7 +127,7 @@ export default function Dashboard() {
   );
 
   // ================================
-  // HEADER COMPONENT
+  // HEADER
   // ================================
   const Header = () => (
     <header className="bg-white p-4 border-b flex justify-between items-center">
@@ -180,8 +212,12 @@ export default function Dashboard() {
                     <tr key={idx}>
                       <td className="p-2 border">{t.nama}</td>
                       <td className="p-2 text-right border">{formatRp(t.total)}</td>
-                      <td className="p-2 text-right border text-green-600">{formatRp(t.lunas)}</td>
-                      <td className="p-2 text-right border text-red-600">{formatRp(t.sisa)}</td>
+                      <td className="p-2 text-right border text-green-600">
+                        {formatRp(t.lunas)}
+                      </td>
+                      <td className="p-2 text-right border text-red-600">
+                        {formatRp(t.sisa)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -204,8 +240,8 @@ export default function Dashboard() {
               <table className="w-full border rounded-lg">
                 <thead className="bg-gray-100">
                   <tr>
-                    <th className="p-2 border">Nama</th>
-                    <th className="p-2 border">Kelas</th>
+                    <th className="p-3 border w-2/3">Nama</th>
+                    <th className="p-3 border w-1/3">Kelas</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -215,8 +251,8 @@ export default function Dashboard() {
                     )
                     .map((s, idx) => (
                       <tr key={idx}>
-                        <td className="p-2 border">{s.nama}</td>
-                        <td className="p-2 border">{s.kelas}</td>
+                        <td className="p-3 border w-2/3">{s.nama}</td>
+                        <td className="p-3 border w-1/3">{s.kelas}</td>
                       </tr>
                     ))}
                 </tbody>
@@ -235,12 +271,13 @@ export default function Dashboard() {
               value={searchGuru}
               onChange={(e) => setSearchGuru(e.target.value)}
             />
+
             <div className="overflow-auto">
               <table className="w-full border rounded-lg">
                 <thead className="bg-gray-100">
                   <tr>
-                    <th className="p-2 border">Nama</th>
-                    <th className="p-2 border">Mata Pelajaran</th>
+                    <th className="p-3 border w-2/3">Nama</th>
+                    <th className="p-3 border w-1/3">Mata Pelajaran</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -250,8 +287,8 @@ export default function Dashboard() {
                     )
                     .map((g, idx) => (
                       <tr key={idx}>
-                        <td className="p-2 border">{g.nama}</td>
-                        <td className="p-2 border">{g.ket}</td>
+                        <td className="p-3 border w-2/3">{g.nama}</td>
+                        <td className="p-3 border w-1/3">{g.ket}</td>
                       </tr>
                     ))}
                 </tbody>
@@ -270,12 +307,13 @@ export default function Dashboard() {
               value={searchKaryawan}
               onChange={(e) => setSearchKaryawan(e.target.value)}
             />
+
             <div className="overflow-auto">
               <table className="w-full border rounded-lg">
                 <thead className="bg-gray-100">
                   <tr>
-                    <th className="p-2 border">Nama</th>
-                    <th className="p-2 border">Jabatan</th>
+                    <th className="p-3 border w-2/3">Nama</th>
+                    <th className="p-3 border w-1/3">Jabatan</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -285,8 +323,8 @@ export default function Dashboard() {
                     )
                     .map((k, idx) => (
                       <tr key={idx}>
-                        <td className="p-2 border">{k.nama}</td>
-                        <td className="p-2 border">{k.ket}</td>
+                        <td className="p-3 border w-2/3">{k.nama}</td>
+                        <td className="p-3 border w-1/3">{k.ket}</td>
                       </tr>
                     ))}
                 </tbody>

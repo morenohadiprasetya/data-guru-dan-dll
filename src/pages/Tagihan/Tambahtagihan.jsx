@@ -9,81 +9,91 @@ export default function TambahTagihan() {
 
   const API = {
     tagihan: "http://localhost:5000/tagihan",
-    kelas: "http://localhost:5000/kelas", // API untuk ambil daftar kelas
+    siswa: "http://localhost:5000/siswa",
   };
 
   const [data, setData] = useState({
+    siswaId: "",
     nama: "",
     kelas: "",
+    kategori: "",
     bulan: "",
     jumlah: "",
     status: "Belum Lunas",
-    kategori: "",
   });
 
-  const [kelasList, setKelasList] = useState([]); // state untuk daftar kelas
+  const [siswaList, setSiswaList] = useState([]);
 
   const kategoriList = ["SPP", "Uang Gedung", "Pendaftaran", "Lain-lain"];
 
-  // Ambil daftar kelas dari API
+  // Ambil data siswa
   useEffect(() => {
-    axios
-      .get(API.kelas)
-      .then((res) => setKelasList(res.data))
-      .catch(() => Swal.fire("Error", "Gagal memuat daftar kelas", "error"));
+    axios.get(API.siswa)
+      .then(res => setSiswaList(res.data))
+      .catch(() => Swal.fire("Error", "Gagal memuat data siswa", "error"));
   }, []);
+
+  // Ketika siswa dipilih
+  const handleSelectSiswa = (id) => {
+    const siswa = siswaList.find(s => s.id === id);
+    if (!siswa) return;
+
+    setData({
+      ...data,
+      siswaId: siswa.id,
+      nama: siswa.nama,
+      kelas: siswa.kelas, // otomatis isi kelas dari masterdata
+    });
+  };
 
   const submit = (e) => {
     e.preventDefault();
 
-    if (!data.nama.trim()) {
-      return Swal.fire("Nama tagihan wajib diisi", "", "warning");
-    }
+    if (!data.siswaId)
+      return Swal.fire("Pilih siswa dulu!", "", "warning");
 
-    if (!data.kelas) {
-      return Swal.fire("Kelas wajib dipilih", "", "warning");
-    }
+    if (!data.kategori)
+      return Swal.fire("Pilih kategori tagihan!", "", "warning");
 
-    axios
-      .post(API.tagihan, {
-        ...data,
-        id: Date.now().toString(),
-      })
+    if (!data.jumlah)
+      return Swal.fire("Jumlah wajib diisi!", "", "warning");
+
+    axios.post(API.tagihan, {
+      ...data,
+      id: Date.now().toString(),
+      terbayar: data.status === "Lunas" ? Number(data.jumlah) : 0,
+      sisa: data.status === "Lunas" ? 0 : Number(data.jumlah),
+    })
       .then(() => {
-        Swal.fire("Berhasil!", "Tagihan berhasil ditambahkan", "success").then(() =>
-          navigate("/tagihan")
-        );
+        Swal.fire("Berhasil!", "Tagihan berhasil ditambahkan", "success")
+          .then(() => navigate("/tagihan"));
       })
       .catch(() => Swal.fire("Error", "Gagal menambah tagihan", "error"));
   };
 
   return (
     <div className="flex-1 ml-55 mr-10 p-6 bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen">
-      <h2 className="text-2xl font-bold text-blue-700 mb-4">➕ Tambah Tagihan Baru</h2>
+
+      <h2 className="text-2xl font-bold text-blue-700 mb-4">
+        ➕ Tambah Tagihan Baru
+      </h2>
 
       <CCard className="shadow-md">
         <CCardBody>
           <form onSubmit={submit}>
 
-            {/* Nama Tagihan */}
-            <label>Nama Siswa</label>
-            <CFormInput
-              className="mb-3"
-              placeholder="Contoh: Ambatukam"
-              value={data.nama}
-              onChange={(e) => setData({ ...data, nama: e.target.value })}
-            />
-
-            {/* Kelas */}
-            <label>Kelas</label>
+            {/* Pilih Siswa */}
+            <label>Pilih Siswa</label>
             <CFormSelect
               className="mb-3"
-              value={data.kelas}
-              onChange={(e) => setData({ ...data, kelas: e.target.value })}
+              value={data.siswaId}
+              onChange={(e) => handleSelectSiswa(e.target.value)}
             >
-              <option value="">-- Pilih Kelas --</option>
-              {kelasList.map((k) => (
-                <option key={k.id} value={k.nama}>{k.nama}</option>
+              <option value="">-- Pilih Siswa --</option>
+              {siswaList.map(s => (
+                <option key={s.id} value={s.id}>
+                  {s.nama} — {s.kelas}
+                </option>
               ))}
             </CFormSelect>
 
@@ -100,7 +110,7 @@ export default function TambahTagihan() {
               ))}
             </CFormSelect>
 
-            {/* Bulan / Periode */}
+            {/* Bulan */}
             <label>Bulan / Periode</label>
             <CFormInput
               className="mb-3"
@@ -130,10 +140,7 @@ export default function TambahTagihan() {
               <option>Pending</option>
             </CFormSelect>
 
-            {/* Buttons */}
-            <CButton type="submit" color="primary">
-              Simpan
-            </CButton>
+            <CButton type="submit" color="primary">Simpan</CButton>
             <CButton
               type="button"
               className="ms-2"
@@ -142,9 +149,11 @@ export default function TambahTagihan() {
             >
               Batal
             </CButton>
+
           </form>
         </CCardBody>
       </CCard>
+
     </div>
   );
 }

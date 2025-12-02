@@ -111,6 +111,9 @@ export default function Sidnav() {
               <Link to="/rekap" className="py-1 flex items-center gap-2 text-white hover:text-blue-200">
                 <i className="ri-bar-chart-box-line"></i> Rekap Tagihan
               </Link>
+              <Link to="/presensi" className="py-1 flex items-center gap-2 text-white hover:text-blue-200">
+                <i className="ri-bar-chart-box-line"></i> Presensi
+              </Link>
 
             </div>
           )}

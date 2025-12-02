@@ -10,7 +10,7 @@ export default function Tagihan() {
   const [tagihan, setTagihan] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // DATA UNTUK EDIT
+  // DATA UNTUK EDIT / TAMBAH
   const [formData, setFormData] = useState({
     id: "",
     nama: "",
@@ -19,20 +19,22 @@ export default function Tagihan() {
     jumlah: "",
     status: "Belum Lunas",
     kategori: "SPP",
+    terbayar: 0,
+    sisa: "",
   });
 
   const [isSlideOpen, setIsSlideOpen] = useState(false);
 
   const formatRp = (n) => "Rp " + Number(n).toLocaleString("id-ID");
 
-  // ====================================================================
+  // ==========================================================
   // FETCH DATA
-  // ====================================================================
+  // ==========================================================
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(API);
-      setTagihan(response.data);
+      const res = await axios.get(API);
+      setTagihan(res.data);
     } catch {
       Swal.fire("Error", "Gagal memuat data", "error");
     }
@@ -43,19 +45,15 @@ export default function Tagihan() {
     fetchData();
   }, []);
 
-  // ====================================================================
-  // OPEN / CLOSE SLIDE FORM
-  // ====================================================================
+  // ==========================================================
+  // OPEN SLIDE
+  // ==========================================================
   const openSlide = (item = null) => {
     if (item) {
       setFormData({
-        id: item.id,
-        nama: item.nama,
-        kelas: item.kelas,
-        bulan: item.bulan,
-        jumlah: item.jumlah,
-        status: item.status,
-        kategori: item.kategori,
+        ...item,
+        terbayar: item.terbayar || 0,
+        sisa: item.sisa ?? item.jumlah - (item.terbayar || 0),
       });
     } else {
       setFormData({
@@ -66,21 +64,29 @@ export default function Tagihan() {
         jumlah: "",
         status: "Belum Lunas",
         kategori: "SPP",
+        terbayar: 0,
+        sisa: "",
       });
     }
-
     setIsSlideOpen(true);
   };
 
   const closeSlide = () => setIsSlideOpen(false);
 
-  // ====================================================================
-  // SAVE DATA (EDIT + TAMBAH)
-  // ====================================================================
+  // ==========================================================
+  // SAVE / UPDATE
+  // ==========================================================
   const saveForm = async () => {
+    const jumlah = Number(formData.jumlah);
+    const terbayar = Number(formData.terbayar || 0);
+    const sisa = jumlah - terbayar;
+
     const dataToSave = {
       ...formData,
-      jumlah: Number(formData.jumlah),
+      jumlah,
+      terbayar,
+      sisa,
+      status: sisa === 0 ? "Lunas" : "Belum Lunas",
     };
 
     try {
@@ -99,13 +105,13 @@ export default function Tagihan() {
     }
   };
 
-  // ====================================================================
-  // DELETE DATA
-  // ====================================================================
+  // ==========================================================
+  // DELETE
+  // ==========================================================
   const handleDelete = (id) => {
     Swal.fire({
       title: "Hapus data?",
-      text: "Data yang dihapus tidak dapat dikembalikan!",
+      text: "Data yang dihapus tidak dapat dikembalikan.",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Hapus",
@@ -123,9 +129,9 @@ export default function Tagihan() {
     });
   };
 
-  // ====================================================================
-  // BAYAR (RECOMMENDED VERSION)
-  // ====================================================================
+  // ==========================================================
+  // PEMBAYARAN FIX (TANPA MERUSAK JUMLAH ASLI)
+  // ==========================================================
   const handleBayar = (item) => {
     Swal.fire({
       title: "Pilih Metode Pembayaran",
@@ -134,80 +140,66 @@ export default function Tagihan() {
       showCancelButton: true,
       confirmButtonText: "Bayar Semua",
       cancelButtonText: "Bayar Sebagian",
-      showDenyButton: true,
-      denyButtonText: "Batal",
     }).then(async (result) => {
-      // ==============================
+      // ======================
       // BAYAR LUNAS
-      // ==============================
+      // ======================
       if (result.isConfirmed) {
-        try {
-          await axios.put(`${API}/${item.id}`, {
-            ...item,
-            jumlah: 0,
-            status: "Lunas",
-          });
+        const updated = {
+          ...item,
+          terbayar: item.jumlah,
+          sisa: 0,
+          status: "Lunas",
+        };
 
-          fetchData();
-          Swal.fire("Berhasil!", "Tagihan sudah dibayar lunas.", "success");
-        } catch {
-          Swal.fire("Error", "Gagal memproses pembayaran", "error");
-        }
+        await axios.put(`${API}/${item.id}`, updated);
+
+        fetchData();
+        Swal.fire("Berhasil!", "Tagihan sudah lunas.", "success");
       }
 
-      // ==============================
+      // ======================
       // BAYAR SEBAGIAN
-      // ==============================
+      // ======================
       else if (result.dismiss === Swal.DismissReason.cancel) {
         Swal.fire({
-          title: "Masukkan jumlah pembayaran",
+          title: "Masukkan jumlah pembayaran:",
           input: "number",
-          inputLabel: `Sisa: ${formatRp(item.jumlah)}`,
-          inputAttributes: {
-            min: 1000,
-            max: item.jumlah,
-          },
+          inputLabel: `Sisa: ${formatRp(item.jumlah - (item.terbayar || 0))}`,
+          inputAttributes: { min: 1000 },
           showCancelButton: true,
-          confirmButtonText: "Bayar",
-          cancelButtonText: "Batal",
-        }).then(async (res) => {
-          if (!res.value) return;
+        }).then(async (res2) => {
+          if (!res2.value) return;
 
-          const bayar = Number(res.value);
+          const bayar = Number(res2.value);
+          const totalTerbayar = (item.terbayar || 0) + bayar;
+          const sisa = item.jumlah - totalTerbayar;
 
-          if (bayar <= 0 || bayar > item.jumlah) {
-            return Swal.fire("Error", "Jumlah tidak valid!", "error");
-          }
+          const updated = {
+            ...item,
+            terbayar: totalTerbayar,
+            sisa,
+            status: sisa === 0 ? "Lunas" : "Belum Lunas",
+          };
 
-          const sisa = item.jumlah - bayar;
+          await axios.put(`${API}/${item.id}`, updated);
 
-          try {
-            await axios.put(`${API}/${item.id}`, {
-              ...item,
-              jumlah: sisa,
-              status: sisa === 0 ? "Lunas" : "Belum Lunas",
-            });
-
-            fetchData();
-
-            Swal.fire(
-              "Berhasil!",
-              sisa === 0
-                ? "Tagihan telah lunas."
-                : `Sisa tagihan: ${formatRp(sisa)}`,
-              "success"
-            );
-          } catch {
-            Swal.fire("Error", "Gagal menyimpan pembayaran", "error");
-          }
+          fetchData();
+          Swal.fire(
+            "Berhasil!",
+            sisa === 0
+              ? "Tagihan lunas."
+              : `Sisa tagihan: ${formatRp(sisa)}`,
+            "success"
+          );
         });
       }
     });
   };
 
-  // ====================================================================
+  // ==========================================================
   // UI
-  // ====================================================================
+  // ==========================================================
   return (
     <div className="ml-50 p-8 bg-gradient-to-br from-blue-50 to-white min-h-screen">
       <h1 className="text-4xl font-extrabold text-blue-700 mb-6">📘 Data Tagihan</h1>
@@ -215,7 +207,7 @@ export default function Tagihan() {
       <div className="bg-white p-6 rounded-2xl shadow-xl border border-blue-100">
         <button
           onClick={() => navigate("/garoet")}
-          className="mb-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded shadow active:scale-95 transition"
+          className="mb-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded shadow"
         >
           + Tambah Tagihan
         </button>
@@ -229,6 +221,8 @@ export default function Tagihan() {
                 <th className="p-3">Kelas</th>
                 <th className="p-3">Bulan</th>
                 <th className="p-3">Jumlah</th>
+                <th className="p-3">Dibayar</th>
+                <th className="p-3">Sisa</th>
                 <th className="p-3">Status</th>
                 <th className="p-3">Kategori</th>
                 <th className="p-3 text-center">Aksi</th>
@@ -238,25 +232,26 @@ export default function Tagihan() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={8} className="p-6 text-center">⏳ Memuat data...</td>
+                  <td colSpan={10} className="p-6 text-center">
+                    ⏳ Memuat data...
+                  </td>
                 </tr>
               ) : tagihan.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="p-6 text-center text-gray-500">Tidak ada data</td>
+                  <td colSpan={10} className="p-6 text-center text-gray-500">
+                    Tidak ada data
+                  </td>
                 </tr>
               ) : (
                 tagihan.map((t, i) => (
-                  <tr
-                    key={t.id}
-                    className="border-b hover:bg-blue-50 transition"
-                  >
+                  <tr key={t.id} className="border-b hover:bg-blue-50">
                     <td className="p-3">{i + 1}</td>
-
                     <td className="p-3 font-semibold text-blue-700">{t.nama}</td>
                     <td className="p-3">{t.kelas}</td>
                     <td className="p-3">{t.bulan}</td>
                     <td className="p-3">{formatRp(t.jumlah)}</td>
-
+                    <td className="p-3">{formatRp(t.terbayar || 0)}</td>
+                    <td className="p-3">{formatRp(t.sisa || (t.jumlah - (t.terbayar || 0)))}</td>
                     <td className="p-3">
                       <span
                         className={`px-3 py-1 rounded-full text-sm font-semibold ${
@@ -268,27 +263,20 @@ export default function Tagihan() {
                         {t.status}
                       </span>
                     </td>
-
                     <td className="p-3">{t.kategori}</td>
-
-                    <td className="p-3 flex justify-center gap-3">
-                      {/* BAYAR */}
+                    <td className="p-3 flex gap-3 justify-center">
                       <button
                         onClick={() => handleBayar(t)}
                         className="p-2 rounded bg-green-600 hover:bg-green-700 text-white"
                       >
                         💰
                       </button>
-
-                      {/* EDIT */}
                       <button
                         onClick={() => openSlide(t)}
-                        className="p-2 rounded bg-yellow-400 hover:bg-yellow-500 text-white"
+                        className="p-2 rounded bg-yellow-500 text-white"
                       >
                         ✏
                       </button>
-
-                      {/* DELETE */}
                       <button
                         onClick={() => handleDelete(t.id)}
                         className="p-2 rounded bg-red-600 hover:bg-red-700 text-white"
@@ -308,9 +296,9 @@ export default function Tagihan() {
         </div>
       </div>
 
-      {/* SLIDE FORM EDIT / TAMBAH */}
+      {/* SLIDE FORM */}
       {isSlideOpen && (
-        <div className="fixed top-0 right-0 w-96 h-full bg-white shadow-2xl border-l border-blue-200 p-6 z-50 animate-slide-left">
+        <div className="fixed top-0 right-0 w-96 h-full bg-white shadow-2xl border-l border-blue-200 p-6">
           <h2 className="text-3xl font-extrabold text-blue-700 mb-6">
             {formData.id ? "Edit Tagihan" : "Tambah Tagihan"}
           </h2>
@@ -320,32 +308,45 @@ export default function Tagihan() {
               className="border p-3 rounded-xl bg-blue-50"
               placeholder="Nama"
               value={formData.nama}
-              onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, nama: e.target.value })
+              }
             />
+
             <input
               className="border p-3 rounded-xl bg-blue-50"
               placeholder="Kelas"
               value={formData.kelas}
-              onChange={(e) => setFormData({ ...formData, kelas: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, kelas: e.target.value })
+              }
             />
+
             <input
               className="border p-3 rounded-xl bg-blue-50"
               placeholder="Bulan"
               value={formData.bulan}
-              onChange={(e) => setFormData({ ...formData, bulan: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, bulan: e.target.value })
+              }
             />
+
             <input
               type="number"
               className="border p-3 rounded-xl bg-blue-50"
               placeholder="Jumlah"
               value={formData.jumlah}
-              onChange={(e) => setFormData({ ...formData, jumlah: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, jumlah: e.target.value })
+              }
             />
 
             <select
               className="border p-3 rounded-xl bg-blue-50"
               value={formData.status}
-              onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, status: e.target.value })
+              }
             >
               <option value="Belum Lunas">Belum Lunas</option>
               <option value="Lunas">Lunas</option>
@@ -359,9 +360,10 @@ export default function Tagihan() {
               }
             >
               <option value="SPP">SPP</option>
-              <option value="Kegiatan">Kegiatan</option>
-              <option value="Ujian">Ujian</option>
+           
+              <option value="Ujian">Uang Gedung</option>
               <option value="Lainnya">Lainnya</option>
+              <option value="Lainnya">Pendaftaran</option>
             </select>
           </div>
 
@@ -372,10 +374,9 @@ export default function Tagihan() {
             >
               Simpan
             </button>
-
             <button
               onClick={closeSlide}
-              className="flex-1 bg-gray-300 text-black py-3 rounded-xl"
+              className="flex-1 bg-gray-300 py-3 rounded-xl"
             >
               Batal
             </button>
