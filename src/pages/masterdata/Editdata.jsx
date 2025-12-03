@@ -1,4 +1,4 @@
-// EditData.jsx (updated to use kelas CRUD and level)
+// EditData.jsx (updated: added kodeUnik for siswa)
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -6,7 +6,6 @@ import { CFormInput, CFormSelect, CButton, CCard, CCardBody } from "@coreui/reac
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 
 export default function EditData() {
-
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -21,7 +20,16 @@ export default function EditData() {
     kelas: "http://localhost:5000/kelas",
   };
 
-  const [data, setData] = useState({ nama: "", alamat: "", hp: "", kelas: "", ket: "", level: "" });
+  const [data, setData] = useState({
+    nama: "",
+    alamat: "",
+    hp: "",
+    kelas: "",
+    ket: "",
+    level: "",
+    kodeUnik: "",
+  });
+
   const [kelasList, setKelasList] = useState([]);
   const [levels, setLevels] = useState([]);
 
@@ -34,14 +42,16 @@ export default function EditData() {
           navigate("/masterdata");
           return;
         }
-        // if kelas stored as namaKelas keep it, else if stored id prefer id
+
         setData({
           nama: found.nama || "",
           alamat: found.alamat || "",
           hp: found.hp || "",
           kelas: found.kelasId || found.kelas || "",
           ket: found.ket || "",
-          level: found.level || (kategori === "siswa" ? "Siswa" : kategori === "guru"? "Guru" : "Karyawan"),
+          level: found.level || "",
+          kodeUnik: found.kodeUnik || "",  // <-- added here
+          jurusan: found.jurusan || "",
         });
       })
       .catch(() => {
@@ -95,6 +105,15 @@ export default function EditData() {
 
             {kategori === "siswa" && (
               <>
+                {/* 🔥 ADDED: Kode Unik */}
+                <label>Kode Unik Presensi</label>
+                <CFormInput
+                  value={data.kodeUnik}
+                  onChange={(e) => setData({ ...data, kodeUnik: e.target.value })}
+                  className="mb-3"
+                  placeholder="Contoh: R-2025 atau kode RFID"
+                />
+
                 <label>Kelas</label>
                 <CFormSelect value={data.kelas} onChange={(e) => setData({ ...data, kelas: e.target.value })} className="mb-3">
                   <option value="">-- Pilih Kelas --</option>

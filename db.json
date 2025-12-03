@@ -1,87 +1,78 @@
 {
   "siswa": [
     {
-      "id": "dc74",
+      "id": "c675",
+      "nama": "Ryuzaki (L . Lawliet)",
+      "ket": "",
+      "alamat": "Ngebrok",
+      "hp": "08xxxxxxxxx",
+      "kelas": "X TKJ",
+      "nomorUnik": "T-0969",
+      "level": "siswa"
+    },
+    {
+      "id": "9279",
       "nama": "Moreno",
       "ket": "",
       "alamat": "Ngebrok",
       "hp": "08xxxxxxxxx",
-      "kelas": " X TKJ",
-      "level": "siswa"
-    },
-    {
-      "id": "7c7a",
-      "nama": "Ayyas",
-      "ket": "",
-      "alamat": "Krapyak",
-      "hp": "08xxxxxxxxx",
-      "kelas": " X TKJ",
-      "level": "siswa"
-    },
-    {
-      "id": "bf1e",
-      "nama": "Andre",
-      "ket": "",
-      "alamat": "Garoet",
-      "hp": "08xxxxxxxxx",
-      "kelas": " X TKJ",
-      "level": "siswa"
-    },
-    {
-      "id": "4bef",
-      "nama": "Asu",
-      "ket": "",
-      "alamat": "Ngebruk",
-      "hp": "08912121",
       "kelas": "XI TKJ",
-      "nomorUnik": "R-2025",
+      "nomorUnik": "M-2010",
+      "level": "siswa"
+    },
+    {
+      "id": "9423",
+      "nama": "Ambatukam",
+      "ket": "",
+      "alamat": "Ngebrok",
+      "hp": "08xxxxxxxxx",
+      "kelas": "X DPB",
+      "nomorUnik": "Ngawi-0777",
       "level": "siswa"
     }
   ],
   "guru": [
     {
-      "id": "g1",
-      "nama": "Pak Renz",
+      "id": "4648",
+      "nama": "Pak rusdi",
       "ket": "Ngawinesia",
-      "alamat": "Ngebruk",
-      "hp": "083877290876"
+      "alamat": "ngawi",
+      "hp": "08xxxxxxxxx",
+      "kelas": "",
+      "nomorUnik": "N-0234",
+      "level": "guru"
     },
     {
-      "id": "g2",
-      "nama": "Ibu Siti",
-      "ket": "Matematika",
-      "alamat": "Sekolah",
-      "hp": "0811111111"
+      "id": "a404",
+      "nama": "Pak amba",
+      "ket": "Ngawiformatika",
+      "alamat": "ngawi",
+      "hp": "08xxxxxxxxx",
+      "kelas": "",
+      "nomorUnik": "N-0123",
+      "level": "guru"
     },
     {
-      "id": "g3",
-      "nama": "Pak Budi",
-      "ket": "Bahasa Inggris",
-      "alamat": "Malang",
-      "hp": "082233445566"
+      "id": "3214",
+      "nama": "Bu laura",
+      "ket": "Biologi",
+      "alamat": "Jaksel",
+      "hp": "08xxxxxxxxx",
+      "kelas": "",
+      "nomorUnik": "S-0001",
+      "level": "guru"
     }
   ],
   "karyawan": [
     {
-      "id": "k1",
-      "nama": "Andre",
-      "ket": "OBHN",
-      "alamat": "Garut",
-      "hp": "0986756"
-    },
-    {
-      "id": "k2",
-      "nama": "Pak Joko",
-      "ket": "Staff TU",
-      "alamat": "Sekolah",
-      "hp": "0813333333"
-    },
-    {
-      "id": "k3",
-      "nama": "Bu Lina",
-      "ket": "Administrasi",
-      "alamat": "Kepanjen",
-      "hp": "082199887766"
+      "id": "05dd",
+      "nama": "Ambatukam",
+      "ket": "Tukang bersih bersih",
+      "alamat": "Ngebrok",
+      "hp": "08xxxxxxxxx",
+      "kelas": "",
+      "nomorUnik": "M-2015",
+      "level": "Karyawan"
     }
   ],
   "kategoridata": [
@@ -161,7 +152,7 @@
     },
     {
       "id": "1764639958722",
-      "siswaId": "dc74",
+      "siswaId": null,
       "nama": "Moreno",
       "kelas": " X TKJ",
       "kategori": "Lain-lain",
@@ -287,7 +278,7 @@
   "presensi": [
     {
       "id": "prs-001",
-      "siswaId": "dc74",
+      "siswaId": null,
       "nama": "Moreno",
       "kelas": "X TKJ",
       "tanggal": "2025-01-20",
@@ -296,7 +287,7 @@
     },
     {
       "id": "prs-002",
-      "siswaId": "7c7a",
+      "siswaId": null,
       "nama": "Ayyas",
       "kelas": "X TKJ",
       "tanggal": "2025-01-20",
@@ -305,7 +296,7 @@
     },
     {
       "id": "prs-003",
-      "siswaId": "bf1e",
+      "siswaId": null,
       "nama": "Andre",
       "kelas": "X TKJ",
       "tanggal": "2025-01-20",
@@ -330,6 +321,61 @@
       "nomorUnik": "R-2025",
       "masuk": "11.38",
       "pulang": ""
+    },
+    {
+      "id": "1764729539776",
+      "tanggal": "2025-12-03",
+      "id_user": "9279",
+      "nama": "Moreno",
+      "level": "siswa",
+      "kelas": "XI TKJ",
+      "nomorUnik": "M-2010",
+      "masuk": "09.38",
+      "pulang": "09.39"
+    },
+    {
+      "id": "1764729623739",
+      "tanggal": "2025-12-03",
+      "id_user": "4648",
+      "nama": "Pak rusdi",
+      "level": "guru",
+      "kelas": "Ngawinesia",
+      "nomorUnik": "N-0234",
+      "masuk": "09.40",
+      "pulang": "09.40"
+    },
+    {
+      "id": "1764729873752",
+      "tanggal": "2025-12-03",
+      "id_user": "9423",
+      "nama": "Ambatukam",
+      "level": "siswa",
+      "kelas": "X DPB",
+      "nomorUnik": "Ngawi-0777",
+      "masuk": "09.44",
+      "pulang": "10.48"
+    },
+    {
+      "id": "1764733655296",
+      "tanggal": "2025-12-03",
+      "id_user": "a404",
+      "nama": "Pak amba",
+      "level": "guru",
+      "kelas": "Ngawiformatika",
+      "nomorUnik": "N-0123",
+      "masuk": "10.47",
+      "pulang": "10.47"
+    },
+    {
+      "id": "1764733674000",
+      "tanggal": "2025-12-03",
+      "id_user": "05dd",
+      "nama": "Ambatukam",
+      "level": "karyawan",
+      "kelas": "Tukang bersih bersih",
+      "nomorUnik": "M-2015",
+      "masuk": "10.47",
+      "pulang": "10.47"
     }
   ]
 }

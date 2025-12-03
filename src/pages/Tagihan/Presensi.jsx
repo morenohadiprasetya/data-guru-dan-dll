@@ -2,27 +2,37 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 
-const API_SISWA = "http://localhost:5000/siswa";
+const API = {
+  siswa: "http://localhost:5000/siswa",
+  guru: "http://localhost:5000/guru",
+  karyawan: "http://localhost:5000/karyawan",
+};
+
 const API_PRESENSI = "http://localhost:5000/presensi";
 
 export default function Presensi() {
-  const [siswa, setSiswa] = useState([]);
-  const [selectedSiswa, setSelectedSiswa] = useState("");
+  const [level, setLevel] = useState("siswa"); // ← OPSI LEVEL
+  const [dataLevel, setDataLevel] = useState([]);
+
+  const [selectedUser, setSelectedUser] = useState("");
   const [kelas, setKelas] = useState("");
   const [nomorUnik, setNomorUnik] = useState("");
 
-  const [inputKode, setInputKode] = useState(""); // ← input KODE UNIK
+  const [inputKode, setInputKode] = useState("");
 
   const [opsi, setOpsi] = useState("masuk");
-  const [tanggal, setTanggal] = useState(
-    new Date().toISOString().split("T")[0]
-  );
+  const [tanggal, setTanggal] = useState(new Date().toISOString().split("T")[0]);
   const [riwayat, setRiwayat] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  // === FETCH DATA BERDASARKAN LEVEL ===
   useEffect(() => {
-    axios.get(API_SISWA).then((res) => setSiswa(res.data));
-  }, []);
+    axios.get(API[level]).then((res) => setDataLevel(res.data));
+    setSelectedUser("");
+    setNomorUnik("");
+    setKelas("");
+    setInputKode("");
+  }, [level]);
 
   useEffect(() => {
     loadRiwayat();
@@ -33,18 +43,18 @@ export default function Presensi() {
     setRiwayat(res.data);
   };
 
-  const handleSiswaChange = (e) => {
+  const handleUserChange = (e) => {
     const id = e.target.value;
-    setSelectedSiswa(id);
+    setSelectedUser(id);
 
-    const detail = siswa.find((s) => s.id === id);
+    const detail = dataLevel.find((s) => s.id === id);
 
     if (detail) {
-      setKelas(detail.kelas);
-      setNomorUnik(detail.nomorUnik); // ambil nomor unik
+      setKelas(detail.kelas || detail.ket || "-");
+      setNomorUnik(detail.nomorUnik);
     }
 
-    setInputKode(""); // reset kode unik input
+    setInputKode("");
   };
 
   const ambilJam = () => {
@@ -55,68 +65,59 @@ export default function Presensi() {
     });
   };
 
-  // ===================
   // SUBMIT PRESENSI
-  // ===================
   const submitPresensi = async () => {
-    if (!selectedSiswa) {
-      Swal.fire("Pilih siswa dulu!", "", "warning");
+    if (!selectedUser) {
+      Swal.fire("Pilih dulu!", "", "warning");
       return;
     }
 
-    // ** VALIDASI KODE UNIK **
     if (inputKode !== nomorUnik) {
-      Swal.fire("Kode Unik Salah!", "Presensi tidak bisa dilanjutkan.", "error");
+      Swal.fire("Kode Unik Salah!", "Presensi dibatalkan.", "error");
       return;
     }
 
     setLoading(true);
 
     try {
-      const siswaDetail = siswa.find((s) => s.id === selectedSiswa);
+      const detail = dataLevel.find((s) => s.id === selectedUser);
       const jam = ambilJam();
 
       const getToday = await axios.get(
-        `${API_PRESENSI}?id_siswa=${selectedSiswa}&tanggal=${tanggal}`
+        `${API_PRESENSI}?id_user=${selectedUser}&tanggal=${tanggal}`
       );
 
       const existing = getToday.data[0];
 
       if (existing) {
-        // UPDATE
-        const updateBody = {
-          ...existing,
-          nomorUnik: siswaDetail.nomorUnik,
-          [opsi]: jam,
-        };
+       const updateBody = {
+  ...existing,
+  level, // ← tambahkan
+  nomorUnik: detail.nomorUnik,
+  [opsi]: jam,
+};
+
 
         await axios.put(`${API_PRESENSI}/${existing.id}`, updateBody);
 
-        Swal.fire(
-          "Berhasil",
-          `Presensi ${opsi.toUpperCase()} dicatat: ${jam}`,
-          "success"
-        );
+        Swal.fire("Berhasil", `Presensi ${opsi} dicatat: ${jam}`, "success");
       } else {
-        // CREATE BARU
         const newData = {
-          id: Date.now(),
+          id: String(Date.now()),
+
           tanggal,
-          id_siswa: siswaDetail.id,
-          nama: siswaDetail.nama,
-          kelas: siswaDetail.kelas,
-          nomorUnik: siswaDetail.nomorUnik,
+          id_user: detail.id,
+          nama: detail.nama,
+          level, // ← SIMPAN LEVEL
+          kelas: detail.kelas || detail.ket || "-",
+          nomorUnik: detail.nomorUnik,
           masuk: opsi === "masuk" ? jam : "",
           pulang: opsi === "pulang" ? jam : "",
         };
 
         await axios.post(API_PRESENSI, newData);
 
-        Swal.fire(
-          "Berhasil",
-          `Presensi ${opsi.toUpperCase()} dicatat: ${jam}`,
-          "success"
-        );
+        Swal.fire("Berhasil", `Presensi ${opsi} dicatat: ${jam}`, "success");
       }
     } catch (err) {
       Swal.fire("Error", err.message, "error");
@@ -145,9 +146,11 @@ export default function Presensi() {
 
   return (
     <div className="p-4" style={{ maxWidth: "900px", margin: "auto" }}>
-      <h2>📌 Presensi Siswa</h2>
+      <h2>📌 Presensi</h2>
 
-      {/* FILTER TANGGAL */}
+
+
+      {/* TANGGAL */}
       <div className="card p-3 mt-3">
         <label>Tanggal Presensi</label>
         <input
@@ -157,24 +160,35 @@ export default function Presensi() {
           onChange={(e) => setTanggal(e.target.value)}
         />
       </div>
-
-      {/* FORM PRESENSI */}
       <div className="card p-3 mt-3">
-        <label>Pilih Siswa</label>
+        <label>Pilih Level</label>
         <select
           className="form-control"
-          value={selectedSiswa}
-          onChange={handleSiswaChange}
+          value={level}
+          onChange={(e) => setLevel(e.target.value)}
+        >
+          <option value="siswa">Siswa</option>
+          <option value="guru">Guru</option>
+          <option value="karyawan">Karyawan</option>
+        </select>
+      </div>
+
+      {/* FORM */}
+      <div className="card p-3 mt-3">
+        <label>Pilih {level}</label>
+        <select
+          className="form-control"
+          value={selectedUser}
+          onChange={handleUserChange}
         >
           <option value="">-- Pilih --</option>
-          {siswa.map((s) => (
+          {dataLevel.map((s) => (
             <option value={s.id} key={s.id}>
-              {s.nama} - {s.kelas}
+              {s.nama} ({s.nomorUnik})
             </option>
           ))}
         </select>
 
-        {/* INPUT KODE UNIK */}
         <label className="mt-3">Masukkan Kode Unik</label>
         <input
           className="form-control"
@@ -189,8 +203,8 @@ export default function Presensi() {
           value={opsi}
           onChange={(e) => setOpsi(e.target.value)}
         >
-          <option value="masuk">Presensi Masuk</option>
-          <option value="pulang">Presensi Pulang</option>
+          <option value="masuk">Masuk</option>
+          <option value="pulang">Pulang</option>
         </select>
 
         <button
@@ -204,7 +218,7 @@ export default function Presensi() {
 
       {/* RIWAYAT */}
       <div className="card p-3 mt-4">
-        <h4>Riwayat Presensi ({tanggal})</h4>
+        <h4>Rekap Presensi ({tanggal})</h4>
 
         {riwayat.length === 0 ? (
           <p className="mt-3">Belum ada presensi hari ini.</p>
@@ -212,9 +226,10 @@ export default function Presensi() {
           <table className="table mt-3 table-striped">
             <thead>
               <tr>
+                <th>Level</th>
                 <th>Nomor Unik</th>
                 <th>Nama</th>
-                <th>Kelas</th>
+                <th>Kelas/Jabatan/Mapel</th>
                 <th>Masuk</th>
                 <th>Pulang</th>
                 <th>Aksi</th>
@@ -223,6 +238,7 @@ export default function Presensi() {
             <tbody>
               {riwayat.map((p) => (
                 <tr key={p.id}>
+                  <td>{p.level}</td>
                   <td>{p.nomorUnik}</td>
                   <td>{p.nama}</td>
                   <td>{p.kelas}</td>
@@ -242,8 +258,6 @@ export default function Presensi() {
           </table>
         )}
       </div>
-
-      <br />
     </div>
   );
 }

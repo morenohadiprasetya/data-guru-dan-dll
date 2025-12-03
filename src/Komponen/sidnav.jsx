@@ -112,7 +112,8 @@ export default function Sidnav() {
                 <i className="ri-bar-chart-box-line"></i> Rekap Tagihan
               </Link>
               <Link to="/presensi" className="py-1 flex items-center gap-2 text-white hover:text-blue-200">
-                <i className="ri-bar-chart-box-line"></i> Presensi
+              <i className="ri-calendar-check-line"></i>
+ Presensi
               </Link>
 
             </div>

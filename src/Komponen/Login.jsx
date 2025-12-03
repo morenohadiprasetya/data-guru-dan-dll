@@ -40,7 +40,7 @@ function Login() {
   };
 
   const handleDirectToWeb = () => {
-    navigate("/Apo?kategori=Siswa");
+    navigate("/dashboard");
   };
 
   return (
@@ -52,22 +52,20 @@ function Login() {
         className="bg-white/30 backdrop-blur-xl shadow-2xl border border-white/40 
                  p-8 rounded-2xl w-full max-w-md animate__animated animate__fadeIn"
       >
-        {/* SECRET BUTTON */}
-        <button
-          type="button"
-          onClick={handleDirectToWeb}
-          className="text-blue-900 mb-2 text-sm"
-        >
-        
-        </button>
 
-        {/* ICON + TITLE */}
         <div className="flex flex-col items-center mb-6">
           <div className="bg-blue-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg mb-3">
             <i className="ri-shield-user-line text-3xl"></i>
           </div>
           <h2 className="text-3xl font-bold text-blue-800">Login</h2>
-          <p className="text-gray-700 mt-1">Silakan masuk untuk melanjutkan</p>
+          <button
+            type="button"
+            onClick={handleDirectToWeb}
+            className=" "
+          >          <p className="text-gray-700 mt-1">Silakan masuk untuk melanjutkan</p>
+
+
+          </button>
         </div>
 
         {/* EMAIL */}
