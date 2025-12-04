@@ -114,13 +114,7 @@ export default function EditData() {
                   placeholder="Contoh: R-2025 atau kode RFID"
                 />
 
-                <label>Kelas</label>
-                <CFormSelect value={data.kelas} onChange={(e) => setData({ ...data, kelas: e.target.value })} className="mb-3">
-                  <option value="">-- Pilih Kelas --</option>
-                  {kelasList.map(k => (
-                    <option key={k.id} value={k.id}>{k.namaKelas}</option>
-                  ))}
-                </CFormSelect>
+                 
 
                 <label>Jurusan</label>
                 <CFormInput value={data.jurusan || ""} readOnly className="mb-3" />

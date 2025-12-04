@@ -27,6 +27,8 @@ import Ekategori from "./pages/Tagihan/Ekategori";
 import Tkategori from "./pages/Tagihan/Tkategori";
 import TambahTagihan from "./pages/Tagihan/Tambahtagihan";
 import PresensiPage from "./pages/Tagihan/Presensi";
+import Trht from "./pages/Tagihan/Trht";
+
 
 export default function App() {
   const loc = useLocation();
@@ -59,6 +61,7 @@ export default function App() {
 
           {/* KELAS */}
           <Route path="/kelas" element={<Kelas />} />
+          <Route path="/Trht" element={<Trht />} />
           <Route path="/brngn/:id" element={<EditKelas />} />
           <Route path="/tkelas" element={<TambahKelas />} />
 <Route path="/presensi" element={<PresensiPage />} />

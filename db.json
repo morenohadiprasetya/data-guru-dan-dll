@@ -158,9 +158,9 @@
       "kategori": "Lain-lain",
       "bulan": "Mei 2025",
       "jumlah": "100000",
-      "status": "Belum Lunas",
-      "terbayar": 0,
-      "sisa": 100000
+      "status": "Lunas",
+      "terbayar": "100000",
+      "sisa": 0
     }
   ],
   "pembayaran": [
@@ -304,7 +304,7 @@
       "keterangan": ""
     },
     {
-      "id": 1764648854408,
+      "id": "1764648854408",
       "tanggal": "2025-12-02",
       "id_siswa": "dc74",
       "nama": "Moreno",
@@ -313,7 +313,7 @@
       "pulang": ""
     },
     {
-      "id": 1764650329594,
+      "id": "1764650329594",
       "tanggal": "2025-12-02",
       "id_siswa": "4bef",
       "nama": "Asu",
@@ -376,6 +376,39 @@
       "nomorUnik": "M-2015",
       "masuk": "10.47",
       "pulang": "10.47"
+    },
+    {
+      "id": "1764807151322",
+      "tanggal": "2025-12-04",
+      "id_user": "c675",
+      "nama": "Ryuzaki (L . Lawliet)",
+      "level": "siswa",
+      "kelas": "X TKJ",
+      "nomorUnik": "T-0969",
+      "masuk": "07.12",
+      "pulang": "07.24"
+    },
+    {
+      "id": "1764807876504",
+      "tanggal": "2025-12-04",
+      "id_user": "9423",
+      "nama": "Ambatukam",
+      "level": "siswa",
+      "kelas": "X DPB",
+      "nomorUnik": "Ngawi-0777",
+      "masuk": "07.24",
+      "pulang": "07.37"
+    },
+    {
+      "id": "1764824849957",
+      "tanggal": "2025-12-04",
+      "id_user": "9279",
+      "nama": "Moreno",
+      "level": "siswa",
+      "kelas": "XI TKJ",
+      "nomorUnik": "M-2010",
+      "masuk": "12.07",
+      "pulang": ""
     }
   ]
 }

@@ -11,7 +11,7 @@ const API = {
 const API_PRESENSI = "http://localhost:5000/presensi";
 
 export default function Presensi() {
-  const [level, setLevel] = useState("siswa"); // ← OPSI LEVEL
+  const [level, setLevel] = useState("siswa");
   const [dataLevel, setDataLevel] = useState([]);
 
   const [selectedUser, setSelectedUser] = useState("");
@@ -48,14 +48,36 @@ export default function Presensi() {
     setSelectedUser(id);
 
     const detail = dataLevel.find((s) => s.id === id);
-
     if (detail) {
       setKelas(detail.kelas || detail.ket || "-");
       setNomorUnik(detail.nomorUnik);
+      setInputKode(detail.nomorUnik);
+    }
+  };
+
+  // === AUTO SEARCH KODE UNIK (real-time & smooth) ===
+  useEffect(() => {
+    if (!inputKode.trim()) {
+      setSelectedUser("");
+      setKelas("");
+      setNomorUnik("");
+      return;
     }
 
-    setInputKode("");
-  };
+    const timer = setTimeout(() => {
+      const detail = dataLevel.find(
+        (s) => s.nomorUnik.toLowerCase() === inputKode.toLowerCase()
+      );
+
+      if (detail) {
+        setSelectedUser(detail.id);
+        setKelas(detail.kelas || detail.ket || "-");
+        setNomorUnik(detail.nomorUnik);
+      }
+    }, 250);
+
+    return () => clearTimeout(timer);
+  }, [inputKode, dataLevel]);
 
   const ambilJam = () => {
     const now = new Date();
@@ -65,10 +87,9 @@ export default function Presensi() {
     });
   };
 
-  // SUBMIT PRESENSI
   const submitPresensi = async () => {
     if (!selectedUser) {
-      Swal.fire("Pilih dulu!", "", "warning");
+      Swal.fire("Pilih atau isi kode unik dulu!", "", "warning");
       return;
     }
 
@@ -78,7 +99,6 @@ export default function Presensi() {
     }
 
     setLoading(true);
-
     try {
       const detail = dataLevel.find((s) => s.id === selectedUser);
       const jam = ambilJam();
@@ -90,25 +110,22 @@ export default function Presensi() {
       const existing = getToday.data[0];
 
       if (existing) {
-       const updateBody = {
-  ...existing,
-  level, // ← tambahkan
-  nomorUnik: detail.nomorUnik,
-  [opsi]: jam,
-};
-
+        const updateBody = {
+          ...existing,
+          level,
+          nomorUnik: detail.nomorUnik,
+          [opsi]: jam,
+        };
 
         await axios.put(`${API_PRESENSI}/${existing.id}`, updateBody);
-
         Swal.fire("Berhasil", `Presensi ${opsi} dicatat: ${jam}`, "success");
       } else {
         const newData = {
           id: String(Date.now()),
-
           tanggal,
           id_user: detail.id,
           nama: detail.nama,
-          level, // ← SIMPAN LEVEL
+          level,
           kelas: detail.kelas || detail.ket || "-",
           nomorUnik: detail.nomorUnik,
           masuk: opsi === "masuk" ? jam : "",
@@ -116,7 +133,6 @@ export default function Presensi() {
         };
 
         await axios.post(API_PRESENSI, newData);
-
         Swal.fire("Berhasil", `Presensi ${opsi} dicatat: ${jam}`, "success");
       }
     } catch (err) {
@@ -127,7 +143,6 @@ export default function Presensi() {
     loadRiwayat();
   };
 
-  // DELETE
   const deletePresensi = async (id) => {
     Swal.fire({
       title: "Hapus data ini?",
@@ -145,117 +160,140 @@ export default function Presensi() {
   };
 
   return (
-    <div className="p-4" style={{ maxWidth: "900px", margin: "auto" }}>
-      <h2>📌 Presensi</h2>
+    <div className="p-4" style={{ maxWidth: "950px", margin: "auto" }}>
+      <h2 className="fw-bold mb-3">📌 Presensi</h2>
 
+      {/* TANGGAL + LEVEL */}
+      <div className="card p-3 shadow-sm">
+        <div className="row g-3">
+          <div className="col-md-6">
+            <label className="fw-semibold">Tanggal Presensi</label>
+            <input
+              type="date"
+              className="form-control"
+              value={tanggal}
+              onChange={(e) => setTanggal(e.target.value)}
+            />
+          </div>
 
-
-      {/* TANGGAL */}
-      <div className="card p-3 mt-3">
-        <label>Tanggal Presensi</label>
-        <input
-          type="date"
-          className="form-control"
-          value={tanggal}
-          onChange={(e) => setTanggal(e.target.value)}
-        />
-      </div>
-      <div className="card p-3 mt-3">
-        <label>Pilih Level</label>
-        <select
-          className="form-control"
-          value={level}
-          onChange={(e) => setLevel(e.target.value)}
-        >
-          <option value="siswa">Siswa</option>
-          <option value="guru">Guru</option>
-          <option value="karyawan">Karyawan</option>
-        </select>
-      </div>
-
-      {/* FORM */}
-      <div className="card p-3 mt-3">
-        <label>Pilih {level}</label>
-        <select
-          className="form-control"
-          value={selectedUser}
-          onChange={handleUserChange}
-        >
-          <option value="">-- Pilih --</option>
-          {dataLevel.map((s) => (
-            <option value={s.id} key={s.id}>
-              {s.nama} ({s.nomorUnik})
-            </option>
-          ))}
-        </select>
-
-        <label className="mt-3">Masukkan Kode Unik</label>
-        <input
-          className="form-control"
-          placeholder="Masukkan kode unik"
-          value={inputKode}
-          onChange={(e) => setInputKode(e.target.value)}
-        />
-
-        <label className="mt-3">Jenis Presensi</label>
-        <select
-          className="form-control"
-          value={opsi}
-          onChange={(e) => setOpsi(e.target.value)}
-        >
-          <option value="masuk">Masuk</option>
-          <option value="pulang">Pulang</option>
-        </select>
-
-        <button
-          className="btn btn-primary mt-4"
-          onClick={submitPresensi}
-          disabled={loading}
-        >
-          {loading ? "Menyimpan..." : "Simpan Presensi"}
-        </button>
+          <div className="col-md-6">
+            <label className="fw-semibold">Pilih Level</label>
+            <select
+              className="form-control"
+              value={level}
+              onChange={(e) => setLevel(e.target.value)}
+            >
+              <option value="siswa">Siswa</option>
+              <option value="guru">Guru</option>
+              <option value="karyawan">Karyawan</option>
+            </select>
+          </div>
+        </div>
       </div>
 
-      {/* RIWAYAT */}
-      <div className="card p-3 mt-4">
-        <h4>Rekap Presensi ({tanggal})</h4>
+      {/* FORM PRESENSI */}
+      <div className="card p-3 mt-3 shadow-sm">
+        <h5 className="fw-bold mb-3">Form Presensi</h5>
+
+        <div className="row g-3">
+          <div className="col-md-6">
+            <label className="fw-semibold">Pilih {level}</label>
+            <select
+              className="form-control"
+              value={selectedUser}
+              onChange={handleUserChange}
+            >
+              <option value="">-- Pilih --</option>
+              {dataLevel.map((s) => (
+                <option value={s.id} key={s.id}>
+                  {s.nama} ({s.nomorUnik})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="col-md-6">
+            <label className="fw-semibold">Kode Unik</label>
+            <input
+              className={`form-control ${
+                nomorUnik && inputKode === nomorUnik
+                  ? "is-valid"
+                  : inputKode
+                  ? "is-invalid"
+                  : ""
+              }`}
+              placeholder="Masukkan kode unik"
+              value={inputKode}
+              onChange={(e) => setInputKode(e.target.value)}
+            />
+          </div>
+
+          <div className="col-md-6">
+            <label className="fw-semibold">Jenis Presensi</label>
+            <select
+              className="form-control"
+              value={opsi}
+              onChange={(e) => setOpsi(e.target.value)}
+            >
+              <option value="masuk">Masuk</option>
+              <option value="pulang">Pulang</option>
+            </select>
+          </div>
+
+          <div className="col-md-6 d-flex align-items-end">
+            <button
+              className="btn btn-primary w-100"
+              onClick={submitPresensi}
+              disabled={loading}
+            >
+              {loading ? "Menyimpan..." : "Presensi"}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* REKAP */}
+      <div className="card p-3 mt-4 shadow-sm">
+        <h4 className="fw-bold">Rekap Presensi ({tanggal})</h4>
 
         {riwayat.length === 0 ? (
           <p className="mt-3">Belum ada presensi hari ini.</p>
         ) : (
-          <table className="table mt-3 table-striped">
-            <thead>
-              <tr>
-                <th>Level</th>
-                <th>Nomor Unik</th>
-                <th>Nama</th>
-                <th>Kelas/Jabatan/Mapel</th>
-                <th>Masuk</th>
-                <th>Pulang</th>
-                <th>Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {riwayat.map((p) => (
-                <tr key={p.id}>
-                  <td>{p.level}</td>
-                  <td>{p.nomorUnik}</td>
-                  <td>{p.nama}</td>
-                  <td>{p.kelas}</td>
-                  <td>{p.masuk || "-"}</td>
-                  <td>{p.pulang || "-"}</td>
-                  <td>
-                    <button
-                      className="btn btn-danger btn-sm"
-                      onClick={() => deletePresensi(p.id)}
-                    >
-                      Hapus
-                    </button>
-                  </td>
+          <div className="table-responsive mt-3">
+            <table className="table table-bordered table-striped">
+              <thead className="table-dark">
+                <tr>
+                  <th>Level</th>
+                  <th>Nomor Unik</th>
+                  <th>Nama</th>
+                  <th>Kelas/Jabatan</th>
+                  <th>Masuk</th>
+                  <th>Pulang</th>
+                  <th>Aksi</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {riwayat.map((p) => (
+                  <tr key={p.id}>
+                    <td>{p.level}</td>
+                    <td>{p.nomorUnik}</td>
+                    <td>{p.nama}</td>
+                    <td>{p.kelas}</td>
+                    <td>{p.masuk || "-"}</td>
+                    <td>{p.pulang || "-"}</td>
+                    <td>
+                      <button
+                        className="btn btn-danger btn-sm"
+                        onClick={() => deletePresensi(p.id)}
+                      >
+                        Hapus
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>
