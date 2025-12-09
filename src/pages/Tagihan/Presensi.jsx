@@ -1,301 +1,204 @@
-import React, { useEffect, useState } from "react";
+// Presensi.jsx
+import React, { useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
+import {
+  CCard,
+  CCardBody,
+  CFormInput,
+  CFormSelect,
+  CButton,
+} from "@coreui/react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faClock, faUserCheck, faUserTag, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+
 
 const API = {
   siswa: "http://localhost:5000/siswa",
   guru: "http://localhost:5000/guru",
   karyawan: "http://localhost:5000/karyawan",
+  presensi: "http://localhost:5000/presensi",
 };
 
-const API_PRESENSI = "http://localhost:5000/presensi";
+function nowISO() {
+  return new Date().toISOString();
+}
 
 export default function Presensi() {
-  const [level, setLevel] = useState("siswa");
-  const [dataLevel, setDataLevel] = useState([]);
+  const [kodeUnik, setKodeUnik] = useState("");
+  const [dataUser, setDataUser] = useState(null);
+  const [status, setStatus] = useState("");
+  const [loadingCari, setLoadingCari] = useState(false);
+  const [loadingSimpan, setLoadingSimpan] = useState(false);
 
-  const [selectedUser, setSelectedUser] = useState("");
-  const [kelas, setKelas] = useState("");
-  const [nomorUnik, setNomorUnik] = useState("");
-
-  const [inputKode, setInputKode] = useState("");
-
-  const [opsi, setOpsi] = useState("masuk");
-  const [tanggal, setTanggal] = useState(new Date().toISOString().split("T")[0]);
-  const [riwayat, setRiwayat] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  // === FETCH DATA BERDASARKAN LEVEL ===
-  useEffect(() => {
-    axios.get(API[level]).then((res) => setDataLevel(res.data));
-    setSelectedUser("");
-    setNomorUnik("");
-    setKelas("");
-    setInputKode("");
-  }, [level]);
-
-  useEffect(() => {
-    loadRiwayat();
-  }, [tanggal]);
-
-  const loadRiwayat = async () => {
-    const res = await axios.get(`${API_PRESENSI}?tanggal=${tanggal}`);
-    setRiwayat(res.data);
-  };
-
-  const handleUserChange = (e) => {
-    const id = e.target.value;
-    setSelectedUser(id);
-
-    const detail = dataLevel.find((s) => s.id === id);
-    if (detail) {
-      setKelas(detail.kelas || detail.ket || "-");
-      setNomorUnik(detail.nomorUnik);
-      setInputKode(detail.nomorUnik);
-    }
-  };
-
-  // === AUTO SEARCH KODE UNIK (real-time & smooth) ===
-  useEffect(() => {
-    if (!inputKode.trim()) {
-      setSelectedUser("");
-      setKelas("");
-      setNomorUnik("");
+  // cari data di masterdata
+  const cariData = async () => {
+    if (!kodeUnik || kodeUnik.trim() === "") {
+      Swal.fire("Oops", "Kode unik masih kosong", "warning");
       return;
     }
 
-    const timer = setTimeout(() => {
-      const detail = dataLevel.find(
-        (s) => s.nomorUnik.toLowerCase() === inputKode.toLowerCase()
-      );
-
-      if (detail) {
-        setSelectedUser(detail.id);
-        setKelas(detail.kelas || detail.ket || "-");
-        setNomorUnik(detail.nomorUnik);
-      }
-    }, 250);
-
-    return () => clearTimeout(timer);
-  }, [inputKode, dataLevel]);
-
-  const ambilJam = () => {
-    const now = new Date();
-    return now.toLocaleTimeString("id-ID", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  const submitPresensi = async () => {
-    if (!selectedUser) {
-      Swal.fire("Pilih atau isi kode unik dulu!", "", "warning");
-      return;
-    }
-
-    if (inputKode !== nomorUnik) {
-      Swal.fire("Kode Unik Salah!", "Presensi dibatalkan.", "error");
-      return;
-    }
-
-    setLoading(true);
     try {
-      const detail = dataLevel.find((s) => s.id === selectedUser);
-      const jam = ambilJam();
+      setLoadingCari(true);
+      // helper untuk cek endpoint dengan params nomorUnik
+      const cekApi = async (url) => {
+        const r = await axios.get(url, { params: { nomorUnik: kodeUnik } });
+        if (Array.isArray(r.data) && r.data.length > 0) return r.data[0];
+        return null;
+      };
 
-      const getToday = await axios.get(
-        `${API_PRESENSI}?id_user=${selectedUser}&tanggal=${tanggal}`
-      );
+      const hasil =
+        (await cekApi(API.siswa)) ||
+        (await cekApi(API.guru)) ||
+        (await cekApi(API.karyawan));
 
-      const existing = getToday.data[0];
-
-      if (existing) {
-        const updateBody = {
-          ...existing,
-          level,
-          nomorUnik: detail.nomorUnik,
-          [opsi]: jam,
-        };
-
-        await axios.put(`${API_PRESENSI}/${existing.id}`, updateBody);
-        Swal.fire("Berhasil", `Presensi ${opsi} dicatat: ${jam}`, "success");
+      if (hasil) {
+        setDataUser(hasil);
+        Swal.fire("Ditemukan", `${hasil.nama} ditemukan`, "success");
       } else {
-        const newData = {
-          id: String(Date.now()),
-          tanggal,
-          id_user: detail.id,
-          nama: detail.nama,
-          level,
-          kelas: detail.kelas || detail.ket || "-",
-          nomorUnik: detail.nomorUnik,
-          masuk: opsi === "masuk" ? jam : "",
-          pulang: opsi === "pulang" ? jam : "",
-        };
-
-        await axios.post(API_PRESENSI, newData);
-        Swal.fire("Berhasil", `Presensi ${opsi} dicatat: ${jam}`, "success");
+        setDataUser(null);
+        Swal.fire("Tidak ditemukan", "Kode unik tidak ada di Masterdata", "error");
       }
     } catch (err) {
-      Swal.fire("Error", err.message, "error");
+      console.error(err);
+      Swal.fire("Error", "Gagal mencari data (cek koneksi)", "error");
+    } finally {
+      setLoadingCari(false);
     }
-
-    setLoading(false);
-    loadRiwayat();
   };
 
-  const deletePresensi = async (id) => {
-    Swal.fire({
-      title: "Hapus data ini?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Ya",
-      cancelButtonText: "Batal",
-    }).then(async (res) => {
-      if (res.isConfirmed) {
-        await axios.delete(`${API_PRESENSI}/${id}`);
-        loadRiwayat();
-        Swal.fire("Terhapus!", "", "success");
+  // simpan presensi -> create atau update (lock masuk)
+  const simpanPresensi = async () => {
+    if (!status) return Swal.fire("Oops", "Pilih status presensi", "warning");
+    if (!dataUser) return Swal.fire("Oops", "Belum ada data yang dipilih", "warning");
+
+    try {
+      setLoadingSimpan(true);
+
+      const tanggal = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
+      // cek apakah sudah ada record hari ini berdasarkan nomorUnik + tanggal
+      const cek = await axios.get(API.presensi, {
+        params: { nomorUnik: dataUser.nomorUnik, tanggal },
+      });
+
+      let existing = Array.isArray(cek.data) && cek.data.length > 0 ? cek.data[0] : null;
+
+      if (!existing) {
+        // buat record baru
+        const payload = {
+          nomorUnik: dataUser.nomorUnik,
+          nama: dataUser.nama,
+          kelas: dataUser.kelas || dataUser.ket || "-",
+          kategori: status,
+          masuk: status === "hadir" ? nowISO() : "",
+          pulang: status === "pulang" ? nowISO() : "",
+          tanggal,
+        };
+
+        await axios.post(API.presensi, payload);
+        Swal.fire("Berhasil", "Presensi baru tersimpan", "success");
+      } else {
+        // update record existing, tapi jangan timpa masuk jika sudah ada
+        const updated = {
+          ...existing,
+          kategori: status,
+          // lock masuk: kalau sudah ada masuk, tetap pakai yang lama
+          masuk: existing.masuk && existing.masuk !== "" ? existing.masuk : (status === "hadir" ? nowISO() : ""),
+          // pulang hanya diupdate bila status === 'pulang'
+          pulang: status === "pulang" ? nowISO() : existing.pulang || "",
+        };
+
+        // PUT ke /presensi/:id (json-server expects numeric id or string id, it keeps it)
+        await axios.put(`${API.presensi}/${existing.id}`, updated);
+        Swal.fire("Berhasil", "Presensi diupdate", "success");
       }
-    });
+
+      // reset form
+      setKodeUnik("");
+      setDataUser(null);
+      setStatus("");
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Gagal menyimpan presensi", "error");
+    } finally {
+      setLoadingSimpan(false);
+    }
   };
 
   return (
-    <div className="p-4" style={{ maxWidth: "950px", margin: "auto" }}>
-      <h2 className="fw-bold mb-3">📌 Presensi</h2>
+    <div className="p-2 ml-10 max-w-5xl mx-auto bg-gray-100 min-h-screen rounded-xl">
+      <div className="flex items-center gap-3 mb-6">
+        <FontAwesomeIcon icon={faClock} className="text-blue-700 text-4xl" />
+        <h1 className="text-3xl font-bold">Presensi Manual</h1>
+      </div>
 
-      {/* TANGGAL + LEVEL */}
-      <div className="card p-3 shadow-sm">
-        <div className="row g-3">
-          <div className="col-md-6">
-            <label className="fw-semibold">Tanggal Presensi</label>
-            <input
-              type="date"
-              className="form-control"
-              value={tanggal}
-              onChange={(e) => setTanggal(e.target.value)}
+      <CCard className="p-4 shadow-lg border border-gray-200 rounded-lg bg-white">
+        <CCardBody>
+          <label className="block mb-3 text-lg font-bold">Masukkan Kode Unik</label>
+
+          <div className="flex gap-3 items-center">
+            <CFormInput
+              placeholder="Contoh: T-0969 atau 889922"
+              className="w-72 p-3 text-lg shadow-sm"
+              value={kodeUnik}
+              onChange={(e) => setKodeUnik(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") cariData();
+              }}
             />
-          </div>
-
-          <div className="col-md-6">
-            <label className="fw-semibold">Pilih Level</label>
-            <select
-              className="form-control"
-              value={level}
-              onChange={(e) => setLevel(e.target.value)}
+            <CButton
+              color="primary"
+              className="px-4 py-2 text-lg shadow-md flex items-center gap-2"
+              onClick={cariData}
+              disabled={loadingCari}
             >
-              <option value="siswa">Siswa</option>
-              <option value="guru">Guru</option>
-              <option value="karyawan">Karyawan</option>
-            </select>
-          </div>
-        </div>
-      </div>
+              <FontAwesomeIcon icon={faUserTag} /> {loadingCari ? "Mencari..." : "Cari"}
+            </CButton>
 
-      {/* FORM PRESENSI */}
-      <div className="card p-3 mt-3 shadow-sm">
-        <h5 className="fw-bold mb-3">Form Presensi</h5>
+            <div className="ml-4">
+              <CFormSelect
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                className="shadow-sm"
+              >
+                <option value="">-- Pilih Status --</option>
+                <option value="hadir">Hadir</option>
+                <option value="sakit">Sakit</option>
+                <option value="izin">Izin</option>
+                <option value="pulang">Pulang</option>
+              </CFormSelect>
+            </div>
 
-        <div className="row g-3">
-          <div className="col-md-6">
-            <label className="fw-semibold">Pilih {level}</label>
-            <select
-              className="form-control"
-              value={selectedUser}
-              onChange={handleUserChange}
+            <CButton
+              color="success"
+              className="px-4 py-2 text-lg shadow-md"
+              onClick={simpanPresensi}
+              disabled={loadingSimpan}
             >
-              <option value="">-- Pilih --</option>
-              {dataLevel.map((s) => (
-                <option value={s.id} key={s.id}>
-                  {s.nama} ({s.nomorUnik})
-                </option>
-              ))}
-            </select>
+              <FontAwesomeIcon icon={faUserCheck} /> {loadingSimpan ? "Menyimpan..." : "Simpan"}
+            </CButton>
           </div>
 
-          <div className="col-md-6">
-            <label className="fw-semibold">Kode Unik</label>
-            <input
-              className={`form-control ${
-                nomorUnik && inputKode === nomorUnik
-                  ? "is-valid"
-                  : inputKode
-                  ? "is-invalid"
-                  : ""
-              }`}
-              placeholder="Masukkan kode unik"
-              value={inputKode}
-              onChange={(e) => setInputKode(e.target.value)}
-            />
-          </div>
+          {/* DETAIL USER */}
+          {dataUser && (
+            <div className="mt-6 bg-gray-50 p-4 rounded border">
+              <div className="grid grid-cols-2 gap-3 text-lg">
+                <div><b>Nama:</b> {dataUser.nama}</div>
+                <div><b>No HP:</b> {dataUser.hp || "-"}</div>
+                <div><b>Alamat:</b> {dataUser.alamat || "-"}</div>
+                <div><b>Kelas/Ket:</b> {dataUser.kelas || dataUser.ket || "-"}</div>
+                <div><b>Nomor Unik:</b> {dataUser.nomorUnik || "-"}</div>
+              </div>
+            </div>
+          )}
 
-          <div className="col-md-6">
-            <label className="fw-semibold">Jenis Presensi</label>
-            <select
-              className="form-control"
-              value={opsi}
-              onChange={(e) => setOpsi(e.target.value)}
-            >
-              <option value="masuk">Masuk</option>
-              <option value="pulang">Pulang</option>
-            </select>
+          <div className="mt-4 text-sm text-gray-600">
+            <FontAwesomeIcon icon={faMagnifyingGlass} /> Tekan Enter atau tombol <b>Cari</b> untuk menemukan user.
+            Setelah ditemukan, pilih status lalu <b>Simpan</b>. Jika sudah ada presensi hari ini, data akan diupdate (masuk terkunci).
           </div>
-
-          <div className="col-md-6 d-flex align-items-end">
-            <button
-              className="btn btn-primary w-100"
-              onClick={submitPresensi}
-              disabled={loading}
-            >
-              {loading ? "Menyimpan..." : "Presensi"}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* REKAP */}
-      <div className="card p-3 mt-4 shadow-sm">
-        <h4 className="fw-bold">Rekap Presensi ({tanggal})</h4>
-
-        {riwayat.length === 0 ? (
-          <p className="mt-3">Belum ada presensi hari ini.</p>
-        ) : (
-          <div className="table-responsive mt-3">
-            <table className="table table-bordered table-striped">
-              <thead className="table-dark">
-                <tr>
-                  <th>Level</th>
-                  <th>Nomor Unik</th>
-                  <th>Nama</th>
-                  <th>Kelas/Jabatan</th>
-                  <th>Masuk</th>
-                  <th>Pulang</th>
-                  <th>Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                {riwayat.map((p) => (
-                  <tr key={p.id}>
-                    <td>{p.level}</td>
-                    <td>{p.nomorUnik}</td>
-                    <td>{p.nama}</td>
-                    <td>{p.kelas}</td>
-                    <td>{p.masuk || "-"}</td>
-                    <td>{p.pulang || "-"}</td>
-                    <td>
-                      <button
-                        className="btn btn-danger btn-sm"
-                        onClick={() => deletePresensi(p.id)}
-                      >
-                        Hapus
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+        </CCardBody>
+      </CCard>
     </div>
   );
 }

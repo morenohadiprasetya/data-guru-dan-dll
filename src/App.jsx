@@ -13,7 +13,7 @@ import Register from "./Komponen/Register";
 import Masterdata from "./pages/masterdata/Masterdata";
 import Tambahdata from "./pages/masterdata/TambahData";
 import Edit from "./pages/masterdata/Editdata";
-
+import RekapPresensi from "./pages/Tagihan/rPresensi";
  
 import Tambahkategoridata from "./pages/data/tambahkategorid";
 import Editkategoridata from "./pages/data/editkategorid";
@@ -65,6 +65,7 @@ export default function App() {
           <Route path="/brngn/:id" element={<EditKelas />} />
           <Route path="/tkelas" element={<TambahKelas />} />
 <Route path="/presensi" element={<PresensiPage />} />
+<Route path="/Rekappresensi" element={<RekapPresensi />} />
 
           {/* Kategori Tagihan */}
           <Route path="/Ekategori/:id" element={<Ekategori />} />
