@@ -22,6 +22,12 @@ export default function Sidnav() {
       if (res.isConfirmed) navigate("/");
     });
   };
+  // SEMBUNYIKAN SIDEBAR DI HALAMAN TERTENTU
+const hideSidebarRoutes = ["/presensi", "/Rekappresensi"];
+const hideSidebar = hideSidebarRoutes.includes(location.pathname);
+
+if (hideSidebar) return null;
+
 
   const isActive = (path) =>
     location.pathname === path

@@ -19,6 +19,16 @@
       "kelas": "X DPB",
       "nomorUnik": "Ngawi-0777",
       "level": "siswa"
+    },
+    {
+      "id": "17d3",
+      "nama": "Fadhil",
+      "ket": "",
+      "alamat": "Beringin",
+      "hp": "08xxxxxxxxx",
+      "kelas": "X TKJ",
+      "nomorUnik": "B-2010",
+      "level": "siswa"
     }
   ],
   "guru": [
@@ -313,6 +323,89 @@
       "masuk": "",
       "pulang": "",
       "tanggal": "2025-12-09"
+    },
+    {
+      "id": "cf06",
+      "nomorUnik": "B-2010",
+      "nama": "Fadhil",
+      "kelas": "X TKJ",
+      "kategori": "pulang",
+      "masuk": "2025-12-10T03:47:40.343Z",
+      "pulang": "2025-12-10T04:22:08.781Z",
+      "tanggal": "2025-12-10"
+    },
+    {
+      "id": "6392",
+      "nomorUnik": "Ngawi-0777",
+      "nama": "Ambatukam",
+      "kelas": "X DPB",
+      "kategori": "hadir",
+      "masuk": "2025-12-10T04:21:20.987Z",
+      "pulang": "",
+      "tanggal": "2025-12-10"
+    },
+    {
+      "id": "3886",
+      "nomorUnik": "Ngawi-0777",
+      "nama": "Ambatukam",
+      "kelas": "X DPB",
+      "kategori": "sakit",
+      "masuk": "",
+      "pulang": "",
+      "tanggal": "2025-12-11"
+    },
+    {
+      "id": "d9d4",
+      "nomorUnik": "B-2010",
+      "nama": "Fadhil",
+      "kelas": "X TKJ",
+      "kategori": "sakit",
+      "masuk": "",
+      "pulang": "",
+      "tanggal": "2025-12-11"
+    },
+    {
+      "id": "fb8e",
+      "nomorUnik": "M-2010",
+      "nama": "Moreno",
+      "kelas": "XI TKJ",
+      "kategori": "pulang",
+      "masuk": "2025-12-11T01:52:32.582Z",
+      "pulang": "2025-12-11T06:05:20.006Z",
+      "tanggal": "2025-12-11"
+    },
+    {
+      "id": "c370",
+      "nomorUnik": "M-2015",
+      "nama": "Ambatukam",
+      "kelas": "Tukang bersih bersih",
+      "kategori": "izin",
+      "masuk": "",
+      "pulang": "",
+      "tanggal": "2025-12-11",
+      "keteranganIzin": "Omahe di Gusur"
+    },
+    {
+      "id": "654f",
+      "nomorUnik": "N-0123",
+      "nama": "Pak amba",
+      "kelas": "Ngawiformatika",
+      "kategori": "izin",
+      "masuk": "",
+      "pulang": "",
+      "tanggal": "2025-12-11",
+      "keteranganIzin": "tauran"
+    },
+    {
+      "id": "48e2",
+      "nomorUnik": "N-0234",
+      "nama": "Pak rusdi",
+      "kelas": "Ngawinesia",
+      "kategori": "pulang",
+      "masuk": "2025-12-11T07:04:28.861Z",
+      "pulang": "2025-12-11T07:04:38.860Z",
+      "tanggal": "2025-12-11",
+      "keteranganIzin": ""
     }
   ]
 }

@@ -2,74 +2,54 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-import {
-  ArrowPathIcon,
-  TrashIcon,
-  DocumentArrowDownIcon,
-  MagnifyingGlassIcon,
-} from "@heroicons/react/24/solid";
+import { ArrowPathIcon, MagnifyingGlassIcon } from "@heroicons/react/24/solid";
+import { useNavigate } from "react-router-dom";
 
- 
 const API_PRESENSI = "http://localhost:5000/presensi";
-
-function exportExcel(data = [], filename = "rekap-presensi.xlsx") {
-  if (!Array.isArray(data) || data.length === 0) {
-    Swal.fire("Gagal", "Tidak ada data untuk diexport", "error");
-    return;
-  }
-
-  // sanitize: pilih kolom utama agar urut
-  const header = ["tanggal", "nomorUnik", "nama", "kelas", "kategori", "masuk", "pulang"];
-  const rows = data.map((obj) =>
-    header.map((k) => (obj[k] !== undefined && obj[k] !== null ? String(obj[k]) : "")).join("\t")
-  );
-  const fileContent = header.join("\t") + "\n" + rows.join("\n");
-  const blob = new Blob(["\ufeff" + fileContent], { type: "application/vnd.ms-excel" });
-
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}
 
 function formatJam(val) {
   if (!val) return "-";
   try {
-     
-    if (typeof val === "string" && (val.includes(":") || val.includes(".")) && !val.includes("T")) {
+    if (
+      typeof val === "string" &&
+      (val.includes(":") || val.includes(".")) &&
+      !val.includes("T")
+    ) {
       return val.replace(".", ":");
     }
     const d = new Date(val);
     if (isNaN(d.getTime())) return val;
-    return d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+    return d.toLocaleTimeString("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   } catch {
     return "-";
   }
 }
 
 export default function RekapPresensi() {
+  const navigate = useNavigate();
+
   const [rekap, setRekap] = useState([]);
   const [loading, setLoading] = useState(false);
   const [tanggal, setTanggal] = useState(new Date().toISOString().slice(0, 10));
   const [kategori, setKategori] = useState("all");
   const [cari, setCari] = useState("");
   const [page, setPage] = useState(1);
+  const [rowOpen, setRowOpen] = useState(null);
   const limit = 10;
 
   useEffect(() => {
     ambilRekap();
-    // reset page saat filter berubah
     setPage(1);
   }, [tanggal, kategori]);
 
   async function ambilRekap() {
     setLoading(true);
     try {
-      // Kirim params hanya bila bukan 'all'
       const params = { tanggal };
-      if (kategori && kategori !== "all") params.kategori = kategori;
+      if (kategori !== "all") params.kategori = kategori;
 
       const r = await axios.get(API_PRESENSI, { params });
       setRekap(Array.isArray(r.data) ? r.data : []);
@@ -80,29 +60,42 @@ export default function RekapPresensi() {
       setLoading(false);
     }
   }
- 
-  // search filter
-  const dataFiltered = rekap.filter((x) => x.nama?.toLowerCase().includes(cari.toLowerCase()));
 
-  // pagination
+  const dataFiltered = rekap.filter((x) =>
+    x.nama?.toLowerCase().includes(cari.toLowerCase())
+  );
+
   const totalPage = Math.max(1, Math.ceil(dataFiltered.length / limit));
   const mulai = (page - 1) * limit;
   const tampil = dataFiltered.slice(mulai, mulai + limit);
 
   return (
-    <div className="p-6 max-w-6xl  mr-10 justify bg-gray-100 min-h-screen ml-100 rounded-lg shadow-md">
+    <div className="p-6 max-w-6xl bg-gray-100 min-h-screen ml-70 rounded-lg shadow-md relative">
+
+      {/* TOMBOL KEMBALI FIXED POJOK KIRI ATAS */}
+      <button
+        onClick={() => navigate("/dashboard")}
+        className="fixed top-5 left-5 px-4 py-2 bg-blue-700 text-white rounded shadow z-50"
+      >
+        Kembali ke Menu
+      </button>
+
+      {/* HEADER */}
       <div className="flex justify-between items-center mb-6 ml-100">
         <h1 className="text-2xl font-bold text-blue-700">Rekap Presensi</h1>
-        <button
-          onClick={ambilRekap}
-          className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded"
-        >
-          <ArrowPathIcon className="w-5" />
-          Refresh
-        </button>
+
+        <div className="flex gap-2">
+          <button
+            onClick={ambilRekap}
+            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded"
+          >
+            <ArrowPathIcon className="w-5" />
+            Refresh
+          </button>
+        </div>
       </div>
 
-      {/* filter bar */}
+      {/* FILTER */}
       <div className="grid grid-cols-3 gap-4 bg-white p-4 rounded shadow-sm mb-4">
         <div>
           <label className="text-sm font-semibold block mb-1">Tanggal</label>
@@ -135,7 +128,7 @@ export default function RekapPresensi() {
             <MagnifyingGlassIcon className="w-5 mx-2 text-gray-500" />
             <input
               className="p-2 w-full outline-none"
-              placeholder="Cari nama siswa..."
+              placeholder="Cari nama..."
               value={cari}
               onChange={(e) => {
                 setCari(e.target.value);
@@ -146,9 +139,7 @@ export default function RekapPresensi() {
         </div>
       </div>
 
-       
-
-      {/* table */}
+      {/* TABEL */}
       <div className="bg-white rounded shadow overflow-auto">
         <table className="min-w-full text-sm">
           <thead className="bg-blue-100 text-blue-900">
@@ -158,40 +149,70 @@ export default function RekapPresensi() {
               <th className="p-2 border">Kategori</th>
               <th className="p-2 border">Masuk</th>
               <th className="p-2 border">Pulang</th>
-              
             </tr>
           </thead>
 
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan="6" className="text-center p-4">Loading...</td>
+                <td colSpan="5" className="text-center p-4">
+                  Loading...
+                </td>
               </tr>
             ) : tampil.length === 0 ? (
               <tr>
-                <td colSpan="6" className="text-center p-4">Tidak ada data</td>
+                <td colSpan="5" className="text-center p-4">
+                  Tidak ada data
+                </td>
               </tr>
             ) : (
               tampil.map((x, i) => (
-                <tr key={x.id || i} className="hover:bg-gray-50">
-                  <td className="p-2 border">{x.nama}</td>
-                  <td className="p-2 border">{x.kelas || "-"}</td>
-                  <td className="p-2 border capitalize">{x.kategori || "-"}</td>
-                  <td className="p-2 border">{formatJam(x.masuk)}</td>
-                  <td className="p-2 border">{formatJam(x.pulang)}</td>
-                  <td className="p-2 border text-center">
-                    
-                  </td>
-                </tr>
+                <React.Fragment key={x.id || i}>
+                  <tr className="hover:bg-gray-50">
+                    <td className="p-2 border">{x.nama}</td>
+                    <td className="p-2 border">{x.kelas || "-"}</td>
+
+                    <td
+                      className={`p-2 border capitalize ${
+                        x.kategori === "izin"
+                          ? "cursor-pointer text-blue-700 underline"
+                          : ""
+                      }`}
+                      onClick={() =>
+                        x.kategori === "izin"
+                          ? setRowOpen(rowOpen === x.id ? null : x.id)
+                          : null
+                      }
+                    >
+                      {x.kategori || "-"}
+                    </td>
+
+                    <td className="p-2 border">{formatJam(x.masuk)}</td>
+                    <td className="p-2 border">{formatJam(x.pulang)}</td>
+                  </tr>
+
+                  {rowOpen === x.id && x.kategori === "izin" && (
+                    <tr className="bg-blue-50">
+                      <td colSpan="5" className="p-3 border-l-4 border-blue-500">
+                        <div className="font-semibold mb-1">
+                          Keterangan Izin:
+                        </div>
+                        <div>{x.keteranganIzin || "(Tidak ada keterangan)"}</div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
               ))
             )}
           </tbody>
         </table>
       </div>
 
-      {/* pagination */}
+      {/* PAGINATION */}
       <div className="flex justify-between mt-4 items-center">
-        <div>Halaman {page} dari {totalPage}</div>
+        <div>
+          Halaman {page} dari {totalPage}
+        </div>
 
         <div className="flex gap-2">
           <button
