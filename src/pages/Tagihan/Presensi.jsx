@@ -1,4 +1,3 @@
-// Presensi.jsx
 import React, { useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -11,8 +10,14 @@ import {
   CFormSelect,
   CButton,
 } from "@coreui/react";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faClock, faUserCheck, faUserTag, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import {
+  faClock,
+  faUserCheck,
+  faUserTag,
+  faMagnifyingGlass,
+} from "@fortawesome/free-solid-svg-icons";
 
 const API = {
   siswa: "http://localhost:5000/siswa",
@@ -21,12 +26,21 @@ const API = {
   presensi: "http://localhost:5000/presensi",
 };
 
+// ================= HELPER =================
 function nowISO() {
   return new Date().toISOString();
 }
 
+function isAfterJamPulang() {
+  const now = new Date();
+  const jam = now.getHours();
+  const menit = now.getMinutes();
+  return jam > 15 || (jam === 15 && menit >= 0);
+}
+
+// ================= COMPONENT =================
 export default function Presensi() {
-  const navigate = useNavigate(); // FIX WAJIB
+  const navigate = useNavigate();
 
   const [kodeUnik, setKodeUnik] = useState("");
   const [dataUser, setDataUser] = useState(null);
@@ -35,46 +49,59 @@ export default function Presensi() {
   const [loadingCari, setLoadingCari] = useState(false);
   const [loadingSimpan, setLoadingSimpan] = useState(false);
 
+  // ================= CARI DATA =================
   const cariData = async () => {
     if (!kodeUnik.trim()) {
-      Swal.fire("Oops", "Kode unik masih kosong", "warning");
-      return;
+      return Swal.fire("Oops", "Kode unik masih kosong", "warning");
     }
 
     try {
       setLoadingCari(true);
 
-      const cekApi = async (url) => {
-        const r = await axios.get(url, { params: { nomorUnik: kodeUnik } });
-        if (Array.isArray(r.data) && r.data.length > 0) return r.data[0];
-        return null;
+      const cek = async (url) => {
+        const r = await axios.get(url, {
+          params: { nomorUnik: kodeUnik },
+        });
+        return Array.isArray(r.data) && r.data.length > 0 ? r.data[0] : null;
       };
 
       const hasil =
-        (await cekApi(API.siswa)) ||
-        (await cekApi(API.guru)) ||
-        (await cekApi(API.karyawan));
+        (await cek(API.siswa)) ||
+        (await cek(API.guru)) ||
+        (await cek(API.karyawan));
 
-      if (hasil) {
-        setDataUser(hasil);
-        Swal.fire("Ditemukan", `${hasil.nama} ditemukan`, "success");
-      } else {
+      if (!hasil) {
         setDataUser(null);
-        Swal.fire("Tidak ditemukan", "Kode unik tidak ada di Masterdata", "error");
+        return Swal.fire("Gagal", "Kode unik tidak ditemukan", "error");
       }
+
+      setDataUser(hasil);
+      Swal.fire("Ditemukan", hasil.nama, "success");
     } catch {
-      Swal.fire("Error", "Gagal mencari data (cek koneksi)", "error");
+      Swal.fire("Error", "Gagal mencari data", "error");
     } finally {
       setLoadingCari(false);
     }
   };
 
+  // ================= SIMPAN PRESENSI =================
   const simpanPresensi = async () => {
-    if (!status) return Swal.fire("Oops", "Pilih status presensi", "warning");
-    if (!dataUser) return Swal.fire("Oops", "Belum ada data yang dipilih", "warning");
+    if (!dataUser)
+      return Swal.fire("Oops", "Cari data terlebih dahulu", "warning");
 
-    if (status === "izin" && (!keteranganIzin.trim())) {
+    if (!status)
+      return Swal.fire("Oops", "Pilih status presensi", "warning");
+
+    if (status === "izin" && !keteranganIzin.trim()) {
       return Swal.fire("Oops", "Keterangan izin wajib diisi", "warning");
+    }
+
+    if (status === "pulang" && !isAfterJamPulang()) {
+      return Swal.fire(
+        "Belum Waktunya",
+        "Presensi pulang hanya bisa setelah jam 15:00",
+        "warning"
+      );
     }
 
     try {
@@ -86,9 +113,29 @@ export default function Presensi() {
         params: { nomorUnik: dataUser.nomorUnik, tanggal },
       });
 
-      let existing =
+      const existing =
         Array.isArray(cek.data) && cek.data.length > 0 ? cek.data[0] : null;
 
+      // ===== VALIDASI DATA EXISTING =====
+      if (existing) {
+        if (existing.pulang) {
+          return Swal.fire(
+            "Ditolak",
+            "Presensi hari ini sudah selesai",
+            "error"
+          );
+        }
+
+        if (existing.kategori !== "hadir" && status !== "pulang") {
+          return Swal.fire(
+            "Ditolak",
+            "Anda sudah presensi hari ini",
+            "error"
+          );
+        }
+      }
+
+      // ===== SIMPAN BARU =====
       if (!existing) {
         const payload = {
           nomorUnik: dataUser.nomorUnik,
@@ -96,32 +143,27 @@ export default function Presensi() {
           kelas: dataUser.kelas || dataUser.ket || "-",
           kategori: status,
           masuk: status === "hadir" ? nowISO() : "",
-          pulang: status === "pulang" ? nowISO() : "",
+          pulang: "",
           tanggal,
           keteranganIzin: status === "izin" ? keteranganIzin : "",
         };
 
         await axios.post(API.presensi, payload);
-        Swal.fire("Berhasil", "Presensi baru tersimpan", "success");
-      } else {
-        const updated = {
-          ...existing,
-          kategori: status,
-          masuk:
-            existing.masuk && existing.masuk !== ""
-              ? existing.masuk
-              : status === "hadir"
-              ? nowISO()
-              : "",
-          pulang: status === "pulang" ? nowISO() : existing.pulang || "",
-          keteranganIzin:
-            status === "izin" ? keteranganIzin : existing.keteranganIzin || "",
-        };
-
-        await axios.put(`${API.presensi}/${existing.id}`, updated);
-        Swal.fire("Berhasil", "Presensi diupdate", "success");
+        Swal.fire("Berhasil", "Presensi tersimpan", "success");
       }
 
+      // ===== UPDATE HADIR → PULANG =====
+      if (existing) {
+        const update = {
+          ...existing,
+          pulang: status === "pulang" ? nowISO() : existing.pulang,
+        };
+
+        await axios.put(`${API.presensi}/${existing.id}`, update);
+        Swal.fire("Berhasil", "Presensi pulang dicatat", "success");
+      }
+
+      // RESET
       setKodeUnik("");
       setDataUser(null);
       setStatus("");
@@ -133,75 +175,65 @@ export default function Presensi() {
     }
   };
 
+  // ================= UI =================
   return (
-    <div className="ml-40 p-2 max-w-5xl mx-auto w-full bg-gray-100 min-h-screen rounded-full">
-      
-      <div className="flex items-center gap-3 mb-6">
-        <FontAwesomeIcon icon={faClock} className="text-blue-700 text-4xl" />
-        <h1 className="text-3xl font-bold">Presensi Manual</h1>
-      </div>
+    <div className="ml-40 p-4 max-w-5xl mx-auto min-h-screen bg-gray-100">
 
-      {/* Tombol Kembali */}
       <button
         onClick={() => navigate("/dashboard")}
-        className="fixed top-5 left-5 px-4 py-2 bg-blue-700 text-white rounded shadow z-50"
+        className="fixed top-5 left-5 bg-blue-700 text-white px-4 py-2 rounded z-50"
       >
         Kembali ke Menu
       </button>
 
-      <CCard className="p-4 shadow-lg border border-gray-200 rounded-lg bg-white">
-        <CCardBody>
-          <label className="block mb-3 text-lg font-bold">Masukkan Kode Unik</label>
+      <div className="flex items-center gap-3 mb-6">
+        <FontAwesomeIcon icon={faClock} className="text-blue-700 text-4xl" />
+        <h1 className="text-3xl font-bold">Presensi</h1>
+      </div>
 
-          <div className="flex gap-3 items-center">
+      <CCard>
+        <CCardBody>
+          <label className="font-bold text-lg">Kode Unik</label>
+
+          <div className="flex gap-3 mt-2 items-center">
             <CFormInput
-              placeholder=" Masukan Kode"
-              className="w-72 p-3 text-lg shadow-sm"
+              className="w-72"
               value={kodeUnik}
               onChange={(e) => setKodeUnik(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && cariData()}
+              placeholder="Masukkan kode unik"
             />
 
-            <CButton
-              color="primary"
-              className="px-4 py-2 text-lg shadow-md flex items-center gap-2"
-              onClick={cariData}
-              disabled={loadingCari}
-            >
-              <FontAwesomeIcon icon={faUserTag} />
-              {loadingCari ? "Mencari..." : "Cari"}
+            <CButton onClick={cariData} disabled={loadingCari}>
+              <FontAwesomeIcon icon={faUserTag} /> Cari
             </CButton>
 
-            <div className="ml-4">
-              <CFormSelect
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-                className="shadow-sm"
-              >
-                <option value="">-- Pilih Status --</option>
-                <option value="hadir">Hadir</option>
-                <option value="sakit">Sakit</option>
-                <option value="izin">Izin</option>
-                <option value="pulang">Pulang</option>
-              </CFormSelect>
-            </div>
+            <CFormSelect
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+            >
+              <option value="">-- Pilih Status --</option>
+              <option value="hadir">Hadir</option>
+              <option value="izin">Izin</option>
+              <option value="sakit">Sakit</option>
+              <option value="pulang" disabled={!isAfterJamPulang()}>
+                Pulang (≥ 15:00)
+              </option>
+            </CFormSelect>
 
             <CButton
               color="success"
-              className="px-4 py-2 text-lg shadow-md"
               onClick={simpanPresensi}
               disabled={loadingSimpan}
             >
-              <FontAwesomeIcon icon={faUserCheck} />
-              {loadingSimpan ? "Menyimpan..." : "Simpan"}
+              <FontAwesomeIcon icon={faUserCheck} /> Simpan
             </CButton>
           </div>
 
           {status === "izin" && (
             <div className="mt-4">
               <CFormInput
-                placeholder="Keterangan izin (contoh: sakit perut, urusan keluarga)"
-                className="w-72 p-3 text-lg shadow-sm"
+                placeholder="Keterangan izin"
                 value={keteranganIzin}
                 onChange={(e) => setKeteranganIzin(e.target.value)}
               />
@@ -209,20 +241,16 @@ export default function Presensi() {
           )}
 
           {dataUser && (
-            <div className="mt-6 bg-gray-50 p-4 rounded border">
-              <div className="grid grid-cols-2 gap-3 text-lg">
-                <div><b>Nama:</b> {dataUser.nama}</div>
-                <div><b>No HP:</b> {dataUser.hp || "-"}</div>
-                <div><b>Alamat:</b> {dataUser.alamat || "-"}</div>
-                <div><b>Kelas/Ket:</b> {dataUser.kelas || dataUser.ket || "-"}</div>
-                <div><b>Nomor Unik:</b> {dataUser.nomorUnik || "-"}</div>
-              </div>
+            <div className="mt-6 p-4 bg-gray-50 border rounded">
+              <p><b>Nama:</b> {dataUser.nama}</p>
+              <p><b>Kelas/Ket:</b> {dataUser.kelas || dataUser.ket}</p>
+              <p><b>Nomor Unik:</b> {dataUser.nomorUnik}</p>
             </div>
           )}
 
-          <div className="mt-4 text-sm text-gray-600">
-            <FontAwesomeIcon icon={faMagnifyingGlass} /> Tekan Enter atau tombol <b>Cari</b>.
-            Pilih status lalu <b>Simpan</b>. Jika sudah ada presensi hari ini, data akan diupdate.
+          <div className="text-sm text-gray-600 mt-4">
+            <FontAwesomeIcon icon={faMagnifyingGlass} /> Presensi hanya 1× per
+            hari. Pulang hanya setelah jam 15:00. 
           </div>
         </CCardBody>
       </CCard>

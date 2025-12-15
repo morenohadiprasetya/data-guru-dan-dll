@@ -1,16 +1,6 @@
 {
   "siswa": [
     {
-      "id": "9279",
-      "nama": "Moreno",
-      "ket": "",
-      "alamat": "Ngebrok",
-      "hp": "08xxxxxxxxx",
-      "kelas": "XI TKJ",
-      "nomorUnik": "M-2010",
-      "level": "siswa"
-    },
-    {
       "id": "9423",
       "nama": "Ambatukam",
       "ket": "",
@@ -28,6 +18,26 @@
       "hp": "08xxxxxxxxx",
       "kelas": "X TKJ",
       "nomorUnik": "B-2010",
+      "level": "siswa"
+    },
+    {
+      "id": "431a",
+      "nama": "Ayyas",
+      "ket": "",
+      "alamat": "Krapayak",
+      "hp": "08xxxxxxxxx",
+      "kelas": "X TKJ",
+      "nomorUnik": "K-2010",
+      "level": "siswa"
+    },
+    {
+      "id": "4be8",
+      "nama": "AmbaNgawi",
+      "ket": "",
+      "alamat": "Ngawi Timoer",
+      "hp": "08xxxxxxxxx",
+      "kelas": "X TKJ",
+      "nomorUnik": "Ngawi-0977",
       "level": "siswa"
     }
   ],
@@ -51,17 +61,27 @@
       "kelas": "",
       "nomorUnik": "N-0123",
       "level": "guru"
+    },
+    {
+      "id": "a74e",
+      "nama": "Ambatukamasssu",
+      "ket": "Ngawinesia",
+      "alamat": "Ngawi Timoer",
+      "hp": "08xxxxxxxxx",
+      "kelas": "",
+      "nomorUnik": "Ngawi-0001",
+      "level": "guru"
     }
   ],
   "karyawan": [
     {
-      "id": "05dd",
-      "nama": "Ambatukam",
-      "ket": "Tukang bersih bersih",
-      "alamat": "Ngebrok",
+      "id": "6f6c",
+      "nama": "Ambatukamasssu",
+      "ket": "Ngawinesia",
+      "alamat": "Ngawi Timoer",
       "hp": "08xxxxxxxxx",
       "kelas": "",
-      "nomorUnik": "M-2015",
+      "nomorUnik": "Ngawi-0001",
       "level": "Karyawan"
     }
   ],
@@ -417,6 +437,39 @@
       "pulang": "",
       "tanggal": "2025-12-12",
       "keteranganIzin": "Tauran"
+    },
+    {
+      "id": "d04f",
+      "nomorUnik": "M-2010",
+      "nama": "Moreno",
+      "kelas": "XI TKJ",
+      "kategori": "hadir",
+      "masuk": "2025-12-15T07:01:59.432Z",
+      "pulang": "",
+      "tanggal": "2025-12-15",
+      "keteranganIzin": ""
+    },
+    {
+      "id": "3d92",
+      "nomorUnik": "K-2010",
+      "nama": "Ayyas",
+      "kelas": "X TKJ",
+      "kategori": "hadir",
+      "masuk": "2025-12-15T07:10:18.128Z",
+      "pulang": "",
+      "tanggal": "2025-12-15",
+      "keteranganIzin": ""
+    },
+    {
+      "id": "942a",
+      "nomorUnik": "Ngawi-0777",
+      "nama": "Ambatukam",
+      "kelas": "X DPB",
+      "kategori": "izin",
+      "masuk": "",
+      "pulang": "",
+      "tanggal": "2025-12-15",
+      "keteranganIzin": "acara keluarga"
     }
   ]
 }
