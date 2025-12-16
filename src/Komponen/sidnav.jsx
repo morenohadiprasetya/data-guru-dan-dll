@@ -9,7 +9,6 @@ export default function Sidnav() {
 
   const [openDatabase, setOpenDatabase] = useState(false);
   const [openKeuangan, setOpenKeuangan] = useState(false);
-  const [openPresensi, setOpenPresensi] = useState(false);
 
   const handleLogout = () => {
     Swal.fire({
@@ -24,7 +23,7 @@ export default function Sidnav() {
   };
 
   const hideSidebarRoutes = ["/presensi", "/Rekappresensi"];
-  if (hideSidebarRoutes.includes(location.pathname)) return null;
+if (hideSidebarRoutes.includes(location.pathname)) return null;
 
   const isActive = (path) =>
     location.pathname === path
@@ -105,29 +104,6 @@ export default function Sidnav() {
               </Link>
               <Link to="/rekap" className="py-1 flex gap-2 text-white">
                 <i className="ri-bar-chart-box-line"></i> Rekap Tagihan
-              </Link>
-            </div>
-          )}
-
-          {/* PRESENSI */}
-          <button
-            onClick={() => setOpenPresensi(!openPresensi)}
-            className="flex justify-between items-center px-4 py-2 rounded-lg hover:bg-blue-800"
-          >
-            <span className="flex items-center gap-3">
-              <i className="ri-calendar-check-line text-xl"></i>
-              Presensi
-            </span>
-            <i className={`ri-arrow-down-s-line ${openPresensi ? "rotate-180" : ""}`}></i>
-          </button>
-
-          {openPresensi && (
-            <div className="ml-7 flex flex-col gap-1 text-sm">
-              <Link to="/presensi" className="py-1 flex gap-2 text-white">
-                <i className="ri-calendar-check-line"></i>Presensi
-              </Link>
-              <Link to="/Rekappresensi" className="py-1 flex gap-2 text-white">
-                <i className="ri-calendar-check-fill"></i> Rekap Presensi
               </Link>
             </div>
           )}

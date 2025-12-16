@@ -11,16 +11,6 @@
       "level": "siswa"
     },
     {
-      "id": "17d3",
-      "nama": "Fadhil",
-      "ket": "",
-      "alamat": "Beringin",
-      "hp": "08xxxxxxxxx",
-      "kelas": "X TKJ",
-      "nomorUnik": "B-2010",
-      "level": "siswa"
-    },
-    {
       "id": "431a",
       "nama": "Ayyas",
       "ket": "",
@@ -470,6 +460,50 @@
       "pulang": "",
       "tanggal": "2025-12-15",
       "keteranganIzin": "acara keluarga"
+    },
+    {
+      "id": "193a",
+      "nomorUnik": "Ngawi-0977",
+      "nama": "AmbaNgawi",
+      "kelas": "X TKJ",
+      "kategori": "hadir",
+      "masuk": "2025-12-16T02:48:51.817Z",
+      "pulang": "",
+      "tanggal": "2025-12-16",
+      "keteranganIzin": ""
+    },
+    {
+      "id": "8c6e",
+      "nomorUnik": "N-0123",
+      "nama": "Pak amba",
+      "kelas": "Ngawiformatika",
+      "kategori": "hadir",
+      "masuk": "2025-12-16T02:54:07.063Z",
+      "pulang": "",
+      "tanggal": "2025-12-16",
+      "keteranganIzin": ""
+    },
+    {
+      "id": "e059",
+      "nomorUnik": "K-2010",
+      "nama": "Ayyas",
+      "kelas": "X TKJ",
+      "kategori": "izin",
+      "masuk": "",
+      "pulang": "",
+      "tanggal": "2025-12-16",
+      "keteranganIzin": "Tawuran"
+    },
+    {
+      "id": "5e19",
+      "nomorUnik": "N-0234",
+      "nama": "Pak rusdi",
+      "kelas": "Ngawinesia",
+      "kategori": "hadir",
+      "masuk": "2025-12-16T06:40:14.640Z",
+      "pulang": "",
+      "tanggal": "2025-12-16",
+      "keteranganIzin": ""
     }
   ]
 }
