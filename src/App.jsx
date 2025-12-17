@@ -29,6 +29,7 @@ import Tkategori from "./pages/Tagihan/Tkategori";
 import TambahTagihan from "./pages/Tagihan/Tambahtagihan";
 import PresensiPage from "./pages/Tagihan/Presensi";
 import Trht from "./pages/Tagihan/Trht";
+import EditPresensi from "./pages/Presensi/EditPresensi";
 
 
 export default function App() {
@@ -67,6 +68,7 @@ export default function App() {
           <Route path="/tkelas" element={<TambahKelas />} />
 <Route path="/presensi" element={<PresensiPage />} />
 <Route path="/Rekappresensi" element={<RekapPresensi />} />
+<Route path="/presensi/edit/:id" element={<EditPresensi />} />
 
           {/* Kategori Tagihan */}
           <Route path="/Ekategori/:id" element={<Ekategori />} />

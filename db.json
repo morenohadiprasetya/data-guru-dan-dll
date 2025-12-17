@@ -29,6 +29,16 @@
       "kelas": "X TKJ",
       "nomorUnik": "Ngawi-0977",
       "level": "siswa"
+    },
+    {
+      "id": "8b9c",
+      "nama": "Moreno",
+      "ket": "",
+      "alamat": "Ngebrok",
+      "hp": "08xxxxxxxxx",
+      "kelas": "X TKJ",
+      "nomorUnik": "Ngebrok-0969",
+      "level": "siswa"
     }
   ],
   "guru": [
@@ -503,6 +513,17 @@
       "masuk": "2025-12-16T06:40:14.640Z",
       "pulang": "",
       "tanggal": "2025-12-16",
+      "keteranganIzin": ""
+    },
+    {
+      "id": "e257",
+      "nomorUnik": "Ngebrok-0969",
+      "nama": "Moreno",
+      "kelas": "X TKJ",
+      "kategori": "hadir",
+      "masuk": "2025-12-17T03:22:56.668Z",
+      "pulang": "",
+      "tanggal": "2025-12-17",
       "keteranganIzin": ""
     }
   ]

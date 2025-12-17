@@ -22,8 +22,19 @@ export default function Sidnav() {
     });
   };
 
-  const hideSidebarRoutes = ["/presensi", "/Rekappresensi"];
-if (hideSidebarRoutes.includes(location.pathname)) return null;
+ const hideSidebarRoutes = [
+  "/presensi",
+  "/Rekappresensi",
+  "/presensi/edit"
+];
+
+if (
+  hideSidebarRoutes.some((path) =>
+    location.pathname.startsWith(path)
+  )
+) {
+  return null;
+}
 
   const isActive = (path) =>
     location.pathname === path

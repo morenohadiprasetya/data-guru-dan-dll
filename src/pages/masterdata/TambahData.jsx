@@ -126,7 +126,7 @@ const api = `http://localhost:5000/${form.level.toLowerCase()}`;
             {/* Level */}
             <div>
               <label className="block text-sm font-semibold text-blue-700 mb-1">
-                Level
+                Pilih Kategori
               </label>
               <select
                 name="level"
