@@ -39,6 +39,16 @@
       "kelas": "X TKJ",
       "nomorUnik": "Ngebrok-0969",
       "level": "siswa"
+    },
+    {
+      "id": "9988",
+      "nama": "Andre Nugroho",
+      "ket": "",
+      "alamat": "Garoet",
+      "hp": "08xxxxxxx",
+      "kelas": "X TKJ",
+      "nomorUnik": "G-2010",
+      "level": "siswa"
     }
   ],
   "guru": [
@@ -82,6 +92,16 @@
       "hp": "08xxxxxxxxx",
       "kelas": "",
       "nomorUnik": "Ngawi-0001",
+      "level": "Karyawan"
+    },
+    {
+      "id": "fe3b",
+      "nama": "Jun Himeya",
+      "ket": "Dunamist Ke-2",
+      "alamat": "Japan",
+      "hp": "08xxxxxxx",
+      "kelas": "",
+      "nomorUnik": "Nexus-0001",
       "level": "Karyawan"
     }
   ],
@@ -524,6 +544,46 @@
       "masuk": "2025-12-17T03:22:56.668Z",
       "pulang": "",
       "tanggal": "2025-12-17",
+      "keteranganIzin": ""
+    },
+    {
+      "id": "2b74",
+      "nomorUnik": "Ngawi-0001",
+      "nama": "Ambatukamasssu",
+      "kelas": "Ngawinesia",
+      "kategori": "izin",
+      "masuk": "",
+      "pulang": "",
+      "tanggal": "2025-12-19",
+      "keteranganIzin": "Tawuran di Ngawi timoer Laoet barat"
+    },
+    {
+      "nama": "Pak rusdi",
+      "kelas": "Ngawinesia",
+      "kategori": "hadir",
+      "masuk": "2025-12-19T06:51",
+      "pulang": "2025-12-19T15:01",
+      "keteranganIzin": "",
+      "id": "b580"
+    },
+    {
+      "nama": "Andre Nugroho",
+      "kelas": "X TKJ",
+      "kategori": "terlambat",
+      "masuk": "2025-12-19T06:33",
+      "pulang": "",
+      "keteranganIzin": "",
+      "id": "4f01"
+    },
+    {
+      "id": "05b0",
+      "nomorUnik": "Nexus-0001",
+      "nama": "Jun Himeya",
+      "kelas": "Dunamist Ke-2",
+      "kategori": "terlambat",
+      "masuk": "2025-12-19T04:33:46.564Z",
+      "pulang": "",
+      "tanggal": "2025-12-19",
       "keteranganIzin": ""
     }
   ]
