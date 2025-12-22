@@ -22,11 +22,26 @@ function formatJam(val) {
   });
 }
 
+// CEK TERLAMBAT (> 06:50)
+function isTerlambat(val) {
+  if (!val) return false;
+
+  const masuk = new Date(val);
+  if (isNaN(masuk.getTime())) return false;
+
+  const batas = new Date(val);
+  batas.setHours(6, 50, 0, 0);
+
+  return masuk > batas;
+}
+
 /* ================= BADGE STATUS ================= */
 function BadgeStatus({ data }) {
-  let text = "-";
-  let color = "bg-gray-200 text-gray-700";
+  let text = "Hadir(Terlambat)";
+  let color = "bg-gray-300 text-gray-700";
   let clickable = false;
+
+  const terlambat = data.kategori === "hadir" && isTerlambat(data.masuk);
 
   if (data.kategori === "izin") {
     text = "Izin";
@@ -37,16 +52,21 @@ function BadgeStatus({ data }) {
     color = "bg-red-100 text-red-700";
     clickable = true;
   } else if (data.kategori === "hadir" && data.pulang) {
-    text = "Hadir (Pulang)";
-    color = "bg-green-100 text-green-700";
+    text = terlambat
+      ? "Hadir (Terlambat, Pulang)"
+      : "Hadir (Pulang)";
+    color = terlambat
+      ? "bg-orange-100 text-orange-700"
+      : "bg-green-100 text-green-700";
   } else if (data.kategori === "hadir") {
-    text = "Hadir";
-    color = "bg-blue-100 text-blue-700";
+    text = terlambat ? "Hadir (Terlambat)" : "Hadir";
+    color = terlambat
+      ? "bg-orange-100 text-orange-700"
+      : "bg-blue-100 text-blue-700";
   }
 
   const handleClick = () => {
     if (!clickable) return;
-
     Swal.fire({
       title: `Keterangan ${text}`,
       text: data.keteranganIzin || "-",
@@ -80,6 +100,17 @@ export default function RekapPresensi() {
   const [kategori, setKategori] = useState("all");
   const [cari, setCari] = useState("");
 
+  /* ===== TAMBAHAN JAM WIB (TANPA UBAH LOGIKA LAIN) ===== */
+  const [jamWIB, setJamWIB] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setJamWIB(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+  /* ==================================================== */
+
   useEffect(() => {
     ambilRekap();
   }, [tanggal, kategori]);
@@ -93,6 +124,10 @@ export default function RekapPresensi() {
       if (kategori !== "all") {
         data = data.filter((x) => {
           if (kategori === "pulang") return !!x.pulang;
+          if (kategori === "terlambat")
+            return x.kategori === "hadir" && isTerlambat(x.masuk);
+          if (kategori === "hadir")
+            return x.kategori === "hadir" && !isTerlambat(x.masuk);
           return x.kategori === kategori;
         });
       }
@@ -133,13 +168,35 @@ export default function RekapPresensi() {
   return (
     <div className="p-6 ml-10 min-h-screen bg-gradient-to-br from-blue-50 to-gray-100">
       {/* HEADER */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-blue-700">Rekap Presensi</h1>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <div>
+          <h1 className="text-3xl font-bold text-blue-700">
+            Rekap Presensi
+          </h1>
+          <p className="text-sm text-gray-600">
+            {jamWIB.toLocaleDateString("id-ID", {
+              weekday: "long",
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+            })}{" "}
+            —{" "}
+            <span className="font-semibold">
+              {jamWIB.toLocaleTimeString("id-ID", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              })}{" "}
+              WIB
+            </span>
+          </p>
+        </div>
+
         <button
           onClick={ambilRekap}
           className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow"
         >
-          <ArrowPathIcon className="w-5 rounded" /> Refresh
+          <ArrowPathIcon className="w-5" /> Refresh
         </button>
       </div>
 
@@ -158,7 +215,8 @@ export default function RekapPresensi() {
           onChange={(e) => setKategori(e.target.value)}
         >
           <option value="all">Semua Status</option>
-          <option value="hadir">Hadir</option>
+          <option value="hadir">Hadir (Tepat Waktu)</option>
+          <option value="terlambat">Hadir (Terlambat)</option>
           <option value="pulang">Pulang</option>
           <option value="izin">Izin</option>
           <option value="sakit">Sakit</option>
@@ -181,14 +239,13 @@ export default function RekapPresensi() {
           <thead className="bg-blue-600 text-white">
             <tr>
               <th className="p-3 text-left">Nama</th>
-              <th className="p-3 text-left">Kelas / Ket</th>
+              <th className="p-3 text-left">Kelas</th>
               <th className="p-3 text-center">Status</th>
               <th className="p-3 text-center">Masuk</th>
               <th className="p-3 text-center">Pulang</th>
               <th className="p-3 text-center">Aksi</th>
             </tr>
           </thead>
-
           <tbody>
             {loading ? (
               <tr>

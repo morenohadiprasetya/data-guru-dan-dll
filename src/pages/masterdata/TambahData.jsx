@@ -65,7 +65,7 @@ export default function TambahData() {
 
     try {
       setSaving(true);
-const api = `http://localhost:5000/${form.level.toLowerCase()}`;
+      const api = `http://localhost:5000/${form.level.toLowerCase()}`;
 
       await axios.post(api, form);
 

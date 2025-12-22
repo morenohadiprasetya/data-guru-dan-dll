@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
@@ -53,6 +53,17 @@ export default function Presensi() {
   const [loadingCari, setLoadingCari] = useState(false);
   const [loadingSimpan, setLoadingSimpan] = useState(false);
 
+  /* ===== JAM WIB REALTIME ===== */
+  const [jamWIB, setJamWIB] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setJamWIB(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+  /* ============================ */
+
   /* ================= CARI DATA ================= */
   const cariData = async () => {
     if (!kodeUnik.trim())
@@ -94,13 +105,6 @@ export default function Presensi() {
     if ((status === "izin" || status === "sakit") && !keteranganIzin.trim())
       return Swal.fire("Oops", "Keterangan wajib diisi", "warning");
 
-    if (status === "pulang" && !isAfterJamPulang())
-      return Swal.fire(
-        "Belum Waktunya",
-        "Presensi pulang hanya setelah jam 15:00",
-        "warning"
-      );
-
     try {
       setLoadingSimpan(true);
       const tanggal = new Date().toISOString().slice(0, 10);
@@ -112,32 +116,19 @@ export default function Presensi() {
       const existing =
         Array.isArray(cek.data) && cek.data.length ? cek.data[0] : null;
 
-      /* ===== BLOK PRESENSI ULANG ===== */
-      if (existing) {
-        if (status !== "pulang") {
-          return Swal.fire(
-            "Ditolak",
-            "Anda sudah melakukan presensi hari ini",
-            "error"
-          );
-        }
-
-        if (existing.pulang) {
-          return Swal.fire(
-            "Ditolak",
-            "Presensi hari ini sudah selesai",
-            "error"
-          );
-        }
+      if (existing && existing.pulang) {
+        return Swal.fire(
+          "Ditolak",
+          "Presensi hari ini sudah selesai",
+          "error"
+        );
       }
 
-      /* ===== KATEGORI HADIR / TERLAMBAT ===== */
       let kategoriFinal = status;
       if (status === "hadir" && isTerlambat()) {
         kategoriFinal = "terlambat";
       }
 
-      /* ===== SIMPAN ===== */
       if (!existing) {
         await axios.post(API.presensi, {
           nomorUnik: dataUser.nomorUnik,
@@ -169,7 +160,6 @@ export default function Presensi() {
         Swal.fire("Berhasil", "Presensi pulang dicatat", "success");
       }
 
-      /* ===== RESET ===== */
       setStatus("");
       setKodeUnik("");
       setDataUser(null);
@@ -191,7 +181,23 @@ export default function Presensi() {
           <h1 className="text-3xl font-bold text-blue-700">
             Presensi Kehadiran
           </h1>
-          <p className="text-gray-600 text-sm">
+          <p className="text-sm text-gray-600">
+            {jamWIB.toLocaleDateString("id-ID", {
+              weekday: "long",
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+            })}{" "}
+            —{" "}
+            <span className="font-semibold">
+              {jamWIB.toLocaleTimeString("id-ID", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              })} WIB
+            </span>
+          </p>
+          <p className="text-gray-500 text-xs">
             Siswa, Guru, dan Karyawan
           </p>
         </div>
@@ -251,7 +257,7 @@ export default function Presensi() {
             </div>
           )}
 
-          {/* KETERANGAN (MUNCUL SETELAH DATA DITEMUKAN) */}
+          {/* KETERANGAN */}
           {(status === "izin" || status === "sakit") && dataUser && (
             <div className="space-y-2">
               <label className="font-semibold">Keterangan</label>

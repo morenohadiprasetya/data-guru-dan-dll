@@ -48,7 +48,8 @@ export default function EditPresensi() {
 
   // ================= HANDLE INPUT =================
   function handleChange(e) {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
   }
 
   // ================= SIMPAN =================
@@ -57,6 +58,18 @@ export default function EditPresensi() {
 
     if (!form.nama || !form.kategori) {
       Swal.fire("Peringatan", "Nama dan kategori wajib diisi", "warning");
+      return;
+    }
+
+    if (
+      (form.kategori === "izin" || form.kategori === "sakit") &&
+      !form.keteranganIzin.trim()
+    ) {
+      Swal.fire(
+        "Peringatan",
+        "Keterangan wajib diisi untuk izin atau sakit",
+        "warning"
+      );
       return;
     }
 
@@ -71,8 +84,7 @@ export default function EditPresensi() {
 
   // ================= UI =================
   return (
-    <div className="p-6 max-w-3xl bg-gray-10 min-h-screen ml-90 rounded ">
-
+    <div className="p-6 max-w-3xl min-h-screen ml-90 rounded">
       <h1 className="text-2xl font-bold text-blue-700 mb-6">
         Edit Presensi
       </h1>
@@ -80,8 +92,11 @@ export default function EditPresensi() {
       {loading ? (
         <p>Loading...</p>
       ) : (
-        <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow space-y-4">
-
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white p-6 rounded shadow space-y-4"
+        >
+          {/* NAMA */}
           <div>
             <label className="block font-semibold mb-1">Nama</label>
             <input
@@ -93,6 +108,7 @@ export default function EditPresensi() {
             />
           </div>
 
+          {/* KELAS */}
           <div>
             <label className="block font-semibold mb-1">Kelas</label>
             <input
@@ -103,6 +119,7 @@ export default function EditPresensi() {
             />
           </div>
 
+          {/* KATEGORI */}
           <div>
             <label className="block font-semibold mb-1">Kategori</label>
             <select
@@ -117,19 +134,24 @@ export default function EditPresensi() {
             </select>
           </div>
 
-          {form.kategori === "izin" && (
+          {/* KETERANGAN */}
+          {(form.kategori === "izin" || form.kategori === "sakit") && (
             <div>
-              <label className="block font-semibold mb-1">Keterangan Izin</label>
+              <label className="block font-semibold mb-1">
+                Keterangan {form.kategori === "izin" ? "Izin" : "Sakit"}
+              </label>
               <textarea
                 name="keteranganIzin"
                 value={form.keteranganIzin}
                 onChange={handleChange}
                 className="border p-2 rounded w-full"
                 rows="3"
+                required
               />
             </div>
           )}
 
+          {/* JAM */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block font-semibold mb-1">Jam Masuk</label>
@@ -154,6 +176,7 @@ export default function EditPresensi() {
             </div>
           </div>
 
+          {/* BUTTON */}
           <div className="flex gap-3 justify-end pt-4">
             <button
               type="button"
@@ -170,7 +193,6 @@ export default function EditPresensi() {
               Simpan Perubahan
             </button>
           </div>
-
         </form>
       )}
     </div>
