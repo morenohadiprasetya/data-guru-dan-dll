@@ -1,16 +1,6 @@
 {
   "siswa": [
     {
-      "id": "1974",
-      "nama": "sfsffw",
-      "ket": "",
-      "alamat": "asdasdw",
-      "hp": "08xxxxx",
-      "kelas": "XII DPB",
-      "nomorUnik": "12345",
-      "level": "siswa"
-    },
-    {
       "id": "2fdd",
       "nama": "ries",
       "ket": "",
@@ -49,6 +39,16 @@
       "kelas": "XII DPB",
       "nomorUnik": "92831",
       "level": "siswa"
+    },
+    {
+      "id": "5d04",
+      "nama": "Roihan",
+      "ket": "",
+      "alamat": "SMG",
+      "hp": "12345678",
+      "kelas": "X TKJ",
+      "nomorUnik": "2589287447",
+      "level": "siswa"
     }
   ],
   "guru": [
@@ -60,6 +60,16 @@
       "hp": "08xxxxxx",
       "kelas": "",
       "nomorUnik": "0198",
+      "level": "guru"
+    },
+    {
+      "id": "a99a",
+      "nama": "Ambatukam",
+      "ket": "IPA",
+      "alamat": "Ngawi",
+      "hp": "08xxxxxxx",
+      "kelas": "",
+      "nomorUnik": "0969777",
       "level": "guru"
     }
   ],
@@ -87,43 +97,40 @@
     {
       "id": "d775",
       "nama": "siswa"
+    },
+    {
+      "id": "167f",
+      "nama": "Satpam"
     }
   ],
   "kategoriTagihan": [
     {
       "id": "1763347287243",
-      "nama": "Andre (garut)",
-      "tipe": " Bulanan",
-      "deskripsi": "membayar spp",
+      "nama": " uang gedung",
+      "tipe": "Harian(langsung)",
+      "deskripsi": "Masukkan teks",
       "kelas": "XII"
     },
     {
       "id": "1763350686707",
-      "nama": "Ambatukam(ngawi)",
+      "nama": "Spp",
       "tipe": "Bulanan",
-      "deskripsi": "Bayar spp",
+      "deskripsi": "Bayar spp Setiap 1 bulan",
       "kelas": "X"
     },
     {
-      "id": "1763350748642",
-      "nama": "Moreno (Semarang)",
-      "tipe": "VIP",
-      "deskripsi": "VIP",
-      "kelas": "X-XII"
+      "id": "1766459613893",
+      "nama": "Lain Lain",
+      "tipe": "Bebas",
+      "deskripsi": "Kebutuhan Siswa",
+      "kelas": ""
     },
     {
-      "id": "1763350789969",
-      "nama": "Ayyas(krapyak)",
-      "tipe": "Bulanan",
-      "deskripsi": "Uang gedung",
-      "kelas": "X"
-    },
-    {
-      "id": "1763350822985",
-      "nama": "Nugraha Fadhil Mahardika",
-      "tipe": "BPJS",
-      "deskripsi": "rak niat sekolah",
-      "kelas": "X"
+      "id": "1766460470237",
+      "nama": "Outing Class",
+      "tipe": "Bebas",
+      "deskripsi": "Biaya Outing CLass",
+      "kelas": "-"
     }
   ],
   "tagihan": [
@@ -161,6 +168,30 @@
       "status": "Lunas",
       "terbayar": "100000",
       "sisa": 0
+    },
+    {
+      "id": "1766459661838",
+      "siswaId": "2fdd",
+      "nama": "ries",
+      "kelas": "X TKJ",
+      "kategori": "Lain-lain",
+      "bulan": "januari 1945",
+      "jumlah": "1000000",
+      "status": "Belum Lunas",
+      "terbayar": 0,
+      "sisa": 1000000
+    },
+    {
+      "id": "1766460533605",
+      "siswaId": "5d04",
+      "nama": "Roihan",
+      "kelas": "X TKJ",
+      "kategori": "SPP",
+      "bulan": "Januari",
+      "jumlah": "600000",
+      "status": "Lunas",
+      "terbayar": "600000",
+      "sisa": 0
     }
   ],
   "pembayaran": [
@@ -188,12 +219,6 @@
     }
   ],
   "kelas": [
-    {
-      "id": "7722",
-      "namaKelas": "X TKJ",
-      "tingkat": "X",
-      "jurusan": "TKJ"
-    },
     {
       "id": "f0a3",
       "namaKelas": "XI TKJ",
@@ -259,6 +284,12 @@
       "namaKelas": "XII DPB",
       "tingkat": "XII",
       "jurusan": "DPB"
+    },
+    {
+      "id": "b52b",
+      "namaKelas": "X TKJ",
+      "tingkat": "X",
+      "jurusan": "TKJ"
     }
   ],
   "level": [
@@ -289,7 +320,7 @@
     },
     {
       "id": "ba2b",
-      "nomorUnik": "200510",
+      "kodeUnik": "200510",
       "nama": "Andre Nugroho",
       "kelas": "X TSM",
       "kategori": "izin",
@@ -300,7 +331,7 @@
     },
     {
       "id": "b365",
-      "nomorUnik": "0198",
+      "kodeUnik": "0198",
       "nama": "Pak Amba De Thukam",
       "kelas": "Ngawiformatika",
       "kategori": "terlambat",
@@ -311,7 +342,7 @@
     },
     {
       "id": "7c91",
-      "nomorUnik": "92831",
+      "kodeUnik": "92831",
       "nama": "jbjdhjsvw",
       "kelas": "XII DPB",
       "kategori": "terlambat",
@@ -332,26 +363,27 @@
       "keteranganIzin": ""
     },
     {
-      "id": "638b",
-      "nomorUnik": "260510",
-      "nama": "Moreno",
-      "kelas": "XII DPB",
+      "nama": "Ambatukam",
+      "kelas": "IPA",
       "kategori": "terlambat",
-      "masuk": "2025-12-23T00:48:07.747Z",
+      "masuk": "2025-12-23T05:53",
       "pulang": "",
-      "tanggal": "2025-12-23",
-      "keteranganIzin": ""
+      "keteranganIzin": "",
+      "id": "b6c7"
     },
     {
-      "id": "8eb6",
-      "nomorUnik": "200510",
-      "nama": "Andre Nugroho",
-      "kelas": "X TSM",
-      "kategori": "izin",
+      "id": "7367",
+      "nomorUnik": "08123",
+      "nama": "Jun Himeya",
+      "kategoriUser": "karyawan",
+      "kelas": "Deunamist ke-2",
+      "alamat": "japan",
+      "hp": "08xxxxxxx",
+      "tanggal": "2025-12-23",
+      "kategori": "sakit",
       "masuk": "",
       "pulang": "",
-      "tanggal": "2025-12-23",
-      "keteranganIzin": "Tawuran"
+      "keterangan": "Dikentot agung"
     }
   ]
 }

@@ -17,7 +17,7 @@ export default function EditKelas() {
   });
 
   const tingkatList = ["X", "XI", "XII"];
-  const jurusanList = ["TKJ", "TSM", "Akutansi", "Multimedia", "RPL"];
+  const jurusanList = ["TKJ", "TSM", "Akutansi", "DPB", ];
 
   // FETCH DATA KELAS BERDASARKAN ID
   useEffect(() => {

@@ -61,7 +61,7 @@ if (
           {/* DASHBOARD */}
           <Link
             to="/dashboard"
-            className={`flex items-center gap-3 px-4 py-2 rounded-lg ${isActive("/dashboard")}`}
+            className={`flex items-center gap-3 px-4 py-2 text-white rounded-lg ${isActive("/dashboard")}`}
           >
             <i className="ri-dashboard-2-line text-xl"></i>
             Dashboard

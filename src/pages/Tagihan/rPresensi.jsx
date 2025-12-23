@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import {
@@ -6,148 +6,187 @@ import {
   MagnifyingGlassIcon,
   PencilSquareIcon,
   TrashIcon,
+  InformationCircleIcon,
 } from "@heroicons/react/24/solid";
 import { useNavigate } from "react-router-dom";
 
+/* =========================================================
+   API
+========================================================= */
 const API_PRESENSI = "http://localhost:5000/presensi";
 
-/* ================= HELPER ================= */
-function formatJam(val) {
+/* =========================================================
+   HELPER WIB
+========================================================= */
+const getWIBDate = () =>
+  new Date(
+    new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" })
+  );
+
+const formatJam = (val) => {
   if (!val) return "-";
   const d = new Date(val);
   if (isNaN(d.getTime())) return "-";
-  return d.toLocaleTimeString("id-ID", {
-    hour: "2-digit",
-    minute: "2-digit",
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  return `${hh}:${mm}`;
+};
+
+const formatTanggal = (val) => {
+  if (!val) return "-";
+  const d = new Date(val);
+  return d.toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
   });
-}
+};
 
-// CEK TERLAMBAT (> 06:50)
-function isTerlambat(val) {
-  if (!val) return false;
-
-  const masuk = new Date(val);
-  if (isNaN(masuk.getTime())) return false;
-
-  const batas = new Date(val);
-  batas.setHours(6, 50, 0, 0);
-
-  return masuk > batas;
-}
-
-/* ================= BADGE STATUS ================= */
-function BadgeStatus({ data }) {
+/* =========================================================
+   BADGE STATUS (SESUAI PRESENSI)
+========================================================= */
+function BadgeStatus({ row }) {
   let text = "-";
-  let color = "bg-gray-300 text-gray-700";
-  let clickable = false;
+  let color = "bg-gray-200 text-gray-700";
+  let showInfo = false;
 
-  const terlambat =
-    data.kategori === "hadir" && isTerlambat(data.masuk);
+  switch (row.kategori) {
+    case "hadir":
+      text = row.pulang ? "Hadir (Pulang)" : "Hadir";
+      color = "bg-blue-100 text-blue-700";
+      break;
 
-  if (data.kategori === "izin") {
-    text = "Izin";
-    color = "bg-yellow-100 text-yellow-700";
-    clickable = true;
-  } else if (data.kategori === "sakit") {
-    text = "Sakit";
-    color = "bg-red-100 text-red-700";
-    clickable = true;
-  } else if (data.kategori === "hadir" && data.pulang) {
-    text = terlambat
-      ? "Hadir (Terlambat, Pulang)"
-      : "Hadir (Pulang)";
-    color = terlambat
-      ? "bg-orange-100 text-orange-700"
-      : "bg-green-100 text-green-700";
-  } else if (data.kategori === "hadir") {
-    text = terlambat ? "Hadir (Terlambat)" : "Hadir";
-    color = terlambat
-      ? "bg-orange-100 text-orange-700"
-      : "bg-blue-100 text-blue-700";
+    case "terlambat":
+      text = row.pulang
+        ? "Hadir (Terlambat, Pulang)"
+        : "Hadir (Terlambat)";
+      color = "bg-orange-100 text-orange-700";
+      break;
+
+    case "izin":
+      text = "Izin";
+      color = "bg-yellow-100 text-yellow-700";
+      showInfo = true;
+      break;
+
+    case "sakit":
+      text = "Sakit";
+      color = "bg-red-100 text-red-700";
+      showInfo = true;
+      break;
+
+    default:
+      text = row.kategori || "-";
   }
 
-  const handleClick = () => {
-    if (!clickable) return;
+  const showKeterangan = () => {
     Swal.fire({
       title: `Keterangan ${text}`,
-      text: data.keteranganIzin || "-",
+      text: row.keterangan || "-",
       icon: "info",
       confirmButtonText: "Tutup",
     });
   };
 
   return (
-    <span
-      onClick={handleClick}
-      className={`px-3 py-1 rounded-full text-xs font-semibold
-        ${color}
-        ${clickable ? "cursor-pointer hover:opacity-80" : ""}
-      `}
-    >
-      {text}
-    </span>
+    <div className="flex items-center justify-center gap-1">
+      <span
+        className={`px-3 py-1 rounded-full text-xs font-semibold ${color}`}
+      >
+        {text}
+      </span>
+
+      {showInfo && (
+        <button
+          onClick={showKeterangan}
+          title="Lihat keterangan"
+          className="ml-1"
+        >
+          <InformationCircleIcon className="w-4 h-4 text-gray-500 hover:text-blue-600" />
+        </button>
+      )}
+    </div>
   );
 }
 
-/* ================= COMPONENT ================= */
-export default function RekapPresensi() {
+/* =========================================================
+   MAIN COMPONENT
+========================================================= */
+export default function RekapPresensiLengkap() {
   const navigate = useNavigate();
 
-  const [rekap, setRekap] = useState([]);
-  const [loading, setLoading] = useState(false);
+  /* ================= STATE ================= */
+  const [data, setData] = useState([]);
   const [tanggal, setTanggal] = useState(
     new Date().toISOString().slice(0, 10)
   );
   const [kategori, setKategori] = useState("all");
-  const [cari, setCari] = useState("");
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  /* ===== JAM WIB REALTIME ===== */
-  const [jamWIB, setJamWIB] = useState(new Date());
+  /* ================= JAM WIB ================= */
+  const [jamWIB, setJamWIB] = useState(getWIBDate());
   useEffect(() => {
-    const timer = setInterval(() => setJamWIB(new Date()), 1000);
-    return () => clearInterval(timer);
+    const t = setInterval(() => setJamWIB(getWIBDate()), 1000);
+    return () => clearInterval(t);
   }, []);
 
   useEffect(() => {
-    ambilRekap();
+    fetchData();
   }, [tanggal, kategori]);
 
-  /* ================= AMBIL DATA ================= */
-  async function ambilRekap() {
-    setLoading(true);
+  /* =========================================================
+     FETCH DATA
+  ========================================================= */
+  const fetchData = async () => {
     try {
-      const r = await axios.get(API_PRESENSI, {
+      setLoading(true);
+
+      const res = await axios.get(API_PRESENSI, {
         params: { tanggal },
       });
 
-      let data = Array.isArray(r.data) ? r.data : [];
+      let rows = Array.isArray(res.data) ? res.data : [];
 
-      // FILTER STATUS (HADIR = termasuk TERLAMBAT)
+      // FILTER STATUS
       if (kategori !== "all") {
-        data = data.filter((x) => {
-          if (kategori === "hadir")
-            return x.kategori === "hadir";
-          if (kategori === "pulang") return !!x.pulang;
-          return x.kategori === kategori;
-        });
+        if (kategori === "hadir") {
+          rows = rows.filter(
+            (r) =>
+              r.kategori === "hadir" || r.kategori === "terlambat"
+          );
+        } else if (kategori === "pulang") {
+          rows = rows.filter((r) => r.pulang);
+        } else {
+          rows = rows.filter((r) => r.kategori === kategori);
+        }
       }
 
-      setRekap(data);
+      // SORT TERLAMBAT DI ATAS
+      rows.sort((a, b) => {
+        if (a.kategori === "terlambat") return -1;
+        if (b.kategori === "terlambat") return 1;
+        return 0;
+      });
+
+      setData(rows);
     } catch {
       Swal.fire("Error", "Gagal memuat data presensi", "error");
     } finally {
       setLoading(false);
     }
-  }
+  };
 
-  /* ================= HAPUS DATA ================= */
-  async function handleHapus(id) {
+  /* =========================================================
+     DELETE
+  ========================================================= */
+  const hapusData = async (id) => {
     const confirm = await Swal.fire({
-      title: "Hapus data?",
-      text: "Data presensi ini akan dihapus permanen",
+      title: "Hapus Presensi?",
+      text: "Data ini akan dihapus permanen",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Ya, hapus",
+      confirmButtonText: "Hapus",
       cancelButtonText: "Batal",
     });
 
@@ -155,23 +194,29 @@ export default function RekapPresensi() {
 
     try {
       await axios.delete(`${API_PRESENSI}/${id}`);
-      Swal.fire("Berhasil", "Data berhasil dihapus", "success");
-      ambilRekap();
+      Swal.fire("Sukses", "Data berhasil dihapus", "success");
+      fetchData();
     } catch {
       Swal.fire("Error", "Gagal menghapus data", "error");
     }
-  }
+  };
 
-  /* ================= SEARCH ================= */
-  const dataFiltered = rekap.filter((x) =>
-    x.nama?.toLowerCase().includes(cari.toLowerCase())
-  );
+  /* =========================================================
+     SEARCH
+  ========================================================= */
+  const filtered = useMemo(() => {
+    return data.filter((r) =>
+      r.nama?.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [data, search]);
 
-  /* ================= UI ================= */
+  /* =========================================================
+     UI
+  ========================================================= */
   return (
     <div className="p-6 ml-10 min-h-screen bg-gradient-to-br from-blue-50 to-gray-100">
       {/* HEADER */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+      <div className="flex flex-col md:flex-row justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold text-blue-700">
             Rekap Presensi
@@ -183,33 +228,25 @@ export default function RekapPresensi() {
               month: "long",
               year: "numeric",
             })}{" "}
-            —{" "}
-            <span className="font-semibold">
-              {jamWIB.toLocaleTimeString("id-ID", {
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-              })}{" "}
-              WIB
-            </span>
+            — <b>{jamWIB.toLocaleTimeString("id-ID")} WIB</b>
           </p>
         </div>
 
         <button
-          onClick={ambilRekap}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow"
+          onClick={fetchData}
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
         >
           <ArrowPathIcon className="w-5" /> Refresh
         </button>
       </div>
 
       {/* FILTER */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-4 rounded-xl shadow mb-6">
+      <div className="grid md:grid-cols-3 gap-4 bg-white p-4 rounded-xl shadow mb-6">
         <input
           type="date"
-          className="border rounded-lg p-2"
           value={tanggal}
           onChange={(e) => setTanggal(e.target.value)}
+          className="border rounded-lg p-2"
         />
 
         <select
@@ -217,8 +254,9 @@ export default function RekapPresensi() {
           value={kategori}
           onChange={(e) => setKategori(e.target.value)}
         >
-          <option value="all">Semua Status</option>
+          <option value="all">Semua</option>
           <option value="hadir">Hadir</option>
+          <option value="terlambat">Terlambat</option>
           <option value="pulang">Pulang</option>
           <option value="izin">Izin</option>
           <option value="sakit">Sakit</option>
@@ -227,65 +265,71 @@ export default function RekapPresensi() {
         <div className="relative">
           <MagnifyingGlassIcon className="w-5 absolute left-3 top-3 text-gray-400" />
           <input
-            className="border rounded-lg p-2 pl-10 w-full"
             placeholder="Cari nama..."
-            value={cari}
-            onChange={(e) => setCari(e.target.value)}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="border rounded-lg p-2 pl-10 w-full"
           />
         </div>
       </div>
 
-      {/* TABEL */}
+      {/* TABLE */}
       <div className="bg-white rounded-xl shadow overflow-x-auto">
         <table className="min-w-full text-sm">
           <thead className="bg-blue-600 text-white">
             <tr>
               <th className="p-3 text-left">Nama</th>
-              <th className="p-3 text-left">Kelas</th>
-              <th className="p-3 text-center">Status</th>
+              <th className="p-3 text-center">Kategori</th>
               <th className="p-3 text-center">Masuk</th>
               <th className="p-3 text-center">Pulang</th>
               <th className="p-3 text-center">Aksi</th>
             </tr>
           </thead>
+
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan="6" className="p-6 text-center">
+                <td colSpan="5" className="p-6 text-center">
                   Loading...
                 </td>
               </tr>
-            ) : dataFiltered.length === 0 ? (
+            ) : filtered.length === 0 ? (
               <tr>
-                <td colSpan="6" className="p-6 text-center text-gray-500">
+                <td colSpan="5" className="p-6 text-center text-gray-500">
                   Data tidak ditemukan
                 </td>
               </tr>
             ) : (
-              dataFiltered.map((x) => (
-                <tr key={x.id} className="border-b hover:bg-blue-50">
-                  <td className="p-3 font-medium">{x.nama}</td>
-                  <td className="p-3">{x.kelas || "-"}</td>
+              filtered.map((r) => (
+                <tr
+                  key={r.id}
+                  className={`border-b hover:bg-blue-50 ${
+                    r.kategori === "terlambat"
+                      ? "bg-orange-50"
+                      : ""
+                  }`}
+                >
+                  <td className="p-3 font-medium">{r.nama}</td>
                   <td className="p-3 text-center">
-                    <BadgeStatus data={x} />
+                    <BadgeStatus row={r} />
                   </td>
                   <td className="p-3 text-center">
-                    {formatJam(x.masuk)}
+                    {formatJam(r.masuk)}
                   </td>
                   <td className="p-3 text-center">
-                    {formatJam(x.pulang)}
+                    {formatJam(r.pulang)}
                   </td>
                   <td className="p-3 flex justify-center gap-2">
                     <button
                       onClick={() =>
-                        navigate(`/presensi/edit/${x.id}`)
+                        navigate(`/presensi/edit/${r.id}`)
                       }
                       className="bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded"
                     >
                       <PencilSquareIcon className="w-4" />
                     </button>
                     <button
-                      onClick={() => handleHapus(x.id)}
+                      onClick={() => hapusData(r.id)}
                       className="bg-red-600 hover:bg-red-700 text-white p-2 rounded"
                     >
                       <TrashIcon className="w-4" />

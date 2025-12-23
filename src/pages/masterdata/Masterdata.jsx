@@ -25,7 +25,9 @@ export default function Masterdata() {
     level: "http://localhost:5000/level",
   };
 
-  // Fetch Data
+  // =========================
+  // FETCH DATA
+  // =========================
   const fetchData = async () => {
     try {
       const res = await axios.get(API[kategori]);
@@ -39,7 +41,9 @@ export default function Masterdata() {
     fetchData();
   }, [kategori]);
 
-  // Filter search (termasuk nomorUnik)
+  // =========================
+  // FILTER SEARCH
+  // =========================
   const filteredData = data.filter((item) => {
     const q = search.toLowerCase();
     return (
@@ -51,6 +55,9 @@ export default function Masterdata() {
     );
   });
 
+  // =========================
+  // DELETE DATA
+  // =========================
   const handleDelete = (id) => {
     Swal.fire({
       title: "Yakin ingin menghapus?",
@@ -77,10 +84,13 @@ export default function Masterdata() {
 
   return (
     <div className="ml-55 mr-10 p-6">
-      {/* HEADER + ICON */}
+      {/* ================= HEADER ================= */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <FontAwesomeIcon icon={faFolderOpen} className="text-yellow-600 text-3xl" />
+          <FontAwesomeIcon
+            icon={faFolderOpen}
+            className="text-yellow-600 text-3xl"
+          />
           <h1 className="text-3xl font-semibold">Master Data</h1>
         </div>
 
@@ -95,7 +105,6 @@ export default function Masterdata() {
             <option value="karyawan">Karyawan</option>
           </select>
 
-          {/* Button Tambah */}
           <button
             onClick={() => navigate(`/tambahdata?kategori=${kategori}`)}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded shadow"
@@ -105,7 +114,7 @@ export default function Masterdata() {
         </div>
       </div>
 
-      {/* SEARCH BAR */}
+      {/* ================= SEARCH ================= */}
       <div className="mb-4">
         <input
           className="w-96 p-3 rounded-xl bg-gray-100 border shadow-sm"
@@ -115,35 +124,48 @@ export default function Masterdata() {
         />
       </div>
 
-      {/* CARD WRAPPER */}
-      <div className="bg-white rounded-xl shadow-lg p-0 overflow-hidden border border-gray-200">
+      {/* ================= TABLE ================= */}
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
         {/* TABLE HEADER */}
-        <div className="w-full bg-blue-600 text-white font-semibold p-3 grid grid-cols-7">
+        <div className="w-full bg-blue-600 text-white font-semibold p-3 grid grid-cols-8">
+          <div className="text-center">No</div>
           <div>Nama</div>
           <div>Keterangan</div>
           <div>Alamat</div>
           <div>HP</div>
           <div>Nomor Unik</div>
-          <div className="text-center">Aksi</div>
+          <div className="text-center col-span-2">Aksi</div>
         </div>
 
-        {/* TABLE ROWS */}
+        {/* TABLE BODY */}
         <div>
-          {filteredData.map((x) => (
+          {filteredData.length === 0 && (
+            <div className="p-5 text-center text-gray-500">
+              Data tidak ditemukan
+            </div>
+          )}
+
+          {filteredData.map((x, index) => (
             <div
               key={x.id}
-              className="grid grid-cols-7 border-t p-3 items-center hover:bg-gray-50"
+              className="grid grid-cols-8 border-t p-3 items-center hover:bg-gray-50"
             >
+              {/* NOMOR */}
+              <div className="text-center font-semibold text-gray-600">
+                {index + 1}
+              </div>
+
               <div className="font-medium text-blue-700">{x.nama}</div>
               <div>{x.ket || x.kelas || "-"}</div>
-              <div>{x.alamat}</div>
-              <div>{x.hp}</div>
+              <div>{x.alamat || "-"}</div>
+              <div>{x.hp || "-"}</div>
+
               <div className="font-semibold text-green-700">
                 {x.nomorUnik || "-"}
               </div>
 
-              {/* Aksi */}
-              <div className="flex gap-2 justify-center">
+              {/* AKSI */}
+              <div className="flex gap-2 justify-center col-span-2">
                 <button
                   onClick={() => handleEdit(x.id)}
                   className="flex items-center gap-2 bg-yellow-400 text-white px-4 py-2 rounded shadow hover:bg-yellow-500"
@@ -163,7 +185,6 @@ export default function Masterdata() {
             </div>
           ))}
         </div>
-
       </div>
     </div>
   );

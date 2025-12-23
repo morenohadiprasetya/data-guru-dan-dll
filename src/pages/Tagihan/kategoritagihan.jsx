@@ -147,7 +147,7 @@ export default function KategoriTagihan() {
                     onClick={() => toggleSort("nama")}
                     className="p-3 cursor-pointer"
                   >
-                    Nama
+                    Nama kategori
                   </th>
                   <th
                     onClick={() => toggleSort("tipe")}
@@ -155,8 +155,8 @@ export default function KategoriTagihan() {
                   >
                     Tipe {sortBy === "tipe" ? (order === "asc" ? "⬆" : "⬇") : ""}
                   </th>
-                  <th className="p-3">Deskripsi</th>
-                  <th className="p-3">Kelas</th>
+                  <th className="p-3">Keterangan</th>
+                 
                   <th className="p-3 text-center">Aksi</th>
                 </tr>
               </thead>
@@ -168,7 +168,7 @@ export default function KategoriTagihan() {
                     <td className="p-3 font-semibold text-blue-700">{x.nama}</td>
                     <td className="p-3">{x.tipe}</td>
                     <td className="p-3">{x.deskripsi}</td>
-                    <td className="p-3">{x.kelas}</td>
+                
 
                     <td className="p-3 text-center">
                       <div className="inline-flex gap-2">
