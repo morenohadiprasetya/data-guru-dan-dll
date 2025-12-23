@@ -65,23 +65,13 @@
   ],
   "karyawan": [
     {
-      "id": "6f6c",
-      "nama": "Ambatukamasssu",
-      "ket": "Ngawinesia",
-      "alamat": "Ngawi Timoer",
-      "hp": "08xxxxxxxxx",
-      "kelas": "",
-      "nomorUnik": "Ngawi-0001",
-      "level": "Karyawan"
-    },
-    {
-      "id": "fe3b",
+      "id": "bae4",
       "nama": "Jun Himeya",
-      "ket": "Dunamist Ke-2",
-      "alamat": "Japan",
+      "ket": "Deunamist ke-2",
+      "alamat": "japan",
       "hp": "08xxxxxxx",
       "kelas": "",
-      "nomorUnik": "Nexus-0001",
+      "nomorUnik": "08123",
       "level": "Karyawan"
     }
   ],
@@ -329,6 +319,39 @@
       "pulang": "",
       "tanggal": "2025-12-22",
       "keteranganIzin": ""
+    },
+    {
+      "id": "669e",
+      "nomorUnik": "12345",
+      "nama": "sfsffw",
+      "kelas": "XII DPB",
+      "kategori": "hadir",
+      "masuk": "2025-12-22T23:41:04.693Z",
+      "pulang": "",
+      "tanggal": "2025-12-22",
+      "keteranganIzin": ""
+    },
+    {
+      "id": "638b",
+      "nomorUnik": "260510",
+      "nama": "Moreno",
+      "kelas": "XII DPB",
+      "kategori": "terlambat",
+      "masuk": "2025-12-23T00:48:07.747Z",
+      "pulang": "",
+      "tanggal": "2025-12-23",
+      "keteranganIzin": ""
+    },
+    {
+      "id": "8eb6",
+      "nomorUnik": "200510",
+      "nama": "Andre Nugroho",
+      "kelas": "X TSM",
+      "kategori": "izin",
+      "masuk": "",
+      "pulang": "",
+      "tanggal": "2025-12-23",
+      "keteranganIzin": "Tawuran"
     }
   ]
 }

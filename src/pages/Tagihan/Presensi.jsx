@@ -30,13 +30,11 @@ const API = {
 /* ================= HELPER ================= */
 const nowISO = () => new Date().toISOString();
 
-// pulang ≥ 15:00
 const isAfterJamPulang = () => {
   const d = new Date();
   return d.getHours() > 15 || (d.getHours() === 15 && d.getMinutes() >= 0);
 };
 
-// terlambat > 06:50
 const isTerlambat = () => {
   const d = new Date();
   return d.getHours() > 6 || (d.getHours() === 6 && d.getMinutes() > 50);
@@ -57,12 +55,9 @@ export default function Presensi() {
   const [jamWIB, setJamWIB] = useState(new Date());
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setJamWIB(new Date());
-    }, 1000);
+    const timer = setInterval(() => setJamWIB(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
-  /* ============================ */
 
   /* ================= CARI DATA ================= */
   const cariData = async () => {
@@ -116,6 +111,7 @@ export default function Presensi() {
       const existing =
         Array.isArray(cek.data) && cek.data.length ? cek.data[0] : null;
 
+      /* ===== KUNCI PRESENSI (TAMBAHAN) ===== */
       if (existing && existing.pulang) {
         return Swal.fire(
           "Ditolak",
@@ -123,6 +119,15 @@ export default function Presensi() {
           "error"
         );
       }
+
+      if (existing && status !== "pulang") {
+        return Swal.fire(
+          "Ditolak",
+          "Anda sudah presensi hari ini",
+          "warning"
+        );
+      }
+      /* =================================== */
 
       let kategoriFinal = status;
       if (status === "hadir" && isTerlambat()) {
@@ -231,13 +236,13 @@ export default function Presensi() {
           {/* KODE UNIK */}
           {status && (
             <div className="space-y-3">
-              <label className="font-semibold">Kode Unik</label>
+              <label className="font-semibold">Nomor Unik</label>
               <div className="flex flex-wrap gap-3">
                 <CFormInput
                   className="max-w-sm"
                   value={kodeUnik}
                   onChange={(e) => setKodeUnik(e.target.value)}
-                  placeholder="Masukkan kode unik"
+                  placeholder="Masukkan nomor unik"
                 />
                 <CButton
                   color="primary"

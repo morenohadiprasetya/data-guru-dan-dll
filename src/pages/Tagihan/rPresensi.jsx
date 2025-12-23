@@ -37,11 +37,12 @@ function isTerlambat(val) {
 
 /* ================= BADGE STATUS ================= */
 function BadgeStatus({ data }) {
-  let text = "Hadir(Terlambat)";
+  let text = "-";
   let color = "bg-gray-300 text-gray-700";
   let clickable = false;
 
-  const terlambat = data.kategori === "hadir" && isTerlambat(data.masuk);
+  const terlambat =
+    data.kategori === "hadir" && isTerlambat(data.masuk);
 
   if (data.kategori === "izin") {
     text = "Izin";
@@ -100,34 +101,33 @@ export default function RekapPresensi() {
   const [kategori, setKategori] = useState("all");
   const [cari, setCari] = useState("");
 
-  /* ===== TAMBAHAN JAM WIB (TANPA UBAH LOGIKA LAIN) ===== */
+  /* ===== JAM WIB REALTIME ===== */
   const [jamWIB, setJamWIB] = useState(new Date());
-
   useEffect(() => {
-    const timer = setInterval(() => {
-      setJamWIB(new Date());
-    }, 1000);
+    const timer = setInterval(() => setJamWIB(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
-  /* ==================================================== */
 
   useEffect(() => {
     ambilRekap();
   }, [tanggal, kategori]);
 
+  /* ================= AMBIL DATA ================= */
   async function ambilRekap() {
     setLoading(true);
     try {
-      const r = await axios.get(API_PRESENSI, { params: { tanggal } });
+      const r = await axios.get(API_PRESENSI, {
+        params: { tanggal },
+      });
+
       let data = Array.isArray(r.data) ? r.data : [];
 
+      // FILTER STATUS (HADIR = termasuk TERLAMBAT)
       if (kategori !== "all") {
         data = data.filter((x) => {
-          if (kategori === "pulang") return !!x.pulang;
-          if (kategori === "terlambat")
-            return x.kategori === "hadir" && isTerlambat(x.masuk);
           if (kategori === "hadir")
-            return x.kategori === "hadir" && !isTerlambat(x.masuk);
+            return x.kategori === "hadir";
+          if (kategori === "pulang") return !!x.pulang;
           return x.kategori === kategori;
         });
       }
@@ -140,6 +140,7 @@ export default function RekapPresensi() {
     }
   }
 
+  /* ================= HAPUS DATA ================= */
   async function handleHapus(id) {
     const confirm = await Swal.fire({
       title: "Hapus data?",
@@ -161,10 +162,12 @@ export default function RekapPresensi() {
     }
   }
 
+  /* ================= SEARCH ================= */
   const dataFiltered = rekap.filter((x) =>
     x.nama?.toLowerCase().includes(cari.toLowerCase())
   );
 
+  /* ================= UI ================= */
   return (
     <div className="p-6 ml-10 min-h-screen bg-gradient-to-br from-blue-50 to-gray-100">
       {/* HEADER */}
@@ -215,8 +218,7 @@ export default function RekapPresensi() {
           onChange={(e) => setKategori(e.target.value)}
         >
           <option value="all">Semua Status</option>
-          <option value="hadir">Hadir (Tepat Waktu)</option>
-          <option value="terlambat">Hadir (Terlambat)</option>
+          <option value="hadir">Hadir</option>
           <option value="pulang">Pulang</option>
           <option value="izin">Izin</option>
           <option value="sakit">Sakit</option>
@@ -267,11 +269,17 @@ export default function RekapPresensi() {
                   <td className="p-3 text-center">
                     <BadgeStatus data={x} />
                   </td>
-                  <td className="p-3 text-center">{formatJam(x.masuk)}</td>
-                  <td className="p-3 text-center">{formatJam(x.pulang)}</td>
+                  <td className="p-3 text-center">
+                    {formatJam(x.masuk)}
+                  </td>
+                  <td className="p-3 text-center">
+                    {formatJam(x.pulang)}
+                  </td>
                   <td className="p-3 flex justify-center gap-2">
                     <button
-                      onClick={() => navigate(`/presensi/edit/${x.id}`)}
+                      onClick={() =>
+                        navigate(`/presensi/edit/${x.id}`)
+                      }
                       className="bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded"
                     >
                       <PencilSquareIcon className="w-4" />
