@@ -1,127 +1,63 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEdit, faTrash, faFolderOpen } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 
-const API = "http://localhost:5000/tagihan";
+const API = "http://localhost:8080/api/tagihan";
 
-export default function Tagihan() {
+export default function Masterdata() {
+  const [data, setData] = useState([]);
+  const [search, setSearch] = useState("");
   const navigate = useNavigate();
-  const [tagihan, setTagihan] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  // DATA UNTUK EDIT / TAMBAH
-  const [formData, setFormData] = useState({
-    id: "",
-    nama: "",
-    kelas: "",
-    bulan: "",
-    jumlah: "",
-    status: "Belum Lunas",
-    kategori: "SPP",
-    terbayar: 0,
-    sisa: "",
-  });
-
-  const [isSlideOpen, setIsSlideOpen] = useState(false);
-
-  const formatRp = (n) => "Rp " + Number(n).toLocaleString("id-ID");
-
-  // ==========================================================
-  // FETCH DATA
-  // ==========================================================
+  // =========================
+  // FETCH DATA SQL
+  // =========================
   const fetchData = async () => {
-    setLoading(true);
     try {
       const res = await axios.get(API);
-      setTagihan(res.data);
+      setData(res.data || []);
     } catch {
-      Swal.fire("Error", "Gagal memuat data", "error");
+      Swal.fire("Error", "Gagal mengambil data tagihan", "error");
     }
-    setLoading(false);
   };
 
   useEffect(() => {
     fetchData();
   }, []);
 
-  // ==========================================================
-  // OPEN SLIDE
-  // ==========================================================
-  const openSlide = (item = null) => {
-    if (item) {
-      setFormData({
-        ...item,
-        terbayar: item.terbayar || 0,
-        sisa: item.sisa ?? item.jumlah - (item.terbayar || 0),
-      });
-    } else {
-      setFormData({
-        id: "",
-        nama: "",
-        kelas: "",
-        bulan: "",
-        jumlah: "",
-        status: "Belum Lunas",
-        kategori: "SPP",
-        terbayar: 0,
-        sisa: "",
-      });
-    }
-    setIsSlideOpen(true);
-  };
+  // =========================
+  // FILTER SEARCH
+  // =========================
+  const filteredData = data.filter((x) => {
+    const q = search.toLowerCase();
+    return (
+      x.nama?.toLowerCase().includes(q) ||
+      x.kelas?.toLowerCase().includes(q) ||
+      x.bulan?.toLowerCase().includes(q) ||
+      x.status?.toLowerCase().includes(q) ||
+      x.kategori?.toLowerCase().includes(q)
+    );
+  });
 
-  const closeSlide = () => setIsSlideOpen(false);
-
-  // ==========================================================
-  // SAVE / UPDATE
-  // ==========================================================
-  const saveForm = async () => {
-    const jumlah = Number(formData.jumlah);
-    const terbayar = Number(formData.terbayar || 0);
-    const sisa = jumlah - terbayar;
-
-    const dataToSave = {
-      ...formData,
-      jumlah,
-      terbayar,
-      sisa,
-      status: sisa === 0 ? "Lunas" : "Belum Lunas",
-    };
-
-    try {
-      if (formData.id) {
-        await axios.put(`${API}/${formData.id}`, dataToSave);
-      } else {
-        dataToSave.id = Date.now();
-        await axios.post(API, dataToSave);
-      }
-
-      closeSlide();
-      fetchData();
-      Swal.fire("Berhasil!", "Data berhasil disimpan.", "success");
-    } catch {
-      Swal.fire("Error", "Gagal menyimpan data", "error");
-    }
-  };
-
-  // ==========================================================
+  // =========================
   // DELETE
-  // ==========================================================
+  // =========================
   const handleDelete = (id) => {
     Swal.fire({
       title: "Hapus data?",
-      text: "Data yang dihapus tidak dapat dikembalikan.",
+      text: "Data tidak dapat dikembalikan!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Hapus",
-      cancelButtonText: "Batal",
     }).then(async (res) => {
       if (res.isConfirmed) {
         try {
           await axios.delete(`${API}/${id}`);
+          Swal.fire("Berhasil", "Data terhapus", "success");
           fetchData();
-          Swal.fire("Dihapus!", "Data berhasil dihapus.", "success");
         } catch {
           Swal.fire("Error", "Gagal menghapus data", "error");
         }
@@ -129,260 +65,98 @@ export default function Tagihan() {
     });
   };
 
-  // ==========================================================
-  // PEMBAYARAN FIX (TANPA MERUSAK JUMLAH ASLI)
-  // ==========================================================
-  const handleBayar = (item) => {
-    Swal.fire({
-      title: "Pilih Metode Pembayaran",
-      text: `${item.nama} - ${formatRp(item.jumlah)}`,
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Bayar Semua",
-      cancelButtonText: "Bayar Sebagian",
-    }).then(async (result) => {
-      // ======================
-      // BAYAR LUNAS
-      // ======================
-      if (result.isConfirmed) {
-        const updated = {
-          ...item,
-          terbayar: item.jumlah,
-          sisa: 0,
-          status: "Lunas",
-        };
-
-        await axios.put(`${API}/${item.id}`, updated);
-
-        fetchData();
-        Swal.fire("Berhasil!", "Tagihan sudah lunas.", "success");
-      }
-
-      // ======================
-      // BAYAR SEBAGIAN
-      // ======================
-      else if (result.dismiss === Swal.DismissReason.cancel) {
-        Swal.fire({
-          title: "Masukkan jumlah pembayaran:",
-          input: "number",
-          inputLabel: `Sisa: ${formatRp(item.jumlah - (item.terbayar || 0))}`,
-          inputAttributes: { min: 1000 },
-          showCancelButton: true,
-        }).then(async (res2) => {
-          if (!res2.value) return;
-
-          const bayar = Number(res2.value);
-          const totalTerbayar = (item.terbayar || 0) + bayar;
-          const sisa = item.jumlah - totalTerbayar;
-
-          const updated = {
-            ...item,
-            terbayar: totalTerbayar,
-            sisa,
-            status: sisa === 0 ? "Lunas" : "Belum Lunas",
-          };
-
-          await axios.put(`${API}/${item.id}`, updated);
-
-          fetchData();
-          Swal.fire(
-            "Berhasil!",
-            sisa === 0
-              ? "Tagihan lunas."
-              : `Sisa tagihan: ${formatRp(sisa)}`,
-            "success"
-          );
-        });
-      }
-    });
+  const handleEdit = (id) => {
+    navigate(`/edit-tagihan/${id}`);
   };
 
-  // ==========================================================
-  // UI
-  // ==========================================================
   return (
-    <div className="ml-50 p-8 bg-gradient-to-br from-blue-50 to-white min-h-screen">
-      <h1 className="text-4xl font-extrabold text-blue-700 mb-6">📘 Data Tagihan</h1>
+    <div className="ml-55 mr-10 p-6">
+      {/* HEADER */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <FontAwesomeIcon
+            icon={faFolderOpen}
+            className="text-yellow-600 text-3xl"
+          />
+          <h1 className="text-3xl font-semibold">Data Tagihan</h1>
+        </div>
 
-      <div className="bg-white p-6 rounded-2xl shadow-xl border border-blue-100">
         <button
-          onClick={() => navigate("/garoet")}
-          className="mb-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded shadow"
+          onClick={() => navigate(`/garoet`)}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded shadow"
         >
           + Tambah Tagihan
         </button>
-
-        <div className="overflow-hidden rounded-xl border border-blue-200">
-          <table className="w-full">
-            <thead className="bg-blue-600 text-white">
-              <tr>
-                <th className="p-3">No</th>
-                <th className="p-3">Nama</th>
-                <th className="p-3">Kelas</th>
-                <th className="p-3">Bulan</th>
-                <th className="p-3">Jumlah</th>
-                <th className="p-3">Dibayar</th>
-                <th className="p-3">Sisa</th>
-                <th className="p-3">Status</th>
-                <th className="p-3">Kategori</th>
-                <th className="p-3 text-center">Aksi</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan={10} className="p-6 text-center">
-                    ⏳ Memuat data...
-                  </td>
-                </tr>
-              ) : tagihan.length === 0 ? (
-                <tr>
-                  <td colSpan={10} className="p-6 text-center text-gray-500">
-                    Tidak ada data
-                  </td>
-                </tr>
-              ) : (
-                tagihan.map((t, i) => (
-                  <tr key={t.id} className="border-b hover:bg-blue-50">
-                    <td className="p-3">{i + 1}</td>
-                    <td className="p-3 font-semibold text-blue-700">{t.nama}</td>
-                    <td className="p-3">{t.kelas}</td>
-                    <td className="p-3">{t.bulan}</td>
-                    <td className="p-3">{formatRp(t.jumlah)}</td>
-                    <td className="p-3">{formatRp(t.terbayar || 0)}</td>
-                    <td className="p-3">{formatRp(t.sisa || (t.jumlah - (t.terbayar || 0)))}</td>
-                    <td className="p-3">
-                      <span
-                        className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                          t.status === "Lunas"
-                            ? "bg-green-100 text-green-600"
-                            : "bg-red-100 text-red-600"
-                        }`}
-                      >
-                        {t.status}
-                      </span>
-                    </td>
-                    <td className="p-3">{t.kategori}</td>
-                    <td className="p-3 flex gap-3 justify-center">
-                      <button
-                        onClick={() => handleBayar(t)}
-                        className="p-2 rounded bg-green-600 hover:bg-green-700 text-white"
-                      >
-                        💰
-                      </button>
-                      <button
-                        onClick={() => openSlide(t)}
-                        className="p-2 rounded bg-yellow-500 text-white"
-                      >
-                        ✏
-                      </button>
-                      <button
-                        onClick={() => handleDelete(t.id)}
-                        className="p-2 rounded bg-red-600 hover:bg-red-700 text-white"
-                      >
-                        🗑
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="mt-3 text-gray-600">
-          Menampilkan {tagihan.length} item
-        </div>
       </div>
 
-      {/* SLIDE FORM */}
-      {isSlideOpen && (
-        <div className="fixed top-0 right-0 w-96 h-full bg-white shadow-2xl border-l border-blue-200 p-6">
-          <h2 className="text-3xl font-extrabold text-blue-700 mb-6">
-            {formData.id ? "Edit Tagihan" : "Tambah Tagihan"}
-          </h2>
+      {/* SEARCH */}
+      <div className="mb-4">
+        <input
+          className="w-96 p-3 rounded-xl bg-gray-100 border shadow-sm"
+          placeholder="🔍 Cari nama, kelas, bulan, status, kategori..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
 
-          <div className="flex flex-col gap-4">
-            <input
-              className="border p-3 rounded-xl bg-blue-50"
-              placeholder="Nama"
-              value={formData.nama}
-              onChange={(e) =>
-                setFormData({ ...formData, nama: e.target.value })
-              }
-            />
-
-            <input
-              className="border p-3 rounded-xl bg-blue-50"
-              placeholder="Kelas"
-              value={formData.kelas}
-              onChange={(e) =>
-                setFormData({ ...formData, kelas: e.target.value })
-              }
-            />
-
-            <input
-              className="border p-3 rounded-xl bg-blue-50"
-              placeholder="Bulan"
-              value={formData.bulan}
-              onChange={(e) =>
-                setFormData({ ...formData, bulan: e.target.value })
-              }
-            />
-
-            <input
-              type="number"
-              className="border p-3 rounded-xl bg-blue-50"
-              placeholder="Jumlah"
-              value={formData.jumlah}
-              onChange={(e) =>
-                setFormData({ ...formData, jumlah: e.target.value })
-              }
-            />
-
-            <select
-              className="border p-3 rounded-xl bg-blue-50"
-              value={formData.status}
-              onChange={(e) =>
-                setFormData({ ...formData, status: e.target.value })
-              }
-            >
-              <option value="Belum Lunas">Belum Lunas</option>
-              <option value="Lunas">Lunas</option>
-            </select>
-
-            <select
-              className="border p-3 rounded-xl bg-blue-50"
-              value={formData.kategori}
-              onChange={(e) =>
-                setFormData({ ...formData, kategori: e.target.value })
-              }
-            >
-              <option value="SPP">SPP</option>
-           
-              <option value="Ujian">Uang Gedung</option>
-              <option value="Lainnya">Lainnya</option>
-              <option value="Lainnya">Pendaftaran</option>
-            </select>
-          </div>
-
-          <div className="mt-8 flex gap-3">
-            <button
-              onClick={saveForm}
-              className="flex-1 bg-blue-600 text-white py-3 rounded-xl"
-            >
-              Simpan
-            </button>
-            <button
-              onClick={closeSlide}
-              className="flex-1 bg-gray-300 py-3 rounded-xl"
-            >
-              Batal
-            </button>
-          </div>
+      {/* TABLE */}
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+        <div className="w-full bg-blue-600 text-white font-semibold p-3 grid grid-cols-9">
+          <div className="text-center">No</div>
+          <div>Nama</div>
+          <div>Kelas</div>
+          <div>Bulan</div>
+          <div>Jumlah</div>
+          <div>Dibayar</div>
+          <div>Sisa</div>
+          <div>Status</div>
+          <div className="text-center">Aksi</div>
         </div>
-      )}
+
+        {filteredData.length === 0 && (
+          <div className="p-5 text-center text-gray-500">
+            Data tidak ditemukan
+          </div>
+        )}
+
+        {filteredData.map((x, i) => (
+          <div
+            key={x.no}
+            className="grid grid-cols-9 border-t p-3 items-center hover:bg-gray-50"
+          >
+            <div className="text-center font-semibold">{i + 1}</div>
+            <div className="text-blue-700 font-medium">{x.nama}</div>
+            <div>{x.kelas}</div>
+            <div>{x.bulan}</div>
+            <div>Rp {Number(x.jumlah).toLocaleString("id-ID")}</div>
+            <div>Rp {Number(x.dibayar || 0).toLocaleString("id-ID")}</div>
+            <div>Rp {Number(x.sisa || 0).toLocaleString("id-ID")}</div>
+            <div
+              className={`font-semibold ${
+                x.status === "Lunas" ? "text-green-600" : "text-red-600"
+              }`}
+            >
+              {x.status}
+            </div>
+
+            <div className="flex gap-2 justify-center">
+              <button
+                onClick={() => handleEdit(x.no)}
+                className="bg-yellow-400 text-white px-3 py-2 rounded hover:bg-yellow-500"
+              >
+                <FontAwesomeIcon icon={faEdit} />
+              </button>
+
+              <button
+                onClick={() => handleDelete(x.no)}
+                className="bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700"
+              >
+                <FontAwesomeIcon icon={faTrash} />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

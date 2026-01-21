@@ -231,13 +231,7 @@ export default function RekapPresensiLengkap() {
             — <b>{jamWIB.toLocaleTimeString("id-ID")} WIB</b>
           </p>
         </div>
-
-        <button
-          onClick={fetchData}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-        >
-          <ArrowPathIcon className="w-5" /> Refresh
-        </button>
+ 
       </div>
 
       {/* FILTER */}

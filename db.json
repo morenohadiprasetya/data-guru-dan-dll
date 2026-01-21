@@ -39,16 +39,6 @@
       "kelas": "XII DPB",
       "nomorUnik": "92831",
       "level": "siswa"
-    },
-    {
-      "id": "5d04",
-      "nama": "Roihan",
-      "ket": "",
-      "alamat": "SMG",
-      "hp": "12345678",
-      "kelas": "X TKJ",
-      "nomorUnik": "2589287447",
-      "level": "siswa"
     }
   ],
   "guru": [
@@ -183,7 +173,7 @@
     },
     {
       "id": "1766460533605",
-      "siswaId": "5d04",
+      "siswaId": null,
       "nama": "Roihan",
       "kelas": "X TKJ",
       "kategori": "SPP",
@@ -192,6 +182,18 @@
       "status": "Lunas",
       "terbayar": "600000",
       "sisa": 0
+    },
+    {
+      "id": "1768445141851",
+      "siswaId": "2fdd",
+      "nama": "ries",
+      "kelas": "X TKJ",
+      "kategori": " uang gedung",
+      "bulan": "Kontol",
+      "jumlah": "500000",
+      "status": "Belum Lunas",
+      "terbayar": 0,
+      "sisa": 500000
     }
   ],
   "pembayaran": [
@@ -363,15 +365,6 @@
       "keteranganIzin": ""
     },
     {
-      "nama": "Ambatukam",
-      "kelas": "IPA",
-      "kategori": "terlambat",
-      "masuk": "2025-12-23T05:53",
-      "pulang": "",
-      "keteranganIzin": "",
-      "id": "b6c7"
-    },
-    {
       "id": "7367",
       "nomorUnik": "08123",
       "nama": "Jun Himeya",
@@ -384,6 +377,15 @@
       "masuk": "",
       "pulang": "",
       "keterangan": "Dikentot agung"
+    },
+    {
+      "nama": "Moreno",
+      "kelas": "XII DPB",
+      "kategori": "terlambat",
+      "masuk": "2026-01-05T06:45",
+      "pulang": "2026-01-05T15:01",
+      "keteranganIzin": "",
+      "id": "bb0c"
     }
   ]
 }

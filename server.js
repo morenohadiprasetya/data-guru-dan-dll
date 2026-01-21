@@ -1,6 +1,7 @@
-const express = require("express");
-const fs = require("fs");
-const cors = require("cors");
+import express from "express";
+import fs from "fs";
+import cors from "cors";
+
 const app = express();
 const PORT = 5000;
 
@@ -34,6 +35,7 @@ app.post("/tagihan", (req, res) => {
 app.put("/tagihan/:id", (req, res) => {
   const db = JSON.parse(fs.readFileSync(DB_PATH));
   const idx = db.tagihan.findIndex(t => t.id === req.params.id);
+
   if (idx !== -1) {
     db.tagihan[idx] = { ...db.tagihan[idx], ...req.body };
     fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
@@ -51,4 +53,6 @@ app.delete("/tagihan/:id", (req, res) => {
   res.json({ msg: "Berhasil dihapus" });
 });
 
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});

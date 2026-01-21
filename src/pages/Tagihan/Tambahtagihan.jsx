@@ -14,92 +14,85 @@ export default function TambahTagihan() {
   const navigate = useNavigate();
 
   const API = {
-    tagihan: "http://localhost:5000/tagihan",
-    siswa: "http://localhost:5000/siswa",
-    kategori: "http://localhost:5000/kategoriTagihan",
+    tagihan: "http://localhost:8080/api/tagihan",
+    siswa: "http://localhost:8080/api/siswa",
+    kategori: "http://localhost:8080/api/kategori-tagihan",
   };
 
   const [data, setData] = useState({
-    siswaId: "",
     nama: "",
     kelas: "",
-    kategori: "",
     bulan: "",
     jumlah: "",
     status: "Belum Lunas",
+    kategori: "",
   });
 
   const [siswaList, setSiswaList] = useState([]);
   const [kategoriList, setKategoriList] = useState([]);
 
   // =====================
-  // AMBIL DATA SISWA
+  // LOAD SISWA
   // =====================
   useEffect(() => {
-    axios
-      .get(API.siswa)
-      .then((res) => setSiswaList(res.data))
-      .catch(() =>
-        Swal.fire("Error", "Gagal memuat data siswa", "error")
-      );
+    axios.get(API.siswa)
+      .then(res => setSiswaList(res.data))
+      .catch(() => Swal.fire("Error", "Gagal memuat data siswa", "error"));
   }, []);
 
   // =====================
-  // AMBIL DATA KATEGORI TAGIHAN
+  // LOAD KATEGORI
   // =====================
   useEffect(() => {
-    axios
-      .get(API.kategori)
-      .then((res) => setKategoriList(res.data))
-      .catch(() =>
-        Swal.fire("Error", "Gagal memuat kategori tagihan", "error")
-      );
+    axios.get(API.kategori)
+      .then(res => setKategoriList(res.data))
+      .catch(() => Swal.fire("Error", "Gagal memuat kategori", "error"));
   }, []);
 
   // =====================
   // PILIH SISWA
   // =====================
   const handleSelectSiswa = (id) => {
-    const siswa = siswaList.find((s) => s.id === id);
-    if (!siswa) return;
+    const s = siswaList.find(x => x.id == id);
+    if (!s) return;
 
     setData({
       ...data,
-      siswaId: siswa.id,
-      nama: siswa.nama,
-      kelas: siswa.kelas,
+      nama: s.nama,
+      kelas: s.kelas
     });
   };
 
   // =====================
   // SUBMIT
   // =====================
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
 
-    if (!data.siswaId)
-      return Swal.fire("Pilih siswa dulu!", "", "warning");
+    if (!data.nama) return Swal.fire("Pilih siswa!", "", "warning");
+    if (!data.kategori) return Swal.fire("Pilih kategori!", "", "warning");
+    if (!data.jumlah) return Swal.fire("Jumlah wajib diisi!", "", "warning");
 
-    if (!data.kategori)
-      return Swal.fire("Pilih kategori tagihan!", "", "warning");
+    const jumlah = Number(data.jumlah);
 
-    if (!data.jumlah)
-      return Swal.fire("Jumlah wajib diisi!", "", "warning");
+    const payload = {
+      nama: data.nama,
+      kelas: data.kelas,
+      bulan: data.bulan,
+      jumlah: jumlah,
+      dibayar: data.status === "Lunas" ? jumlah : 0,
+      sisa: data.status === "Lunas" ? 0 : jumlah,
+      status: data.status,
+      kategori: data.kategori,
+    };
 
-    axios
-      .post(API.tagihan, {
-        ...data,
-        id: Date.now().toString(),
-        terbayar: data.status === "Lunas" ? Number(data.jumlah) : 0,
-        sisa: data.status === "Lunas" ? 0 : Number(data.jumlah),
-      })
-      .then(() => {
-        Swal.fire("Berhasil!", "Tagihan berhasil ditambahkan", "success")
-          .then(() => navigate("/tagihan"));
-      })
-      .catch(() =>
-        Swal.fire("Error", "Gagal menambah tagihan", "error")
-      );
+    try {
+      await axios.post(API.tagihan, payload);
+      Swal.fire("Berhasil", "Tagihan berhasil ditambahkan", "success")
+        .then(() => navigate("/tagihan"));
+    } catch {
+      Swal.fire("Error", "Gagal menyimpan tagihan", "error");
+    }
   };
 
   return (
@@ -111,77 +104,56 @@ export default function TambahTagihan() {
       <CCard className="shadow-md">
         <CCardBody>
           <form onSubmit={submit}>
-            {/* SISWA */}
+
             <label>Pilih Siswa</label>
-            <CFormSelect
-              className="mb-3"
-              value={data.siswaId}
-              onChange={(e) => handleSelectSiswa(e.target.value)}
-            >
+            <CFormSelect className="mb-3" onChange={e => handleSelectSiswa(e.target.value)}>
               <option value="">-- Pilih Siswa --</option>
-              {siswaList.map((s) => (
+              {siswaList.map(s => (
                 <option key={s.id} value={s.id}>
                   {s.nama} — {s.kelas}
                 </option>
               ))}
             </CFormSelect>
 
-            {/* KATEGORI (DARI MASTER) */}
             <label>Kategori Tagihan</label>
             <CFormSelect
               className="mb-3"
               value={data.kategori}
-              onChange={(e) =>
-                setData({ ...data, kategori: e.target.value })
-              }
+              onChange={e => setData({ ...data, kategori: e.target.value })}
             >
               <option value="">-- Pilih Kategori --</option>
-              {kategoriList.map((k) => (
-                <option key={k.id} value={k.nama}>
-                  {k.nama} ({k.tipe})
-                </option>
+              {kategoriList.map(k => (
+                <option key={k.id} value={k.nama}>{k.nama}</option>
               ))}
             </CFormSelect>
 
-            {/* BULAN */}
-            <label>Bulan / Periode</label>
+            <label>Bulan</label>
             <CFormInput
               className="mb-3"
-              placeholder="Contoh: Januari 2025"
               value={data.bulan}
-              onChange={(e) =>
-                setData({ ...data, bulan: e.target.value })
-              }
+              onChange={e => setData({ ...data, bulan: e.target.value })}
             />
 
-            {/* JUMLAH */}
-            <label>Jumlah (Rp)</label>
+            <label>Jumlah</label>
             <CFormInput
               type="number"
               className="mb-3"
               value={data.jumlah}
-              onChange={(e) =>
-                setData({ ...data, jumlah: e.target.value })
-              }
+              onChange={e => setData({ ...data, jumlah: e.target.value })}
             />
 
-            {/* STATUS */}
             <label>Status</label>
             <CFormSelect
               className="mb-3"
               value={data.status}
-              onChange={(e) =>
-                setData({ ...data, status: e.target.value })
-              }
+              onChange={e => setData({ ...data, status: e.target.value })}
             >
               <option>Belum Lunas</option>
               <option>Lunas</option>
               <option>Pending</option>
             </CFormSelect>
 
-            <CButton type="submit" color="primary">
-              Simpan
-            </CButton>
+            <CButton type="submit" color="primary">Simpan</CButton>
             <CButton
               type="button"
               className="ms-2"
@@ -190,6 +162,7 @@ export default function TambahTagihan() {
             >
               Batal
             </CButton>
+
           </form>
         </CCardBody>
       </CCard>

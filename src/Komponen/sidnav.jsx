@@ -25,7 +25,8 @@ export default function Sidnav() {
  const hideSidebarRoutes = [
   "/presensi",
   "/Rekappresensi",
-  "/presensi/edit"
+  "/presensi/edit",
+  "/Keuangan"
 ];
 
 if (

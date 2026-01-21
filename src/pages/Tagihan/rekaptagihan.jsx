@@ -190,7 +190,7 @@ export default function RekapTagihan() {
                       {formatRp(r.lunas)}
                     </td>
 
-                    {/* SISA (SEJAJAR + BADGE) */}
+           
                     <td className="px-4 py-3 text-left">
                       <div className="flex justify-end items-center gap-2 font-semibold">
                         <span
