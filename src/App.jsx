@@ -19,7 +19,7 @@ import RekapPresensi from "./pages/Tagihan/rPresensi";
 import Tambahkategoridata from "./pages/data/tambahkategorid";
 import Editkategoridata from "./pages/data/editkategorid";
 import KategoriDataCRUD from "./pages/data/ambatigori";
-
+import EditTagihan from "./pages/Tagihan/EditTagihan"
 import TambahKelas from "./pages/kelas/TambahKelas";
 import Kelas from "./pages/kelas/Kelas";
 import EditKelas from "./pages/kelas/Editkelas";
@@ -29,6 +29,7 @@ import Tkategori from "./pages/Tagihan/Tkategori";
 import TambahTagihan from "./pages/Tagihan/Tambahtagihan";
 import PresensiPage from "./pages/Tagihan/Presensi";
 import Trht from "./pages/Tagihan/Trht";
+ import Test from "./api/Test";
  
 import EditPresensi from "./pages/Presensi/EditPresensi";
 
@@ -50,12 +51,14 @@ export default function App() {
 
           {/* DASHBOARD */}
           <Route path="/dashboard" element={<Dashboard />} />
-
+        
+<Route path="/test" element={<Test />} />
           {/* TAGIHAN */}
           <Route path="/tagihan" element={<Tagihan />} />
           <Route path="/kategori-tagihan" element={<KategoriTagihan />} />
           <Route path="/rekap" element={<RekapTagihan />} />
           <Route path="/garoet" element={<TambahTagihan />} />
+          <Route path="/EditTagihan/:id" element={<EditTagihan />} />
          
 
           {/* MASTER DATA */}

@@ -2,12 +2,12 @@ import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import "remixicon/fonts/remixicon.css";
 
-const API_TAGIHAN = "http://localhost:5000/tagihan";
-const API_KELAS = "http://localhost:5000/kelas";
-const API_KATEGORI = "http://localhost:5000/kategoriTagihan";
-const API_SISWA = "http://localhost:5000/siswa";
-const API_GURU = "http://localhost:5000/guru";
-const API_KARYAWAN = "http://localhost:5000/karyawan";
+const API_TAGIHAN = "http://localhost:8080/api/tagihan";
+const API_KELAS = "http://localhost:8080/kelas";
+const API_KATEGORI = "http://localhost:8080/api/kategori-tagihan";
+const API_SISWA = "http://localhost:8080/siswa";
+const API_GURU = "http://localhost:8080/guru";
+const API_KARYAWAN = "http://localhost:8080/karyawan";
 
 function formatRp(n = 0) {
   return "Rp " + Number(n).toLocaleString("id-ID");
@@ -288,7 +288,7 @@ export default function Dashboard() {
                     .map((g, idx) => (
                       <tr key={idx}>
                         <td className="p-3 border w-2/3">{g.nama}</td>
-                        <td className="p-3 border w-1/3">{g.ket}</td>
+                        <td className="p-3 border w-1/3">{g.keterangan}</td>
                       </tr>
                     ))}
                 </tbody>
@@ -324,7 +324,7 @@ export default function Dashboard() {
                     .map((k, idx) => (
                       <tr key={idx}>
                         <td className="p-3 border w-2/3">{k.nama}</td>
-                        <td className="p-3 border w-1/3">{k.ket}</td>
+                        <td className="p-3 border w-1/3">{k.keterangan}</td>
                       </tr>
                     ))}
                 </tbody>

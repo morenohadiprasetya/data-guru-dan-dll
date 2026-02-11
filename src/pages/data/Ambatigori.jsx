@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import { useNavigate, useParams } from "react-router-dom";
 
 export default function LevelCRUDData() {
-  const API = "http://localhost:5000/kategoridata";
+  const API = "http://localhost:8080/kategoridata";
   const { id } = useParams();
   const navigate = useNavigate();
 

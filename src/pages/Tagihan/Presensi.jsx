@@ -26,10 +26,10 @@ import {
    API CONFIG
 ========================================================= */
 const API = {
-  siswa: "http://localhost:5000/siswa",
-  guru: "http://localhost:5000/guru",
-  karyawan: "http://localhost:5000/karyawan",
-  presensi: "http://localhost:5000/presensi",
+  siswa: "http://localhost:8080/siswa",
+  guru: "http://localhost:8080/guru",
+  karyawan: "http://localhost:8080/karyawan",
+  presensi: "http://localhost:8080/presensi",
 };
 
 /* =========================================================
@@ -59,7 +59,7 @@ const isTerlambat = () => {
 };
 
 const isAfterJamPulang = () => {
-  return getWIBDate().getHours() >= 15;
+  return getWIBDate().getHours() >= 16;
 };
 
 /* =========================================================

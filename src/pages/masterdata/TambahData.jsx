@@ -13,7 +13,7 @@ export default function TambahData() {
 
   const [form, setForm] = useState({
     nama: "",
-    ket: "",
+    keterangan: "",
     alamat: "",
     hp: "",
     kelas: "",
@@ -28,7 +28,7 @@ export default function TambahData() {
   // Ambil daftar level
   useEffect(() => {
     axios
-      .get("http://localhost:5000/kategoridata")
+      .get("http://localhost:8080/kategoridata")
       .then((res) => setLevelList(res.data || []))
       .catch(() => setLevelList([]));
   }, []);
@@ -37,7 +37,7 @@ export default function TambahData() {
   useEffect(() => {
     if (form.level === "siswa") {
       axios
-        .get("http://localhost:5000/kelas")
+        .get("http://localhost:8080/kelas")
         .then((res) => setKelasList(res.data || []))
         .catch(() => setKelasList([]));
     }
@@ -65,7 +65,7 @@ export default function TambahData() {
 
     try {
       setSaving(true);
-      const api = `http://localhost:5000/${form.level.toLowerCase()}`;
+      const api = `http://localhost:8080/${form.level.toLowerCase()}`;
 
       await axios.post(api, form);
 
@@ -184,8 +184,8 @@ export default function TambahData() {
                     {form.level === "guru" ? "Mapel" : "Jabatan"}
                   </label>
                   <input
-                    name="ket"
-                    value={form.ket}
+                    name="keterangan"
+                    value={form.keterangan}
                     onChange={handleChange}
                     className="w-full rounded-lg border p-2"
                   />

@@ -6,20 +6,13 @@ import {
   faCheckCircle,
 } from "@fortawesome/free-solid-svg-icons";
 
-/* =====================================================
-   API
-===================================================== */
-const API = "http://localhost:5000/tagihan";
+ const API = "http://localhost:8080/api/tagihan";
 
-/* =====================================================
-   HELPER
-===================================================== */
-const formatRp = (n = 0) =>
-  "Rp " + Number(n).toLocaleString("id-ID");
+function formatRp(n) {
+  return "Rp " + Number(n || 0).toLocaleString("id-ID");
+}
 
-/* =====================================================
-   MAIN COMPONENT
-===================================================== */
+ 
 export default function RekapTagihan() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);

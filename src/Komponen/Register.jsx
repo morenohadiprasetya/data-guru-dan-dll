@@ -149,7 +149,7 @@ function Register() {
           {/* BUTTON REGISTER */}
           <button
             type="submit"
-            className="w-full py-3 bg-blue-700 text-white font-semibold rounded-xl shadow-md 
+            className="w-full py-3 bg-blue-700 text-white font-semibold rounded shadow-md 
                        hover:bg-blue-800 transition"
           >
             Daftar

@@ -3,7 +3,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { useNavigate, useParams } from "react-router-dom";
 
-const API_PRESENSI = "http://localhost:5000/presensi";
+const API_PRESENSI = "http://localhost:8080/presensi";
 
 export default function EditPresensi() {
   const navigate = useNavigate();
@@ -16,10 +16,9 @@ export default function EditPresensi() {
     kategori: "hadir",
     masuk: "",
     pulang: "",
-    keteranganIzin: "",
+    keterangan: "",
   });
 
-  // ================= AMBIL DATA =================
   useEffect(() => {
     ambilDetail();
   }, []);
@@ -36,163 +35,86 @@ export default function EditPresensi() {
         kategori: d.kategori || "hadir",
         masuk: d.masuk ? d.masuk.slice(0, 16) : "",
         pulang: d.pulang ? d.pulang.slice(0, 16) : "",
-        keteranganIzin: d.keteranganIzin || "",
+        keterangan: d.keterangan || "",
       });
     } catch {
-      Swal.fire("Error", "Data presensi tidak ditemukan", "error");
+      Swal.fire("Error", "Data tidak ditemukan", "error");
       navigate(-1);
     } finally {
       setLoading(false);
     }
   }
 
-  // ================= HANDLE INPUT =================
   function handleChange(e) {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    setForm({ ...form, [e.target.name]: e.target.value });
   }
 
-  // ================= SIMPAN =================
   async function handleSubmit(e) {
     e.preventDefault();
 
-    if (!form.nama || !form.kategori) {
-      Swal.fire("Peringatan", "Nama dan kategori wajib diisi", "warning");
-      return;
-    }
-
     if (
       (form.kategori === "izin" || form.kategori === "sakit") &&
-      !form.keteranganIzin.trim()
+      !form.keterangan.trim()
     ) {
-      Swal.fire(
-        "Peringatan",
-        "Keterangan wajib diisi untuk izin atau sakit",
-        "warning"
-      );
+      Swal.fire("Peringatan", "Keterangan wajib diisi", "warning");
       return;
     }
 
     try {
-      await axios.put(`${API_PRESENSI}/${id}`, form);
-      Swal.fire("Berhasil", "Data presensi berhasil diperbarui", "success");
-      navigate("/Rekappresensi");
+      await axios.put(`${API_PRESENSI}/${id}`, {
+        kategori: form.kategori,
+        masuk: form.masuk,
+        pulang: form.pulang,
+        keterangan: form.keterangan,
+      });
+
+      Swal.fire("Berhasil", "Presensi berhasil diperbarui", "success");
+      navigate("/rekappresensi");
     } catch {
-      Swal.fire("Error", "Gagal menyimpan perubahan", "error");
+      Swal.fire("Error", "Gagal menyimpan", "error");
     }
   }
 
-  // ================= UI =================
   return (
-    <div className="p-6 max-w-3xl min-h-screen ml-90 rounded">
-      <h1 className="text-2xl font-bold text-blue-700 mb-6">
-        Edit Presensi
-      </h1>
+    <div className="p-6 max-w-3xl min-h-screen">
+      <h1 className="text-2xl font-bold mb-6">Edit Presensi</h1>
 
       {loading ? (
         <p>Loading...</p>
       ) : (
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white p-6 rounded shadow space-y-4"
-        >
-          {/* NAMA */}
-          <div>
-            <label className="block font-semibold mb-1">Nama</label>
-            <input
-              name="nama"
-              value={form.nama}
-              onChange={handleChange}
-              className="border p-2 rounded w-full"
-              required
-            />
-          </div>
+        <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded shadow">
+          <input value={form.nama} disabled className="border p-2 w-full bg-gray-100" />
+          <input value={form.kelas} disabled className="border p-2 w-full bg-gray-100" />
 
-          {/* KELAS */}
-          <div>
-            <label className="block font-semibold mb-1">Kelas</label>
-            <input
-              name="kelas"
-              value={form.kelas}
-              onChange={handleChange}
-              className="border p-2 rounded w-full"
-            />
-          </div>
+          <select
+            name="kategori"
+            value={form.kategori}
+            onChange={handleChange}
+            className="border p-2 w-full"
+          >
+            <option value="hadir">Hadir</option>
+            <option value="izin">Izin</option>
+            <option value="sakit">Sakit</option>
+          </select>
 
-          {/* KATEGORI */}
-          <div>
-            <label className="block font-semibold mb-1">Kategori</label>
-            <select
-              name="kategori"
-              value={form.kategori}
-              onChange={handleChange}
-              className="border p-2 rounded w-full"
-            >
-              <option value="hadir">Hadir</option>
-              <option value="izin">Izin</option>
-              <option value="sakit">Sakit</option>
-            </select>
-          </div>
-
-          {/* KETERANGAN */}
           {(form.kategori === "izin" || form.kategori === "sakit") && (
-            <div>
-              <label className="block font-semibold mb-1">
-                Keterangan {form.kategori === "izin" ? "Izin" : "Sakit"}
-              </label>
-              <textarea
-                name="keteranganIzin"
-                value={form.keteranganIzin}
-                onChange={handleChange}
-                className="border p-2 rounded w-full"
-                rows="3"
-                required
-              />
-            </div>
+            <textarea
+              name="keterangan"
+              value={form.keterangan}
+              onChange={handleChange}
+              className="border p-2 w-full"
+              placeholder="Keterangan"
+            />
           )}
 
-          {/* JAM */}
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block font-semibold mb-1">Jam Masuk</label>
-              <input
-                type="datetime-local"
-                name="masuk"
-                value={form.masuk}
-                onChange={handleChange}
-                className="border p-2 rounded w-full"
-              />
-            </div>
-
-            <div>
-              <label className="block font-semibold mb-1">Jam Pulang</label>
-              <input
-                type="datetime-local"
-                name="pulang"
-                value={form.pulang}
-                onChange={handleChange}
-                className="border p-2 rounded w-full"
-              />
-            </div>
+            <input type="datetime-local" name="masuk" value={form.masuk} onChange={handleChange} className="border p-2" />
+            <input type="datetime-local" name="pulang" value={form.pulang} onChange={handleChange} className="border p-2" />
           </div>
 
-          {/* BUTTON */}
-          <div className="flex gap-3 justify-end pt-4">
-            <button
-              type="button"
-              onClick={() => navigate(-1)}
-              className="px-4 py-2 rounded bg-gray-400 text-white"
-            >
-              Batal
-            </button>
-
-            <button
-              type="submit"
-              className="px-4 py-2 rounded bg-blue-600 text-white"
-            >
-              Simpan Perubahan
-            </button>
-          </div>
+          <button className="bg-blue-600 text-white px-4 py-2 rounded">
+            Simpan Perubahan
+          </button>
         </form>
       )}
     </div>

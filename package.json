@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "node server.js"
   },
   "dependencies": {
     "@coreui/icons-react": "^2.3.0",
@@ -22,11 +23,13 @@
     "@tailwindcss/vite": "^4.1.14",
     "animate.css": "^4.1.1",
     "axios": "^1.13.2",
+    "body-parser": "^2.2.2",
     "bootstrap": "^5.3.8",
     "chart.js": "^4.5.1",
-    "cors": "^2.8.5",
+    "cors": "^2.8.6",
     "express": "^5.2.1",
     "lucide-react": "^0.548.0",
+    "mysql2": "^3.16.2",
     "react": "^19.1.1",
     "react-bootstrap": "^2.10.10",
     "react-chartjs-2": "^5.3.1",
@@ -50,5 +53,18 @@
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.14",
     "vite": "^7.1.7"
-  }
+  },
+  "description": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
+  "main": "eslint.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/morenohadiprasetya/data-guru-dan-dll.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/morenohadiprasetya/data-guru-dan-dll/issues"
+  },
+  "homepage": "https://github.com/morenohadiprasetya/data-guru-dan-dll#readme"
 }

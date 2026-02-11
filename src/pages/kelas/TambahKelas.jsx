@@ -3,7 +3,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 
-const API = "http://localhost:5000/kelas";
+const API = "http://localhost:8080/kelas";
 
 export default function TambahKelas() {
   const navigate = useNavigate();

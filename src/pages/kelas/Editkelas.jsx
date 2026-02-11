@@ -8,7 +8,7 @@ export default function EditKelas() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const API = "http://localhost:5000/kelas";
+  const API = "http://localhost:8080/kelas";
 
   const [data, setData] = useState({
     namaKelas: "",

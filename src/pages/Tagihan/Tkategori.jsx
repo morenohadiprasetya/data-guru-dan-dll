@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function TambahKategoriTagihan() {
   const navigate = useNavigate();
-  const API = "http://localhost:5000/kategoriTagihan";
+  const API = "http://localhost:8080/api/kategori-tagihan";
 
   const [data, setData] = useState({
     nama: "",
@@ -70,17 +70,10 @@ export default function TambahKategoriTagihan() {
               rows={3}
               placeholder="Deskripsi tambahan kategori"
             />
-
-            <label>Kelas</label>
-            <CFormInput
-              value={data.kelas}
-              onChange={(e) => setData({ ...data, kelas: e.target.value })}
-              className="mb-3"
-              placeholder="Contoh: X / XI / XII / Semua"
-            />
+ 
 
             <CButton type="submit" color="primary">Simpan</CButton>
-            <CButton type="button" color="secondary" className="ms-2" onClick={() => navigate("/kategoril")}>
+            <CButton type="button" color="secondary" className="ms-2" onClick={() => navigate("/kategori-tagihan")}>
               Batal
             </CButton>
 

@@ -1,62 +1,87 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-import {
-  CCard,
-  CCardBody,
-  CFormSelect,
-  CFormInput,
-  CButton,
-} from "@coreui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faTrash, faFolderOpen } from "@fortawesome/free-solid-svg-icons";
+import {
+  faEdit,
+  faTrash,
+  faFolderOpen,
+} from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 
 export default function Masterdata() {
   const [kategori, setKategori] = useState("siswa");
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
+  // =========================
+  // API ENDPOINT
+  // =========================
   const API = {
-    siswa: "http://localhost:5000/siswa",
-    guru: "http://localhost:5000/guru",
-    karyawan: "http://localhost:5000/karyawan",
-    level: "http://localhost:5000/level",
+    siswa: "http://localhost:8080/siswa",
+    guru: "http://localhost:8080/guru",
+    karyawan: "http://localhost:8080/karyawan",
   };
 
   // =========================
-  // FETCH DATA
+  // FETCH DATA  
   // =========================
-  const fetchData = async () => {
+  const fetchData = async (kategoriAktif) => {
     try {
-      const res = await axios.get(API[kategori]);
+      setLoading(true);
+      const res = await axios.get(API[kategoriAktif]);
       setData(Array.isArray(res.data) ? res.data : []);
     } catch (error) {
       Swal.fire("Error", "Gagal mengambil data", "error");
+      setData([]);
+    } finally {
+      setLoading(false);
     }
   };
 
+  // =========================
+  // EFFECT KATEGORI  
+  // =========================
   useEffect(() => {
-    fetchData();
+    setData([]);     
+    setSearch("");   
+    fetchData(kategori);
   }, [kategori]);
 
   // =========================
-  // FILTER SEARCH
+  // KETERANGAN (FINAL)
   // =========================
-  const filteredData = data.filter((item) => {
-    const q = search.toLowerCase();
-    return (
-      item.nama?.toLowerCase().includes(q) ||
-      item.alamat?.toLowerCase().includes(q) ||
-      (item.ket || "").toLowerCase().includes(q) ||
-      (item.kelas || "").toLowerCase().includes(q) ||
-      (item.nomorUnik || "").toLowerCase().includes(q)
-    );
-  });
+ const getKeterangan = (x) => {
+  return (
+    x.keterangan ||
+    x.jabatan ||
+    x.kelas ||
+    "-"
+  );
+};
+
 
   // =========================
-  // DELETE DATA
+  // SEARCH
+  // =========================
+  const filteredData = data.filter((x) =>
+  `
+    ${x.nama || ""}
+    ${x.keterangan || ""}
+    ${x.kelas || ""}
+    ${x.alamat || ""}
+    ${x.hp || ""}
+    ${x.nomorUnik || ""}
+  `
+    .toLowerCase()
+    .includes(search.toLowerCase())
+);
+
+  // =========================
+  // DELETE
   // =========================
   const handleDelete = (id) => {
     Swal.fire({
@@ -65,19 +90,25 @@ export default function Masterdata() {
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Hapus",
+      cancelButtonText: "Batal",
     }).then((result) => {
       if (result.isConfirmed) {
         axios
           .delete(`${API[kategori]}/${id}`)
           .then(() => {
             Swal.fire("Berhasil", "Data terhapus", "success");
-            fetchData();
+            fetchData(kategori);
           })
-          .catch(() => Swal.fire("Error", "Gagal menghapus", "error"));
+          .catch(() =>
+            Swal.fire("Error", "Gagal menghapus data", "error")
+          );
       }
     });
   };
 
+  // =========================
+  // EDIT
+  // =========================
   const handleEdit = (id) => {
     navigate(`/editdata/${id}?kategori=${kategori}`);
   };
@@ -91,7 +122,9 @@ export default function Masterdata() {
             icon={faFolderOpen}
             className="text-yellow-600 text-3xl"
           />
-          <h1 className="text-3xl font-semibold">Master Data</h1>
+          <h1 className="text-3xl font-semibold">
+            Master Data
+          </h1>
         </div>
 
         <div className="flex items-center gap-3">
@@ -106,7 +139,9 @@ export default function Masterdata() {
           </select>
 
           <button
-            onClick={() => navigate(`/tambahdata?kategori=${kategori}`)}
+            onClick={() =>
+              navigate(`/tambahdata?kategori=${kategori}`)
+            }
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded shadow"
           >
             + Tambah Data
@@ -118,15 +153,17 @@ export default function Masterdata() {
       <div className="mb-4">
         <input
           className="w-96 p-3 rounded-xl bg-gray-100 border shadow-sm"
-          placeholder="🔍 Cari nama, kelas, alamat, nomor unik..."
+          placeholder="🔍 Cari nama, keterangan, alamat, nomor unik..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
       </div>
 
       {/* ================= TABLE ================= */}
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
-        {/* TABLE HEADER */}
+      <div
+        key={kategori} // 🔥 PAKSA RE-RENDER
+        className="bg-white rounded-xl shadow-lg overflow-hidden border"
+      >
         <div className="w-full bg-blue-600 text-white font-semibold p-3 grid grid-cols-8">
           <div className="text-center">No</div>
           <div>Nama</div>
@@ -134,29 +171,39 @@ export default function Masterdata() {
           <div>Alamat</div>
           <div>HP</div>
           <div>Nomor Unik</div>
-          <div className="text-center col-span-2">Aksi</div>
+          <div className="text-center col-span-2">
+            Aksi
+          </div>
         </div>
 
-        {/* TABLE BODY */}
-        <div>
-          {filteredData.length === 0 && (
-            <div className="p-5 text-center text-gray-500">
-              Data tidak ditemukan
-            </div>
-          )}
+        {loading && (
+          <div className="p-5 text-center text-gray-500">
+            Memuat data...
+          </div>
+        )}
 
-          {filteredData.map((x, index) => (
+        {!loading && filteredData.length === 0 && (
+          <div className="p-5 text-center text-gray-500">
+            Data tidak ditemukan
+          </div>
+        )}
+
+        {!loading &&
+          filteredData.map((x, index) => (
             <div
               key={x.id}
               className="grid grid-cols-8 border-t p-3 items-center hover:bg-gray-50"
             >
-              {/* NOMOR */}
               <div className="text-center font-semibold text-gray-600">
                 {index + 1}
               </div>
 
-              <div className="font-medium text-blue-700">{x.nama}</div>
-              <div>{x.ket || x.kelas || "-"}</div>
+              <div className="font-medium text-blue-700">
+                {x.nama || "-"}
+              </div>
+
+              <div>{getKeterangan(x)}</div>
+
               <div>{x.alamat || "-"}</div>
               <div>{x.hp || "-"}</div>
 
@@ -164,7 +211,6 @@ export default function Masterdata() {
                 {x.nomorUnik || "-"}
               </div>
 
-              {/* AKSI */}
               <div className="flex gap-2 justify-center col-span-2">
                 <button
                   onClick={() => handleEdit(x.id)}
@@ -184,7 +230,6 @@ export default function Masterdata() {
               </div>
             </div>
           ))}
-        </div>
       </div>
     </div>
   );

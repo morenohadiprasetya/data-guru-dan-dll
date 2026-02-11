@@ -15,7 +15,7 @@ export default function TambahTagihan() {
 
   const API = {
     tagihan: "http://localhost:8080/api/tagihan",
-    siswa: "http://localhost:8080/api/siswa",
+    siswa: "http://localhost:8080/siswa",
     kategori: "http://localhost:8080/api/kategori-tagihan",
   };
 

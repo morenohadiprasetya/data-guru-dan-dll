@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 /* =========================================================
    API
 ========================================================= */
-const API_PRESENSI = "http://localhost:5000/presensi";
+const API_PRESENSI = "http://localhost:8080/presensi";
 
 /* =========================================================
    HELPER WIB

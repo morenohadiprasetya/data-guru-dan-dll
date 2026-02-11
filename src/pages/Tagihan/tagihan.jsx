@@ -5,22 +5,34 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faTrash, faFolderOpen } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 
-const API = "http://localhost:8080/api/tagihan";
+const API_TAGIHAN = "http://localhost:8080/api/tagihan";
+const API_KATEGORI = "http://localhost:8080/api/kategori-tagihan";
 
-export default function Masterdata() {
+export default function Tagihan() {
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
-  // =========================
-  // FETCH DATA SQL
-  // =========================
   const fetchData = async () => {
     try {
-      const res = await axios.get(API);
-      setData(res.data || []);
-    } catch {
-      Swal.fire("Error", "Gagal mengambil data tagihan", "error");
+      // ambil semua tagihan
+      const tagihanRes = await axios.get(API_TAGIHAN);
+      const tagihanData = tagihanRes.data || [];
+
+      // ambil semua kategori
+      const kategoriRes = await axios.get(API_KATEGORI);
+      const kategoriData = kategoriRes.data || [];
+
+      // mapping kategori ke tagihan
+      const mappedData = tagihanData.map((t) => {
+        const k = kategoriData.find((k) => k.nama === t.kategori);
+        return { ...t, kategori: k ? k.nama : t.kategori || "-" };
+      });
+
+      setData(mappedData);
+    } catch (err) {
+      Swal.fire("Error", "Gagal mengambil data tagihan atau kategori", "error");
+      console.error(err);
     }
   };
 
@@ -35,7 +47,6 @@ export default function Masterdata() {
     const q = search.toLowerCase();
     return (
       x.nama?.toLowerCase().includes(q) ||
-      x.kelas?.toLowerCase().includes(q) ||
       x.bulan?.toLowerCase().includes(q) ||
       x.status?.toLowerCase().includes(q) ||
       x.kategori?.toLowerCase().includes(q)
@@ -55,7 +66,7 @@ export default function Masterdata() {
     }).then(async (res) => {
       if (res.isConfirmed) {
         try {
-          await axios.delete(`${API}/${id}`);
+          await axios.delete(`${API_TAGIHAN}/${id}`);
           Swal.fire("Berhasil", "Data terhapus", "success");
           fetchData();
         } catch {
@@ -93,7 +104,7 @@ export default function Masterdata() {
       <div className="mb-4">
         <input
           className="w-96 p-3 rounded-xl bg-gray-100 border shadow-sm"
-          placeholder="🔍 Cari nama, kelas, bulan, status, kategori..."
+          placeholder="🔍 Cari nama, bulan, status, kategori..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -101,15 +112,15 @@ export default function Masterdata() {
 
       {/* TABLE */}
       <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
-        <div className="w-full bg-blue-600 text-white font-semibold p-3 grid grid-cols-9">
+        <div className="w-full bg-blue-600 text-white font-semibold p-3 grid grid-cols-10">
           <div className="text-center">No</div>
           <div>Nama</div>
-          <div>Kelas</div>
           <div>Bulan</div>
           <div>Jumlah</div>
           <div>Dibayar</div>
           <div>Sisa</div>
           <div>Status</div>
+          <div>Kategori</div> {/* kolom kategori ditambahkan */}
           <div className="text-center">Aksi</div>
         </div>
 
@@ -122,11 +133,10 @@ export default function Masterdata() {
         {filteredData.map((x, i) => (
           <div
             key={x.no}
-            className="grid grid-cols-9 border-t p-3 items-center hover:bg-gray-50"
+            className="grid grid-cols-10 border-t p-3 items-center hover:bg-gray-50"
           >
             <div className="text-center font-semibold">{i + 1}</div>
             <div className="text-blue-700 font-medium">{x.nama}</div>
-            <div>{x.kelas}</div>
             <div>{x.bulan}</div>
             <div>Rp {Number(x.jumlah).toLocaleString("id-ID")}</div>
             <div>Rp {Number(x.dibayar || 0).toLocaleString("id-ID")}</div>
@@ -138,22 +148,23 @@ export default function Masterdata() {
             >
               {x.status}
             </div>
+            <div>{x.kategori}</div> {/* tampilkan kategori */}
+          <div className="flex gap-2 justify-center">
+  <button
+    onClick={() => navigate(`/EditTagihan/${x.no}`)} // langsung pakai navigate
+    className="bg-yellow-400 text-white px-3 py-2 rounded hover:bg-yellow-500"
+  >
+    <FontAwesomeIcon icon={faEdit} />
+  </button>
 
-            <div className="flex gap-2 justify-center">
-              <button
-                onClick={() => handleEdit(x.no)}
-                className="bg-yellow-400 text-white px-3 py-2 rounded hover:bg-yellow-500"
-              >
-                <FontAwesomeIcon icon={faEdit} />
-              </button>
+  <button
+    onClick={() => handleDelete(x.no)}
+    className="bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700"
+  >
+    <FontAwesomeIcon icon={faTrash} />
+  </button>
+</div>
 
-              <button
-                onClick={() => handleDelete(x.no)}
-                className="bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700"
-              >
-                <FontAwesomeIcon icon={faTrash} />
-              </button>
-            </div>
           </div>
         ))}
       </div>

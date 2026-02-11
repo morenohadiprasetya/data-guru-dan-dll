@@ -1,126 +1,127 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import "animate.css";
+import api from "../api/api";
+import "sweetalert2/dist/sweetalert2.min.css";
 import "remixicon/fonts/remixicon.css";
 
 function Login() {
-  const [formData, setFormData] = useState({
+  const navigate = useNavigate();
+
+  const [form, setForm] = useState({
     email: "",
     password: "",
   });
-  const [errors, setErrors] = useState({});
-  const navigate = useNavigate();
+
+  // 🔹 TAMBAHAN (tidak mengubah logic lama)
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const newErrors = {};
 
-    if (!formData.email) newErrors.email = "Email wajib diisi";
-    if (!formData.password) newErrors.password = "Password wajib diisi";
+    try {
+      const res = await api.post("/api/auth/login", form);
 
-    setErrors(newErrors);
+      localStorage.setItem("user", JSON.stringify(res.data));
 
-    if (Object.keys(newErrors).length === 0) {
-      Swal.fire({
-        title: "Login berhasil!",
-        icon: "success",
-        showConfirmButton: false,
-        timer: 1500,
-      });
-
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 1500);
+      Swal.fire("Login berhasil", `Welcome ${res.data.email}`, "success");
+      navigate("/dashboard");
+    } catch (err) {
+      Swal.fire(
+        "Login gagal",
+        err.response?.data?.message || "Server error",
+        "error"
+      );
     }
   };
 
-  const handleDirectToWeb = () => {
-    navigate("/dashboard");
-  };
-
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-100 to-blue-300 p-4">
-
-      {/* LOGIN CARD */}
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white/30 backdrop-blur-xl shadow-2xl border border-white/40 
-                 p-8 rounded-2xl w-full max-w-md animate__animated animate__fadeIn"
-      >
-
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-200 to-blue-400 px-4">
+      <div className="bg-white/30 backdrop-blur-xl border border-white/40 shadow-2xl p-8 rounded-2xl w-full max-w-sm">
+        
+        {/* ICON HEADER */}
         <div className="flex flex-col items-center mb-6">
-          <div className="bg-blue-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg mb-3">
-            <i className="ri-shield-user-line text-3xl"></i>
+          <div className="bg-blue-700 text-white w-16 h-16 rounded-full flex items-center justify-center shadow-lg mb-3">
+            <i className="ri-login-box-line text-3xl"></i>
           </div>
-          <h2 className="text-3xl font-bold text-blue-800">Login</h2>
+          <h1 className="text-3xl font-extrabold text-blue-800">Login</h1>
+          <p className="text-gray-700 mt-1">Masuk ke akun kamu</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+
+          {/* EMAIL */}
+          <div>
+            <label className="font-medium text-gray-900">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              placeholder="Masukkan email"
+              className="w-full mt-1 p-3 rounded-xl border border-gray-300 bg-white/60
+                         focus:ring-2 focus:ring-blue-500 outline-none shadow-sm"
+              required
+            />
+          </div>
+
+          {/* PASSWORD + ICON MATA */}
+          <div className="relative">
+            <label className="font-medium text-gray-900">Password</label>
+
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              placeholder="Masukkan password"
+              className="w-full mt-1 p-3 pr-12 rounded-xl border border-gray-300 bg-white/60
+                         focus:ring-2 focus:ring-blue-500 outline-none shadow-sm"
+              required
+            />
+
+            {/* ICON EYE */}
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-11 text-gray-600 hover:text-blue-700"
+            >
+              <i
+                className={
+                  showPassword
+                    ? "ri-eye-off-line text-xl"
+                    : "ri-eye-line text-xl"
+                }
+              ></i>
+            </button>
+          </div>
+
+          {/* BUTTON LOGIN */}
           <button
-            type="button"
-            onClick={handleDirectToWeb}
-            className=" "
-          >          <p className="text-gray-700 mt-1">Silakan masuk untuk melanjutkan</p>
-
-
+            type="submit"
+            className="w-full py-3 bg-blue-700 text-white font-semibold rounded shadow-md
+                       hover:bg-blue-800 transition"
+          >
+            Login
           </button>
-        </div>
 
-        {/* EMAIL */}
-        <div className="mb-4">
-          <label className="block mb-1 font-medium text-gray-900">Email</label>
-          <input
-            type="email"
-            name="email"
-            className="w-full border rounded-lg px-3 py-2 bg-white/60 focus:ring-2 focus:ring-blue-500 outline-none"
-            value={formData.email}
-            onChange={handleChange}
-          />
-          {errors.email && (
-            <p className="text-red-500 text-sm">{errors.email}</p>
-          )}
-        </div>
-
-        {/* PASSWORD */}
-        <div className="mb-4">
-          <label className="block mb-1 font-medium text-gray-900">Password</label>
-          <input
-            type="password"
-            name="password"
-            className="w-full border rounded-lg px-3 py-2 bg-white/60 focus:ring-2 focus:ring-blue-500 outline-none"
-            value={formData.password}
-            onChange={handleChange}
-          />
-          {errors.password && (
-            <p className="text-red-500 text-sm">{errors.password}</p>
-          )}
-        </div>
-
-        {/* BUTTON LOGIN */}
-        <button
-          type="submit"
-          className="w-full bg-blue-700 text-white py-2 rounded-lg hover:bg-blue-800 
-                     transition-all duration-200 shadow-md"
-        >
-          Login
-        </button>
-
-        {/* REGISTER LINK */}
-        <div className="text-center mt-6">
-          <p className="text-gray-800">
+          {/* REGISTER LINK */}
+          <p className="text-center text-gray-800 text-sm mt-4">
             Belum punya akun?{" "}
             <button
               type="button"
               onClick={() => navigate("/register")}
               className="text-blue-700 font-semibold hover:underline"
             >
-              Daftar
+              Register
             </button>
           </p>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }
